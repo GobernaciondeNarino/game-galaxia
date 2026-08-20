@@ -34,11 +34,15 @@ API de Three.js (`SceneManager.js`, `CameraRig.js`); el resto, en español.
    se destruye con `dispose()` al cambiar de vista.
 9. **Nunca ejecutar la inferencia de manos dentro del bucle de render.**
 10. **Respetar `prefers-reduced-motion`** en cualquier animación nueva.
+11. **Contraste AA como mínimo.** `node tools/contraste.mjs` no puede fallar.
+    `--texto-decorativo` es la única ficha por debajo del umbral y solo vale
+    para elementos ornamentales que no transmiten información.
 
 ## Comprobaciones antes de dar por buena una fase
 
 ```bash
 bash tools/comprobar-secretos.sh           # credenciales en el cliente
+node tools/contraste.mjs                   # contraste WCAG 2.1 AA
 node tools/csp-hash.mjs --verificar        # hash CSP del importmap al día
 find api config -name '*.php' -exec php -l {} \;
 php -S localhost:8080                      # y abrir http://localhost:8080
@@ -54,4 +58,4 @@ para cualquier decisión de diseño de la HUD.
 
 ## Estado
 
-Fase 0 completada. Ver el plan de fases en `README.md`.
+Fases 0 a 4 completadas. Ver el plan de fases en `README.md`.

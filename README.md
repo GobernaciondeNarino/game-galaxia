@@ -5,10 +5,12 @@ Interfaz holográfica e inmersiva del Sistema Solar completo, con navegación po
 íntegramente en el navegador y se despliega como estáticos sobre Apache: **sin
 paso de compilación, sin Node.js en producción y sin procesos en segundo plano**.
 
-> **Estado: fases 0, 1 y 2 completadas.** Hay escena tridimensional navegable
-> con el Sol, los ocho planetas, cinco planetas enanos, diecinueve satélites,
-> anillos, cinturones y entorno galáctico, sobre un catálogo cuyas cifras
-> proceden de JPL Horizons. La HUD llega en la fase 3.
+> **Estado: fases 0 a 4 completadas.** Escena tridimensional navegable con el
+> Sol, los ocho planetas, cinco planetas enanos, diecinueve satélites, anillos,
+> cinturones y entorno galáctico; catálogo cuyas cifras proceden de JPL
+> Horizons; y HUD completa en DOM con sus dos vistas, transición interrumpible,
+> anotaciones ancladas a la superficie y arco de datos. Quedan la narración con
+> ElevenLabs (fase 5), los gestos (fase 6) y la voz (fase 7).
 > Consulta el [plan de fases](#plan-de-fases).
 
 ---
@@ -82,7 +84,8 @@ config/             secrets.example.php (la copia real nunca se versiona)
 cache/audio/        MP3 generados, con nombre por hash
 vendor/             Three.js y MediaPipe, versión fijada
 tools/              vendor.mjs · texturas.mjs · datos-jpl.mjs
-                    construir-datos.mjs · csp-hash.mjs · comprobar-secretos.sh
+                    construir-datos.mjs · contraste.mjs · csp-hash.mjs
+                    comprobar-secretos.sh
 docs/               Despliegue, gestos y comandos, notas técnicas
 ```
 
@@ -127,6 +130,12 @@ interfaz lo muestra como `SIN DATOS`. Ver `docs/DATOS.md`.
 Kepler con sus seis elementos orbitales referidos a J2000. Si el reloj de la
 escena marca una fecha, los planetas están donde estaban ese día — no en una
 fase decorativa.
+
+**Accesibilidad comprobada, no supuesta.** `tools/contraste.mjs` calcula la
+relación de contraste WCAG de cada pareja texto/fondo de las fichas de diseño y
+falla el *push* si alguna baja de 4,5:1. En una interfaz oscura con paneles
+translúcidos es facilísimo dejar texto a 2,7:1 que se lee bien en el monitor de
+quien lo programó; de hecho pasó, y el verificador lo cazó.
 
 **Estado en memoria, nunca en `localStorage`.** Las preferencias
 (`js/utils/storage.js`) duran lo que dure la pestaña. No se deja rastro en el
@@ -185,8 +194,8 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 | 0 | Estructura, `index.html` con importmap, `.htaccess`, `api/health.php`, documentación inicial | ✅ Completada |
 | 1 | Escena Three.js: Sol, ocho planetas, órbitas, skybox, controles de ratón, bloom | ✅ Completada |
 | 2 | `sistema-solar.json` con datos verificados, satélites, anillos y cinturón de asteroides | ✅ Completada |
-| 3 | HUD en DOM: elementos persistentes, `VISTA DE SISTEMA`, gráficos y tira de navegación | Pendiente |
-| 4 | `VISTA DE CUERPO`, transición interrumpible, `CameraRig`, anotaciones y arco de datos | Pendiente |
+| 3 | HUD en DOM: elementos persistentes, `VISTA DE SISTEMA`, gráficos y tira de navegación | ✅ Completada |
+| 4 | `VISTA DE CUERPO`, transición interrumpible, `CameraRig`, anotaciones y arco de datos | ✅ Completada |
 | 5 | `api/tts.php` con caché y límite de peticiones; `Narrator.js` con subtítulos | Pendiente |
 | 6 | Control por manos con MediaPipe y todos los gestos | Pendiente |
 | 7 | Control por voz con parser de intenciones y alternativa vía `stt.php` | Pendiente |

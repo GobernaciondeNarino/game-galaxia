@@ -31,7 +31,9 @@
   #hud-proyeccion-orbital { display: none; }   /* Decorativo: se sacrifica primero. */
 }
 
-/* Tabletas: el panel izquierdo se convierte en una tira superior. */
+/* Tabletas: el panel izquierdo se convierte en una tira superior y la barra
+   deja de repartirse en tres columnas —sus anchos mínimos sumaban más que la
+   pantalla y desbordaban la rejilla entera—. */
 @media (max-width: 1024px) {
   #hud {
     grid-template-columns: 1fr;
@@ -43,16 +45,74 @@
       "derecha"
       "inferior";
   }
-  #hud-estado-entradas { bottom: 92px; width: 150px; }
+  #hud-barra-superior { flex-wrap: wrap; }
+  .barra {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "identidad derecha"
+      "centro    centro";
+    gap: var(--e-2);
+  }
+  .barra__identidad { grid-area: identidad; }
+  .barra__centro    { grid-area: centro; text-align: left; }
+  .barra__derecha   { grid-area: derecha; }
+  .arco { display: none; }
+  #hud-estado-entradas { display: none; }
 }
 
-/* Móvil: solo lo imprescindible — escena, perfil del cuerpo y navegación. */
+/* Móvil: solo lo imprescindible — escena, perfil del cuerpo y navegación.
+   El resto de paneles se retiran; sus datos siguen accesibles al girar el
+   dispositivo o en una pantalla mayor. */
 @media (max-width: 720px) {
   :root { --corte: 6px; }
-  #hud { padding: var(--e-2); gap: var(--e-2); }
-  #hud-panel-derecho   { display: none; }
+
+  #hud {
+    padding: var(--e-2);
+    gap: var(--e-2);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "superior"
+      "izquierda"
+      "inferior";
+  }
+
+  #hud-panel-derecho,
+  #hud-viewport,
+  #hud-proyeccion-orbital,
   #hud-estado-entradas { display: none; }
-  #hud-subtitulos      { width: 92vw; bottom: 96px; }
+
+  #hud-panel-izquierdo { overflow-y: auto; align-content: start; }
+  #hud-subtitulos      { width: 92vw; bottom: 118px; }
+
+  /* Barra superior compacta: marca, estado y controles. El reloj de misión y
+     las pestañas de módulo no caben y no son imprescindibles. */
+  #hud-barra-superior { flex-direction: column; gap: var(--e-2); }
+  .barra {
+    grid-template-columns: 1fr;
+    grid-template-areas: "identidad" "derecha";
+    padding: var(--e-2);
+  }
+  .barra__modulos,
+  .barra__tiempos,
+  .barra__centro { display: none; }
+  .barra__derecha { justify-items: start; }
+  .barra__marca { font-size: 1.05rem; letter-spacing: 0.22em; }
+
+  .controles { width: 100%; justify-content: space-between; padding: var(--e-2); }
+  .controles__valor { min-width: 4em; }
+
+  /* El perfil pasa a dos columnas de fichas: en vertical, doce filas de una
+     sola línea obligan a desplazarse demasiado. */
+  .perfil__lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px var(--e-3);
+  }
+  .perfil__nombre { font-size: 1.25rem; }
+
+  .navegacion__flecha { display: none; }   /* Se desplaza con el dedo. */
+  .miniatura { width: 54px; }
+  .miniatura__disco { width: 28px; height: 28px; }
 
   /* En una columna estrecha, la nota de cada chequeo baja bajo su etiqueta
      en lugar de competir por el mismo renglón. */
@@ -65,6 +125,11 @@
   }
 }
 
+/* Nada de la HUD puede empujar la rejilla más allá de la ventana. Es la red de
+   seguridad que evita que un panel con una cifra larga desborde la pantalla. */
+#hud, #hud > * { min-width: 0; }
+.panel { max-width: 100%; }
+
 /* Pantallas muy bajas (portátiles 768 px de alto en horizontal). */
 @media (max-height: 720px) {
   #hud-proyeccion-orbital { display: none; }
@@ -73,4 +138,18 @@
 /* Impresión: la interfaz no está pensada para papel. */
 @media print {
   #lienzo, #hud, #arranque { display: none !important; }
+}
+
+/* Las anotaciones de superficie llevan nombres largos («División de Cassini»)
+   que en vertical se salen de la pantalla. Se les permite partir en dos líneas
+   y se limita su ancho; el anillo en el que se colocan ya es proporcional al
+   lado menor de la ventana. */
+@media (max-width: 720px) {
+  .anotacion {
+    max-width: 40vw;
+    white-space: normal;
+    line-height: 1.3;
+    letter-spacing: 0.08em;
+  }
+  .anotaciones__aviso { bottom: 148px; font-size: 9px; }
 }

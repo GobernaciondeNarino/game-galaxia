@@ -1,7 +1,9 @@
 /* ==========================================================================
-   ORBIS — HUD: rejilla de zonas persistentes y estilo base de los paneles.
-   En la fase 0 solo se define la maquetación; los paneles con contenido se
-   construyen en la fase 3 (js/ui/panels/).
+   ORBIS — HUD: rejilla de zonas persistentes y estilo de los paneles.
+
+   La rejilla se define una sola vez y no cambia al alternar entre VISTA DE
+   SISTEMA y VISTA DE CUERPO: solo cambia el contenido del viewport central.
+   Por eso los paneles laterales no parpadean en la transición.
    ========================================================================== */
 
 #hud {
@@ -12,58 +14,67 @@
   padding: var(--e-3);
   gap: var(--e-3);
 
-  /* Rejilla persistente. Solo cambia el contenido de #hud-viewport al
-     alternar entre VISTA DE SISTEMA y VISTA DE CUERPO: los paneles laterales
-     y las barras no se recrean nunca, por eso no parpadean. */
-  grid-template-columns: minmax(200px, 250px) 1fr minmax(210px, 270px);
+  grid-template-columns: minmax(210px, 268px) 1fr minmax(220px, 286px);
   grid-template-rows: auto 1fr auto;
   grid-template-areas:
     "superior superior superior"
     "izquierda viewport derecha"
     "inferior  inferior inferior";
 
-  /* La HUD deja pasar el ratón al lienzo salvo en los paneles. */
+  /* La HUD deja pasar el ratón al lienzo salvo en los propios paneles. */
   pointer-events: none;
 }
 
-#hud > * { pointer-events: auto; }
+#hud > *, .panel, .navegacion__pestana { pointer-events: auto; }
 
-#hud-barra-superior          { grid-area: superior; }
-#hud-panel-izquierdo         { grid-area: izquierda; }
-#hud-viewport                { grid-area: viewport;  pointer-events: none; }
-#hud-panel-derecho           { grid-area: derecha; }
-#hud-navegacion-planetaria   { grid-area: inferior; }
+#hud-barra-superior {
+  grid-area: superior;
+  display: flex;
+  gap: var(--e-3);
+  align-items: flex-start;
+  pointer-events: none;
+}
+#hud-panel-izquierdo  { grid-area: izquierda; display: grid; align-content: start; gap: var(--e-3); }
+#hud-viewport         { grid-area: viewport; display: grid; place-items: center; pointer-events: none; }
+#hud-panel-derecho    { grid-area: derecha; display: grid; align-content: start; gap: var(--e-3); overflow-y: auto; }
+#hud-navegacion-planetaria { grid-area: inferior; }
 
-/* Elementos que flotan por encima de la rejilla */
 #hud-proyeccion-orbital {
   position: fixed;
   left: var(--e-3);
-  bottom: 108px;
-  width: clamp(180px, 17vw, 260px);
-  aspect-ratio: 1;
+  bottom: 132px;
+  width: clamp(150px, 14vw, 200px);
   pointer-events: none;
 }
 
+/* Contenedor reservado para la fase 6: la vista previa de la cámara con el
+   esqueleto de la mano, que sí flota sobre la escena. El panel de entradas
+   vive dentro de la columna derecha. */
 #hud-estado-entradas {
   position: fixed;
   right: var(--e-3);
-  bottom: 108px;
-  width: clamp(160px, 15vw, 220px);
+  bottom: 132px;
+  width: clamp(170px, 15vw, 216px);
+  pointer-events: none;
 }
 
 #hud-subtitulos {
   position: fixed;
   left: 50%;
-  bottom: 118px;
+  bottom: 142px;
   transform: translateX(-50%);
   width: min(760px, 72vw);
   text-align: center;
   pointer-events: none;
 }
 
+/* Barras de desplazamiento discretas dentro de los paneles. */
+#hud-panel-derecho::-webkit-scrollbar { width: 6px; }
+#hud-panel-derecho::-webkit-scrollbar-thumb { background: var(--panel-borde); }
+#hud-panel-derecho { scrollbar-width: thin; scrollbar-color: var(--panel-borde) transparent; }
+
 /* --------------------------------------------------------------------------
-   Panel: la pieza visual básica de toda la interfaz.
-   Borde fino luminoso, fondo translúcido y esquinas recortadas en diagonal.
+   Panel: la pieza visual básica.
    -------------------------------------------------------------------------- */
 .panel {
   position: relative;
@@ -77,14 +88,40 @@
   box-shadow: inset 0 0 24px rgba(26, 82, 118, 0.28);
 }
 
+/* Filo luminoso superior: el detalle que hace que un rectángulo parezca una
+   pieza de interfaz y no un div. */
+.panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--corte);
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cian-brillante), transparent 65%);
+  opacity: 0.75;
+}
+
+.panel[data-estado="sin-datos"] { opacity: 0.62; }
+
+.panel__cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-2);
+  margin-bottom: var(--e-2);
+}
+
 .panel__titulo {
   font-family: var(--fuente-titulos);
   font-weight: 500;
   font-size: var(--t-micro);
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--cian-acento);
 }
+.panel__titulo--menor { margin-top: var(--e-2); font-size: 9px; }
+
+.panel__contenido { display: grid; gap: var(--e-2); }
 
 .panel__cifra {
   font-family: var(--fuente-cifras);
@@ -92,19 +129,693 @@
   color: var(--texto);
 }
 
+/* Las notas se recortan a tres líneas: el texto completo sigue disponible en
+   el atributo title y en la VISTA DE CUERPO. Sin el recorte, la columna
+   derecha desborda la pantalla en cuanto un cuerpo tiene mucha bibliografía. */
+.panel__nota {
+  font-size: var(--t-menor);
+  line-height: 1.5;
+  color: var(--texto-apagado);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.panel__fuente {
+  font-size: 9px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  letter-spacing: 0.04em;
+  color: var(--texto-apagado);
+  opacity: 0.85;
+}
+
+.panel__pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  align-items: baseline;
+  font-size: var(--t-menor);
+  color: var(--texto-apagado);
+}
+
 /* Un dato ausente se declara, nunca se inventa. */
 .sin-datos {
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
   color: var(--texto-apagado);
-  font-style: normal;
-  letter-spacing: 0.1em;
 }
 .sin-datos::after { content: "SIN DATOS"; }
 
-/* Gráfico decorativo: se etiqueta como tal para no confundirlo con un dato. */
+/* Elemento decorativo: se etiqueta para no confundirlo con una medida. */
 .marca-simulacion {
+  flex: none;
+  padding: 1px 5px;
+  border: 1px solid rgba(232, 160, 32, 0.55);
   font-family: var(--fuente-cifras);
-  font-size: var(--t-micro);
+  font-size: 9px;
   letter-spacing: 0.14em;
   color: var(--ambar-seleccion);
-  opacity: 0.72;
+}
+
+.grafico-vacio {
+  display: grid;
+  gap: 2px;
+  padding: var(--e-3) 0;
+  text-align: center;
+}
+.grafico-vacio__nota {
+  font-size: var(--t-menor);
+  color: var(--texto-apagado);
+}
+
+/* ==========================================================================
+   Barra superior
+   ========================================================================== */
+.barra {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto minmax(200px, 1fr);
+  align-items: start;
+  gap: var(--e-4);
+  pointer-events: auto;
+}
+
+.barra__marca {
+  font-family: var(--fuente-titulos);
+  font-weight: 600;
+  font-size: 1.35rem;
+  letter-spacing: 0.3em;
+  line-height: 1;
+  color: var(--cian-brillante);
+  text-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+}
+.barra__version {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+}
+
+.barra__modulos { display: flex; flex-wrap: wrap; gap: var(--e-1); margin-top: var(--e-2); }
+.barra__modulo {
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+  transition: color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+}
+.barra__modulo:hover:not(:disabled) { color: var(--texto); border-color: var(--panel-borde); }
+.barra__modulo[aria-pressed="true"] {
+  color: var(--cian-brillante);
+  border-color: var(--panel-borde-vivo);
+}
+.barra__modulo:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.barra__centro { text-align: center; }
+.barra__titulo-central {
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-mayor);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--texto);
+}
+.barra__subtitulo {
+  font-size: var(--t-menor);
+  letter-spacing: 0.08em;
+  color: var(--texto-tenue);
+}
+
+.barra__derecha { display: grid; justify-items: end; gap: var(--e-2); }
+.barra__tiempos {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2px var(--e-2);
+  align-items: baseline;
+}
+.barra__rotulo {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+  text-align: right;
+}
+.barra__reloj, .barra__fecha { font-size: var(--t-menor); }
+
+.barra__indicadores { display: flex; gap: var(--e-2); }
+.indicador {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: 1px solid var(--panel-borde);
+  font-family: var(--fuente-cifras);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--texto-apagado);
+}
+.indicador__etiqueta { text-transform: uppercase; }
+.indicador[data-estado="activo"]   { color: var(--verde-estado); border-color: rgba(58, 170, 53, 0.55); }
+.indicador[data-estado="aviso"]    { color: var(--ambar-seleccion); border-color: rgba(232, 160, 32, 0.55); }
+.indicador[data-estado="alerta"]   { color: var(--rojo-alerta); border-color: rgba(255, 82, 82, 0.6); }
+
+/* Controles de escena, a la derecha de la barra */
+.controles {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2);
+  padding: var(--e-2) var(--e-3);
+}
+.controles__grupo { display: flex; align-items: center; gap: 4px; }
+.controles__boton {
+  padding: 4px 10px;
+  border: 1px solid var(--panel-borde);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  transition: color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+}
+.controles__boton:hover { color: var(--cian-brillante); border-color: var(--panel-borde-vivo); }
+.controles__boton--icono { padding: 4px 7px; font-size: 9px; }
+.controles__valor { min-width: 5.5em; font-size: var(--t-micro); text-align: center; }
+.controles__interruptor {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  cursor: pointer;
+}
+.controles__interruptor input { accent-color: var(--cian-brillante); }
+
+/* ==========================================================================
+   Panel izquierdo — Perfil del cuerpo
+   ========================================================================== */
+.perfil__nombre {
+  margin-top: var(--e-1);
+  font-family: var(--fuente-titulos);
+  font-weight: 500;
+  font-size: 1.5rem;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  color: var(--texto);
+}
+.perfil__tipo {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ambar-seleccion);
+}
+
+.perfil__lista {
+  display: grid;
+  gap: 1px;
+  margin-top: var(--e-3);
+}
+.perfil__fila {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--e-2);
+  align-items: baseline;
+  padding: 3px 4px;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.12);
+}
+.perfil__fila:hover { background: rgba(79, 195, 247, 0.07); }
+.perfil__fila[data-estado="sin-datos"] { opacity: 0.7; }
+.perfil__etiqueta {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+}
+.perfil__valor { font-size: var(--t-menor); text-align: right; }
+.perfil__unidad {
+  margin-left: 0.35em;
+  font-size: 9px;
+  color: var(--texto-apagado);
+}
+.perfil__fuente {
+  margin-top: var(--e-2);
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--texto-apagado);
+}
+
+/* ==========================================================================
+   Gráficos
+   ========================================================================== */
+.barras { display: grid; gap: 3px; }
+.barras__fila {
+  display: grid;
+  grid-template-columns: 3.2em 1fr 4.2em;
+  gap: var(--e-2);
+  align-items: center;
+}
+.barras__etiqueta {
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  color: var(--texto-tenue);
+}
+.barras__pista { height: 7px; background: rgba(79, 195, 247, 0.14); }
+.barras__relleno {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--azul-primario), var(--cian-brillante));
+  transition: width var(--dur-media) var(--curva);
+}
+.barras__valor { font-size: var(--t-micro); text-align: right; }
+
+.traza, .onda { width: 100%; height: auto; }
+.traza__eje, .onda__eje { stroke: rgba(79, 195, 247, 0.22); stroke-width: 1; }
+.traza__linea {
+  fill: none;
+  stroke: var(--cian-acento);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+}
+.onda__linea {
+  fill: none;
+  stroke: var(--cian-brillante);
+  stroke-width: 1.3;
+}
+
+.estado-linea {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  font-size: var(--t-menor);
+}
+.estado-pastilla {
+  padding: 1px 7px;
+  border: 1px solid currentColor;
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.estado-pastilla[data-estado="activa"]   { color: var(--verde-estado); }
+.estado-pastilla[data-estado="residual"] { color: var(--ambar-seleccion); }
+.estado-pastilla[data-estado="inactiva"] { color: var(--texto-apagado); }
+.estado-pastilla[data-estado="sin-superficie"] { color: var(--texto-apagado); }
+
+.dial { display: grid; justify-items: center; gap: 2px; }
+.dial__svg { width: 92px; height: 92px; }
+.dial__pista { fill: none; stroke: rgba(79, 195, 247, 0.18); stroke-width: 6; stroke-linecap: butt; }
+.dial__valor {
+  fill: none;
+  stroke: var(--cian-brillante);
+  stroke-width: 6;
+  stroke-linecap: butt;
+  transition: stroke-dasharray var(--dur-media) var(--curva);
+}
+.dial__pie { display: grid; justify-items: center; margin-top: -34px; }
+.dial__cifra { font-size: var(--t-base); }
+.dial__unidad, .dial__etiqueta {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+}
+.dial__etiqueta { margin-top: 26px; }
+
+.asignacion { display: grid; gap: 3px; }
+.asignacion__fila {
+  display: grid;
+  grid-template-columns: 5em 1fr 5.4em;
+  gap: var(--e-2);
+  align-items: center;
+}
+.asignacion__etiqueta {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+}
+.asignacion__pista { height: 5px; background: rgba(232, 160, 32, 0.16); }
+.asignacion__relleno { display: block; height: 100%; background: var(--ambar-seleccion); }
+.asignacion__valor { font-size: 9px; text-align: right; }
+
+.minilinea { width: 100%; height: auto; }
+.minilinea__linea { fill: none; stroke: var(--cian-acento); stroke-width: 1.2; }
+
+/* Mapa orbital */
+.mapa__svg { width: 100%; height: auto; max-height: 160px; }
+.mapa__orbita { fill: none; stroke: rgba(79, 195, 247, 0.3); stroke-width: 0.7; }
+.mapa__central { fill: currentColor; opacity: 0.92; }
+.mapa__satelite { fill: var(--cian-brillante); cursor: pointer; }
+.mapa__satelite:hover, .mapa__satelite:focus-visible { fill: var(--ambar-seleccion); r: 5; }
+
+/* ==========================================================================
+   Panel galáctico (viewport central de la VISTA DE SISTEMA)
+   ========================================================================== */
+.galaxia {
+  width: min(100%, 640px);
+  transition: opacity var(--dur-transicion-vista) var(--curva),
+              transform var(--dur-transicion-vista) var(--curva),
+              clip-path var(--dur-transicion-vista) var(--curva);
+}
+/* Retirada por barrido, sin destruir el panel. */
+.galaxia[data-oculto="si"] {
+  opacity: 0;
+  transform: translateX(14%) scale(0.96);
+  pointer-events: none;
+  clip-path: inset(0 0 0 100%);
+}
+.galaxia__svg { width: 100%; height: auto; }
+.galaxia__disco { fill: rgba(26, 82, 118, 0.10); stroke: rgba(79, 195, 247, 0.16); stroke-width: 0.6; }
+.galaxia__brazo { fill: none; stroke: rgba(127, 178, 255, 0.5); stroke-width: 5; stroke-linecap: round; opacity: 0.45; }
+.galaxia__polvo { fill: #cfe6ff; }
+.galaxia__bulbo { fill: rgba(255, 217, 160, 0.55); }
+.galaxia__halo-sol { fill: rgba(0, 229, 255, 0.14); }
+.galaxia__sol { fill: var(--cian-brillante); }
+.galaxia__guia { stroke: var(--cian-brillante); stroke-width: 0.8; opacity: 0.75; }
+.galaxia__etiqueta {
+  fill: var(--cian-brillante);
+  font-family: var(--fuente-titulos);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+.galaxia__datos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--e-3);
+  margin-top: var(--e-2);
+  padding-top: var(--e-2);
+  border-top: 1px solid rgba(79, 195, 247, 0.2);
+}
+.galaxia__dato { display: grid; gap: 2px; }
+.galaxia__valor { font-size: var(--t-base); }
+.galaxia__nota { font-size: 9px; line-height: 1.45; color: var(--texto-apagado); }
+
+/* ==========================================================================
+   Proyección orbital
+   ========================================================================== */
+.proyeccion { display: grid; gap: 2px; }
+.proyeccion__svg { width: 100%; height: auto; }
+.proyeccion__anillo { fill: none; stroke: rgba(79, 195, 247, 0.22); stroke-width: 0.6; }
+.proyeccion__anillo--activo { stroke: var(--cian-brillante); stroke-width: 1.1; }
+.proyeccion__destacado { fill: none; stroke: rgba(232, 160, 32, 0.4); stroke-width: 0.8; stroke-dasharray: 3 4; }
+.proyeccion__sol { fill: var(--ambar-seleccion); }
+.proyeccion__marcador { fill: var(--ambar-seleccion); }
+.proyeccion__borde { fill: none; stroke: rgba(79, 195, 247, 0.16); stroke-width: 0.7; }
+.proyeccion__arco { fill: none; stroke: var(--cian-acento); stroke-width: 1.2; opacity: 0.55; }
+.proyeccion__reticula { transform-origin: center; animation: orbis-girar 42s linear infinite; }
+.proyeccion__pie {
+  display: flex;
+  gap: var(--e-2);
+  align-items: center;
+  font-size: 9px;
+  color: var(--texto-apagado);
+}
+
+/* ==========================================================================
+   Estado de las entradas
+   ========================================================================== */
+.panel--entradas { display: grid; gap: var(--e-2); }
+.entradas__vista { position: relative; aspect-ratio: 4 / 3; background: #04070d; }
+.entradas__video, .entradas__esqueleto { position: absolute; inset: 0; width: 100%; height: 100%; }
+.entradas__boton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid var(--panel-borde);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+.entradas__boton:hover { color: var(--cian-brillante); border-color: var(--panel-borde-vivo); }
+.entradas__boton[aria-pressed="true"] { color: var(--verde-estado); border-color: rgba(58, 170, 53, 0.6); }
+.entradas__aviso { font-size: 9px; line-height: 1.5; color: var(--texto-apagado); }
+.entradas__aviso strong { color: var(--texto-tenue); }
+.entradas__comando {
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  color: var(--cian-acento);
+}
+
+/* ==========================================================================
+   Navegación planetaria
+   ========================================================================== */
+.navegacion { display: grid; gap: var(--e-2); }
+.navegacion__cabecera { display: flex; align-items: center; justify-content: space-between; }
+.navegacion__cerrar {
+  width: 22px; height: 22px;
+  border: 1px solid var(--panel-borde);
+  font-size: var(--t-base);
+  line-height: 1;
+  color: var(--texto-tenue);
+}
+.navegacion__cerrar:hover { color: var(--rojo-alerta); border-color: rgba(255, 82, 82, 0.6); }
+
+.navegacion__cuerpo { display: grid; grid-template-columns: auto 1fr auto; gap: var(--e-2); align-items: center; }
+.navegacion__flecha {
+  width: 26px; height: 54px;
+  border: 1px solid var(--panel-borde);
+  font-size: var(--t-mayor);
+  color: var(--texto-tenue);
+}
+.navegacion__flecha:hover { color: var(--cian-brillante); border-color: var(--panel-borde-vivo); }
+
+.navegacion__tira {
+  display: flex;
+  gap: var(--e-2);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel-borde) transparent;
+  padding-bottom: 4px;
+}
+.navegacion__tira::-webkit-scrollbar { height: 5px; }
+.navegacion__tira::-webkit-scrollbar-thumb { background: var(--panel-borde); }
+.navegacion__elemento { flex: none; }
+
+.miniatura {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  width: 62px;
+  padding: 4px 2px;
+  border: 1px solid transparent;
+  transition: border-color var(--dur-corta) var(--curva), background var(--dur-corta) var(--curva);
+}
+.miniatura:hover { border-color: var(--panel-borde); background: rgba(79, 195, 247, 0.08); }
+.miniatura--activa {
+  border-color: var(--ambar-seleccion);
+  background: rgba(232, 160, 32, 0.12);
+}
+.miniatura__disco {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background-size: 200% 100%;
+  background-position: 30% 50%;
+  box-shadow: inset -6px -4px 10px rgba(0, 0, 0, 0.65);
+}
+.miniatura__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  text-align: center;
+  line-height: 1.25;
+}
+.miniatura--activa .miniatura__nombre { color: var(--ambar-seleccion); }
+.miniatura__marca {
+  position: absolute;
+  top: 2px; right: 2px;
+  font-family: var(--fuente-cifras);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ambar-seleccion);
+  opacity: 0.8;
+}
+
+.navegacion__pestana {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  padding: 4px 16px;
+  background: var(--panel-fondo);
+  border: 1px solid var(--panel-borde);
+  border-bottom: 0;
+  backdrop-filter: blur(var(--panel-desenfoque));
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+
+/* ==========================================================================
+   Estados de vista
+   ========================================================================== */
+/* En VISTA DE CUERPO el viewport central se libera para que se vea la escena. */
+body[data-vista="cuerpo"] #hud-viewport { pointer-events: none; }
+
+/* ==========================================================================
+   VISTA DE CUERPO — retícula, anotaciones y arco de datos
+   ========================================================================== */
+
+/* Retícula: SVG a tamaño de ventana, por encima del lienzo y por debajo de los
+   paneles. No recibe el ratón. */
+.reticula {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.reticula__anillo {
+  fill: none;
+  stroke: rgba(79, 195, 247, 0.34);
+  stroke-width: 1;
+}
+.reticula__anillo[data-indice="1"] {
+  stroke: rgba(79, 195, 247, 0.18);
+  stroke-dasharray: 2 9;
+}
+.reticula__aro {
+  fill: none;
+  stroke: rgba(0, 229, 255, 0.42);
+  stroke-width: 1.2;
+}
+.reticula__marcador { fill: var(--ambar-seleccion); }
+
+/* Anotaciones ancladas a coordenadas reales de la superficie */
+.anotaciones__lineas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+.anotacion__guia {
+  fill: none;
+  stroke: rgba(214, 238, 248, 0.55);
+  stroke-width: 1;
+}
+
+.anotaciones {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.anotacion {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 7px;
+  background: rgba(5, 11, 24, 0.7);
+  border: 1px solid rgba(79, 195, 247, 0.4);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto);
+  white-space: nowrap;
+  transition: opacity var(--dur-corta) var(--curva);
+}
+.anotacion[data-oculta="si"] { opacity: 0; }
+.anotacion[data-lado="izquierda"] { flex-direction: row-reverse; }
+.anotacion__punto {
+  width: 5px;
+  height: 5px;
+  background: var(--cian-brillante);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.8);
+}
+
+/* Arco de datos, a la izquierda del cuerpo */
+/* El arco se sitúa a la derecha del panel de perfil, no sobre él: la columna
+   izquierda mide hasta 268 px y el arco hasta 330, así que solaparlos dejaría
+   dos textos superpuestos e ilegibles. */
+.arco {
+  position: fixed;
+  left: clamp(296px, 19vw, 340px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  width: clamp(240px, 22vw, 330px);
+  max-height: 66vh;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity var(--dur-transicion-vista) var(--curva),
+              transform var(--dur-transicion-vista) var(--curva);
+}
+.arco[data-oculto="si"] {
+  opacity: 0;
+  transform: translateY(-50%) translateX(-28px);
+}
+.arco__cuerpo { display: grid; gap: 1px; }
+.arco__linea {
+  /* El desplazamiento por línea es lo que dibuja la curva del arco. */
+  transform: translateX(var(--desplazamiento, 0));
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--texto-tenue);
+  white-space: pre;
+  text-shadow: 0 0 8px rgba(5, 11, 24, 0.95);
+}
+.arco__linea[data-tipo="titulo"] {
+  color: var(--cian-brillante);
+  letter-spacing: 0.14em;
+}
+.arco__linea[data-completa="si"] { color: var(--texto-tenue); }
+
+/* En VISTA DE SISTEMA el arco no estorba */
+body[data-vista="sistema"] .arco { pointer-events: none; }
+
+@media (max-width: 1280px) {
+  .arco { display: none; }   /* Sin sitio: el perfil izquierdo ya da los datos. */
+}
+
+/* Aviso de anotaciones en la cara oculta */
+.anotaciones__aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 176px;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 3px 10px;
+  background: rgba(5, 11, 24, 0.72);
+  border: 1px solid rgba(232, 160, 32, 0.45);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ambar-seleccion);
+  pointer-events: none;
 }

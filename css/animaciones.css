@@ -42,3 +42,9 @@
   }
   .arranque__detalle::after { animation: none; opacity: 1; }
 }
+
+/* Giro lento de la retícula de la proyección orbital. Decorativo. */
+@keyframes orbis-girar {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

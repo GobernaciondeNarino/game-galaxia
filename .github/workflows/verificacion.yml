@@ -36,5 +36,8 @@ jobs:
       - name: Hashes CSP al día
         run: node tools/csp-hash.mjs --verificar
 
+      - name: Contraste de la interfaz (WCAG 2.1 AA)
+        run: node tools/contraste.mjs
+
       - name: Ningún secreto en los archivos servidos al navegador
         run: bash tools/comprobar-secretos.sh

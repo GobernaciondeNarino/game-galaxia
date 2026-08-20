@@ -4,9 +4,10 @@
  * Arranca la aplicación: diagnostica el entorno, carga el catálogo, construye
  * la escena tridimensional y pone en marcha el bucle de render.
  *
- * Fase 1 implementada: Sol, planetas, planetas enanos, satélites, anillos,
- * cinturones, entorno galáctico, órbitas keplerianas reales, post-procesado con
- * bloom y controles de ratón y teclado. La HUD completa llega en la fase 3.
+ * Fases 1 a 4 implementadas: escena tridimensional con órbitas keplerianas
+ * reales, HUD en DOM con paneles persistentes, y las dos vistas —VISTA DE
+ * SISTEMA y VISTA DE CUERPO— con transición interrumpible, anotaciones
+ * ancladas a la superficie y arco de datos.
  */
 
 import { App } from './core/App.js';
@@ -17,6 +18,7 @@ import { CameraRig } from './core/CameraRig.js';
 import { Loop, VELOCIDADES } from './core/Loop.js';
 import { SolarSystem } from './system/SolarSystem.js';
 import { FallbackControls } from './input/FallbackControls.js';
+import { HUD } from './ui/HUD.js';
 import { $, crear, anunciar } from './utils/dom.js';
 import { RAIZ, rutaApp } from './utils/rutas.js';
 import { depuracion, log, error } from './utils/debug.js';
@@ -166,22 +168,46 @@ async function arrancar() {
     seleccionar(orden[siguiente], 'teclado');
   }
 
+  function alternarPausa() {
+    const v = bucle.alternarPausa();
+    anunciar(v.factor === 0 ? 'Tiempo en pausa.' : `Tiempo a ${v.etiqueta}.`);
+    App.emitir('tiempo:velocidad', v);
+    return v;
+  }
+
+  function cambiarVelocidad(direccion) {
+    const v = bucle.establecerVelocidad(bucle.indiceVelocidad + direccion);
+    anunciar(v.factor === 0 ? 'Tiempo en pausa.' : `Tiempo a ${v.etiqueta}.`);
+    App.emitir('tiempo:velocidad', v);
+    return v;
+  }
+
+  function mostrarOrbitas(visible) {
+    App.preferencias.set('mostrarOrbitas', visible);
+    sistema.establecerVisibilidadOrbitas(visible);
+    anunciar(visible ? 'Órbitas visibles.' : 'Órbitas ocultas.');
+  }
+
   const controles = new FallbackControls(gestor, sistema, {
     alSeleccionar: seleccionar,
     alPedirVistaGeneral: vistaGeneral,
     alPedirVecino: vecino,
-    alAlternarPausa: () => {
-      const v = bucle.alternarPausa();
-      anunciar(v.factor === 0 ? 'Tiempo en pausa.' : `Tiempo a ${v.etiqueta}.`);
-      App.emitir('tiempo:velocidad', v);
-    },
-    alAlternarOrbitas: () => {
-      const visible = !App.preferencias.get('mostrarOrbitas');
-      App.preferencias.set('mostrarOrbitas', visible);
-      sistema.establecerVisibilidadOrbitas(visible);
-      anunciar(visible ? 'Órbitas visibles.' : 'Órbitas ocultas.');
-    },
+    alAlternarPausa: alternarPausa,
+    alAlternarOrbitas: () => mostrarOrbitas(!App.preferencias.get('mostrarOrbitas')),
   });
+
+  // ------------------------------------------------------------------- HUD --
+  const hud = new HUD(catalogo, {
+    seleccionar,
+    vistaGeneral,
+    vecino,
+    alternarPausa,
+    cambiarVelocidad,
+    mostrarOrbitas,
+    // La HUD necesita la malla del cuerpo para anclar las anotaciones a su
+    // superficie; se la pide al sistema en lugar de guardar una referencia.
+    obtenerCuerpo3D: (id) => sistema.obtener(id),
+  }, { capaEtiquetas: $('#capa-etiquetas'), gestor });
 
   // ------------------------------------------------------------------ bucle --
   let usuarioInteractuando = false;
@@ -208,9 +234,13 @@ async function arrancar() {
     alRenderizar: (delta) => {
       efectos.render(delta);
       gestor.renderizadorEtiquetas.render(gestor.escena, gestor.camara);
+      // Las anotaciones y la retícula se recolocan después de renderizar, con
+      // la cámara ya en su posición definitiva de este fotograma.
+      hud.actualizarRapido(delta);
     },
     alActualizarLento: (_, fps) => {
       App.definir('fps', fps);
+      hud.actualizarLento(fps, bucle.fechaSimulada);
       ajustarCalidad(fps);
     },
   });
@@ -240,9 +270,9 @@ async function arrancar() {
   }
 
   // -------------------------------------------------------------- exposición --
-  Object.assign(App.subsistemas, { escena: gestor, sistema, efectos, rig, bucle, controles });
+  Object.assign(App.subsistemas, { escena: gestor, sistema, efectos, rig, bucle, controles, hud });
   App.acciones = { seleccionar, vistaGeneral, vecino };
-  App.faseImplementada = 1;
+  App.faseImplementada = 4;
 
   sistema.establecerVisibilidadOrbitas(App.preferencias.get('mostrarOrbitas'));
   bucle.iniciar();
@@ -264,6 +294,7 @@ async function arrancar() {
   // colgado si el navegador conserva la página en la caché de retroceso.
   window.addEventListener('pagehide', () => {
     bucle.detener();
+    hud.destruir();
     controles.destruir();
     sistema.destruir();
     efectos.destruir();

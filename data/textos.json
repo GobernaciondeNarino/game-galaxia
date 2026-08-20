@@ -1,6 +1,6 @@
 {
   "$esquema": "orbis/textos/1",
-  "nota": "Contenido redactado de ORBIS: nombres, jerarquía, narraciones, curiosidades, anotaciones de superficie y opciones de representación. Las cifras físicas y orbitales NO están aquí: vienen de data/fisica-jpl.json (JPL Horizons) y de data/complementos.json (literatura citada). Los datos de temperatura y composición atmosférica sí viven aquí porque Horizons no los publica, y cada uno lleva su campo 'fuente'.",
+  "nota": "Contenido redactado de ORBIS: nombres, jerarquía, narraciones, curiosidades, anotaciones de superficie y opciones de representación. Las cifras físicas y orbitales NO están aquí: vienen de data/fisica-jpl.json (JPL Horizons) y de data/complementos.json (literatura citada). Los datos de temperatura, composición atmosférica, magnetosfera y geología sí viven aquí porque Horizons no los publica, y cada uno lleva su campo 'fuente'.",
   "cuerpos": {
     "sol": {
       "nombre": "Sol",
@@ -40,7 +40,9 @@
         "Su superficie no es sólida: es plasma en movimiento constante, con celdas de convección del tamaño de un país.",
         "Cada segundo pierde cuatro millones de toneladas de masa, convertidas en energía.",
         "La corona solar está a más de un millón de grados, doscientas veces más caliente que la superficie que hay debajo. Por qué, sigue sin explicarse del todo."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "mercurio": {
       "nombre": "Mercurio",
@@ -108,7 +110,18 @@
         "Si pudieras plantarte en su superficie, verías el Sol tres veces más grande que desde la Tierra.",
         "Se está encogiendo: al enfriarse su núcleo, la corteza se arruga en escarpes de cientos de kilómetros.",
         "En algunos puntos de su órbita, el Sol parece detenerse en el cielo, retroceder y volver a avanzar."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 300,
+        "nota": "Campo dipolar global, unas cien veces más débil que el terrestre. Lo genera un núcleo metálico todavía parcialmente fundido.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "residual",
+        "nota": "Escarpes de compresión de cientos de kilómetros, formados al contraerse el planeta mientras su núcleo se enfriaba. Sin tectónica de placas.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "venus": {
       "nombre": "Venus",
@@ -165,7 +178,18 @@
         "Es el objeto más brillante del cielo nocturno después de la Luna: el lucero del alba y el de la tarde son el mismo planeta.",
         "Sus vientos en altura dan la vuelta al planeta en cuatro días, sesenta veces más rápido que su propia rotación.",
         "Si el Sol saliera por algún sitio en Venus, saldría por el oeste."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "No tiene campo magnético global. Solo presenta una magnetosfera inducida por la interacción del viento solar con su ionosfera.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "activa",
+        "nota": "Superficie volcánica de unos 500 millones de años, muy joven para un planeta. Los datos de Magallanes reanalizados en 2023 muestran vulcanismo en curso.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "tierra": {
       "nombre": "Tierra",
@@ -238,7 +262,18 @@
         "Hemos cartografiado mejor la superficie de Marte que el fondo de nuestros propios océanos.",
         "El punto más profundo del mar, la fosa de las Marianas, está a casi once kilómetros bajo la superficie.",
         "La Tierra no es una esfera perfecta: la rotación la ensancha por el ecuador unos veintiún kilómetros."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 31000,
+        "nota": "Campo dipolar generado por la dinamo del núcleo externo de hierro líquido. Desvía el viento solar y protege la atmósfera.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "activa",
+        "nota": "Único cuerpo conocido con tectónica de placas: la corteza se recicla continuamente en las dorsales y las zonas de subducción.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "marte": {
       "nombre": "Marte",
@@ -314,7 +349,18 @@
         "Sus casquetes polares no son solo de hielo de agua: en invierno se les añade una capa de dióxido de carbono congelado.",
         "Las tormentas de polvo pueden cubrir el planeta entero y durar meses.",
         "Hay más vehículos robóticos operativos en Marte que en ningún otro mundo salvo la Tierra."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "Perdió su campo global hace unos 4.000 millones de años. Solo quedan zonas de corteza magnetizada, testigos del campo que hubo.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "residual",
+        "nota": "Vulcanismo extinto desde hace millones de años. El sismómetro de InSight registró más de 1.300 sismos entre 2018 y 2022.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "jupiter": {
       "nombre": "Júpiter",
@@ -375,7 +421,18 @@
         "Su campo magnético se extiende tanto que, si fuera visible desde la Tierra, ocuparía el doble que la Luna llena.",
         "Actúa como escudo del Sistema Solar interior: su gravedad desvía o captura cometas que podrían llegar hasta nosotros.",
         "Galileo descubrió sus cuatro lunas mayores en 1610, y fue la primera prueba de que no todo giraba alrededor de la Tierra."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 428000,
+        "nota": "El campo magnético más intenso del Sistema Solar después del solar. Lo genera un océano de hidrógeno metálico.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "No tiene superficie sólida donde hablar de geología: la atmósfera se comprime gradualmente hasta volverse líquida.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "saturno": {
       "nombre": "Saturno",
@@ -442,7 +499,18 @@
         "Un año en Saturno dura veintinueve años y medio terrestres.",
         "Sus anillos desaparecen de la vista desde la Tierra cada quince años, cuando los vemos exactamente de canto.",
         "El hexágono polar es una única corriente de viento; nada parecido se ha visto en ningún otro planeta."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 21000,
+        "nota": "Campo casi perfectamente alineado con el eje de rotación, algo excepcional que ninguna teoría de dinamo explica del todo.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "Sin superficie sólida.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "urano": {
       "nombre": "Urano",
@@ -509,7 +577,18 @@
         "También tiene anillos, descubiertos en 1977, pero son oscuros y finos, muy distintos de los de Saturno.",
         "Su campo magnético está descentrado y torcido casi sesenta grados respecto al eje de rotación.",
         "Un año en Urano dura ochenta y cuatro años terrestres: desde su descubrimiento solo ha dado tres vueltas al Sol."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 23000,
+        "nota": "Eje magnético inclinado unos 59° respecto al de rotación y desplazado del centro del planeta.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "Sin superficie sólida; bajo la atmósfera hay un manto de agua, amoníaco y metano a alta presión.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "neptuno": {
       "nombre": "Neptuno",
@@ -565,7 +644,18 @@
         "Tarda ciento sesenta y cinco años en dar una vuelta al Sol: desde su descubrimiento solo ha completado una.",
         "Su Gran Mancha Oscura, fotografiada por la Voyager 2 en 1989, había desaparecido cuando el Hubble volvió a mirar en 1994.",
         "Llueven diamantes: la presión descompone el metano y el carbono cristaliza al caer. Es una hipótesis respaldada por experimentos de laboratorio."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 14000,
+        "nota": "Eje magnético inclinado unos 47° y muy descentrado, como el de Urano.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "Sin superficie sólida.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "pluton": {
       "nombre": "Plutón",
@@ -623,7 +713,13 @@
         "Su órbita es tan excéntrica que entre 1979 y 1999 estuvo más cerca del Sol que Neptuno.",
         "Es más pequeño que la Luna terrestre.",
         "Las señales de New Horizons tardan más de cuatro horas en llegar a la Tierra."
-      ]
+      ],
+      "geologia": {
+        "estado": "activa",
+        "nota": "Sputnik Planitia no tiene un solo cráter y muestra células de convección: hay geología en marcha a 230 grados bajo cero.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "ceres": {
       "nombre": "Ceres",
@@ -646,7 +742,9 @@
         "Su nombre viene de la diosa romana de la agricultura; el elemento cerio se llama así por él.",
         "Los puntos brillantes del cráter Occator son carbonato de sodio, depositado por salmuera que llegó desde el interior.",
         "Dawn fue la primera nave en orbitar dos cuerpos distintos: primero Vesta y después Ceres."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "eris": {
       "nombre": "Eris",
@@ -669,7 +767,9 @@
         "Su descubrimiento provocó la reclasificación de Plutón en 2006.",
         "Refleja cerca del 96 % de la luz que recibe: es casi tan blanco como la nieve recién caída.",
         "Tiene un satélite, Disnomia, cuya órbita permitió medir la masa de Eris."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "makemake": {
       "nombre": "Makemake",
@@ -692,7 +792,9 @@
         "Su nombre honra al dios creador de la mitología rapanui, de la isla de Pascua.",
         "La ocultación de 2011 descartó que tenga una atmósfera global, al contrario que Plutón.",
         "Su satélite es tan oscuro que costó mil veces más detectarlo que al propio Makemake."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "haumea": {
       "nombre": "Haumea",
@@ -715,7 +817,9 @@
         "Gira sobre sí mismo en menos de cuatro horas, el más rápido de los cuerpos grandes del Sistema Solar.",
         "Tiene un anillo, descubierto en 2017 por ocultación estelar.",
         "Sus satélites, Hi'iaka y Namaka, llevan nombres de hijas de la diosa hawaiana Haumea."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "luna": {
       "nombre": "Luna",
@@ -743,7 +847,18 @@
         "Doce personas han caminado sobre ella, todas entre 1969 y 1972.",
         "Sus huellas seguirán ahí millones de años: no hay atmósfera ni viento que las borre.",
         "Estabiliza el eje de rotación de la Tierra y con ello hace previsible nuestro clima."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "Sin campo global. Conserva magnetización local en algunas regiones de la corteza.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "residual",
+        "nota": "Los sismógrafos del programa Apolo registraron sismos lunares poco frecuentes y de baja energía. El vulcanismo cesó hace unos mil millones de años.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "fobos": {
       "nombre": "Fobos",
@@ -766,7 +881,9 @@
         "Su nombre significa «miedo» en griego: es uno de los hijos de Ares.",
         "Su gravedad es tan débil que un salto humano normal alcanzaría la velocidad de escape.",
         "El cráter Stickney, de nueve kilómetros, casi la partió en dos."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "deimos": {
       "nombre": "Deimos",
@@ -789,7 +906,9 @@
         "Su nombre significa «terror»: el otro hijo de Ares que acompañaba a su padre en la batalla.",
         "Tarda treinta horas en dar la vuelta a Marte, algo más que el día marciano.",
         "Hall estuvo a punto de rendirse; fue su mujer, Angeline Stickney, quien lo animó a seguir una noche más."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "io": {
       "nombre": "Ío",
@@ -812,7 +931,13 @@
         "Su superficie se renueva por completo cada pocos millones de años.",
         "Deja tras de sí un toroide de plasma que alimenta las auroras de Júpiter.",
         "Es el objeto geológicamente más activo que conocemos, por delante de la Tierra."
-      ]
+      ],
+      "geologia": {
+        "estado": "activa",
+        "nota": "El cuerpo geológicamente más activo del Sistema Solar: más de 400 volcanes en erupción, alimentados por el calentamiento de marea de Júpiter.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "europa": {
       "nombre": "Europa",
@@ -835,7 +960,13 @@
         "Su superficie es la más lisa que se conoce: apenas hay relieve de más de unos cientos de metros.",
         "La misión Europa Clipper de la NASA fue lanzada en 2024 para estudiar su habitabilidad.",
         "El Hubble ha detectado posibles penachos de vapor de agua saliendo por sus grietas."
-      ]
+      ],
+      "geologia": {
+        "estado": "activa",
+        "nota": "Tectónica de hielo: la corteza se fractura y se recompone sobre un océano líquido. Casi no hay cráteres, señal de renovación constante.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "ganimedes": {
       "nombre": "Ganímedes",
@@ -858,7 +989,14 @@
         "Es más grande que Mercurio y que Plutón.",
         "Es el único satélite del Sistema Solar con un campo magnético generado por sí mismo.",
         "La misión europea JUICE, lanzada en 2023, tiene previsto entrar en órbita a su alrededor."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 750,
+        "nota": "Único satélite del Sistema Solar con campo magnético propio, generado por un núcleo de hierro líquido.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": null
     },
     "calisto": {
       "nombre": "Calisto",
@@ -881,7 +1019,13 @@
         "Es el objeto con más cráteres que se conoce: su superficie está saturada.",
         "Recibe mucha menos radiación que las otras lunas galileanas, lo que la hace más accesible.",
         "También parece esconder un océano subterráneo, a unos cien kilómetros de profundidad."
-      ]
+      ],
+      "geologia": {
+        "estado": "inactiva",
+        "nota": "Superficie saturada de cráteres, prácticamente sin cambios desde hace 4.000 millones de años.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "mimas": {
       "nombre": "Mimas",
@@ -904,7 +1048,13 @@
         "El cráter Herschel mide un tercio del diámetro de la luna entera.",
         "Su parecido con la Estrella de la Muerte es casualidad: las fotos nítidas llegaron con la Voyager en 1980.",
         "Su órbita abre la División de Cassini, el hueco más visible de los anillos de Saturno."
-      ]
+      ],
+      "geologia": {
+        "estado": "inactiva",
+        "nota": "Superficie antigua dominada por el cráter Herschel. Datos recientes apuntan a un posible océano interior joven.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "encelado": {
       "nombre": "Encélado",
@@ -927,7 +1077,13 @@
         "Refleja más del noventa por ciento de la luz que recibe: es el cuerpo más blanco del Sistema Solar.",
         "Cassini atravesó sus chorros y detectó moléculas orgánicas complejas.",
         "Sus géiseres son la fuente del anillo E de Saturno."
-      ]
+      ],
+      "geologia": {
+        "estado": "activa",
+        "nota": "Géiseres permanentes en el polo sur que expulsan agua del océano interior a través de cuatro grandes fracturas.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "rea": {
       "nombre": "Rea",
@@ -950,7 +1106,9 @@
         "Está compuesta en un setenta y cinco por ciento de hielo de agua.",
         "Sus «arañazos» blancos son en realidad acantilados de hielo de varios kilómetros.",
         "Tiene una exosfera tenue de oxígeno y dióxido de carbono."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "titan": {
       "nombre": "Titán",
@@ -983,7 +1141,18 @@
         "Su atmósfera es de nitrógeno, como la terrestre, pero con metano en lugar de oxígeno.",
         "Sus lagos de metano están concentrados cerca del polo norte.",
         "La NASA prepara Dragonfly, un dron que volará de un punto a otro de su superficie."
-      ]
+      ],
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "Sin campo magnético propio: queda dentro de la magnetosfera de Saturno.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "activa",
+        "nota": "Ciclo activo de metano líquido con lluvia, ríos y lagos, y posibles indicios de criovulcanismo.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      }
     },
     "japeto": {
       "nombre": "Jápeto",
@@ -1006,7 +1175,13 @@
         "Su hemisferio delantero es diez veces más oscuro que el trasero.",
         "Una cordillera ecuatorial de trece kilómetros lo rodea como una costura.",
         "Cassini dedujo su rotación acoplada en 1671, sin poder verlo más que a un lado del planeta."
-      ]
+      ],
+      "geologia": {
+        "estado": "inactiva",
+        "nota": "Superficie antigua y craterizada, dominada por el contraste de brillo entre sus dos hemisferios.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "ariel": {
       "nombre": "Ariel",
@@ -1029,7 +1204,9 @@
         "Es la luna uraniana con la superficie menos craterizada, y por tanto la más joven.",
         "Sus cañones tienen fondos lisos, señal de que algo los rellenó después de abrirse.",
         "Solo conocemos su hemisferio sur: el norte estaba a oscuras cuando pasó la Voyager 2."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "umbriel": {
       "nombre": "Umbriel",
@@ -1052,7 +1229,9 @@
         "Es la más oscura de las lunas mayores de Urano.",
         "El anillo brillante del cráter Wunda no tiene explicación aceptada.",
         "Su superficie apenas ha cambiado desde el bombardeo intenso temprano."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "titania": {
       "nombre": "Titania",
@@ -1075,7 +1254,9 @@
         "Es la octava luna más grande del Sistema Solar.",
         "Sus cañones se abrieron al congelarse y expandirse el agua de su interior.",
         "Las lunas de Urano son las únicas que no llevan nombres de la mitología griega o romana."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "oberon": {
       "nombre": "Oberón",
@@ -1098,7 +1279,9 @@
         "Una montaña de once kilómetros asoma en su borde en las imágenes de la Voyager 2.",
         "Los fondos oscuros de sus cráteres sugieren material ascendido tras los impactos.",
         "Es la luna uraniana más alejada del planeta entre las cinco principales."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "miranda": {
       "nombre": "Miranda",
@@ -1121,7 +1304,9 @@
         "Verona Rupes, de hasta veinte kilómetros, es el mayor acantilado conocido del Sistema Solar.",
         "Su superficie mezcla terrenos de edades muy distintas sin transición.",
         "Caer desde lo alto de Verona Rupes duraría unos doce minutos."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     },
     "triton": {
       "nombre": "Tritón",
@@ -1149,7 +1334,13 @@
         "Es el único satélite grande del Sistema Solar con órbita retrógrada.",
         "Su superficie está a unos 235 grados bajo cero, de las más frías que se han medido.",
         "Buena parte de su terreno tiene aspecto de piel de melón, y no se conoce nada parecido en ningún otro lugar."
-      ]
+      ],
+      "geologia": {
+        "estado": "activa",
+        "nota": "La Voyager 2 fotografió géiseres de nitrógeno lanzando material a ocho kilómetros de altura.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
+      "magnetosfera": null
     },
     "caronte": {
       "nombre": "Caronte",
@@ -1172,7 +1363,9 @@
         "Plutón y Caronte orbitan alrededor de un punto situado fuera de ambos.",
         "Su mancha polar rojiza está hecha de metano fugado de la atmósfera de Plutón.",
         "Se descubrió en 1978 al notar un bulto que deformaba la imagen de Plutón en las placas fotográficas."
-      ]
+      ],
+      "magnetosfera": null,
+      "geologia": null
     }
   }
 }

@@ -270,6 +270,40 @@ function oblicuidad(t) {
   ], undefined, [0, 180]);
 }
 
+/**
+ * Albedo geométrico: la fracción de luz que el cuerpo refleja. Es un dato real
+ * y comparable entre cuerpos, así que la HUD lo usa en lugar de rellenar el
+ * panel de indicadores con una cifra decorativa.
+ */
+function albedo(t) {
+  return extraer(t, [
+    new RegExp(String.raw`Geometric [Aa]lbedo[^=\n]*=\s*~?\s*${NUM}`),
+    new RegExp(String.raw`\bALBEDO\s*=\s*${NUM}`),
+    new RegExp(String.raw`Albedo[^=\n]*=\s*~?\s*${NUM}`, 'i'),
+  ], undefined, [0.001, 1.5]);
+}
+
+/**
+ * Velocidad de escape, en km/s. Horizons solo la publica para diez de los
+ * treinta y tres cuerpos; para el resto se deduce de v = √(2GM/R), que es su
+ * definición exacta, no una aproximación. Se anota que el valor es derivado.
+ */
+function velocidadEscape(t, radioMedioKm) {
+  const publicada = extraer(t, [
+    new RegExp(String.raw`Escape (?:speed|velocity)[^=\n]*=\s*~?\s*${NUM}`, 'i'),
+    new RegExp(String.raw`Escape vel[^=\n]*=\s*~?\s*${NUM}`, 'i'),
+  ], undefined, [0.001, 1000]);
+  if (publicada.valor !== null) return publicada;
+
+  const gm = parametroGM(t);
+  if (gm.valor === null || !radioMedioKm) return { valor: null, origen: null };
+  return {
+    valor: Math.sqrt((2 * gm.valor) / radioMedioKm),
+    origen: `derivado de v = √(2GM/R) con ${gm.origen}`,
+    derivado: true,
+  };
+}
+
 /** Parámetro gravitacional estándar GM, en km^3/s^2. */
 function parametroGM(t) {
   return extraer(t, [
@@ -386,6 +420,8 @@ async function principal() {
       gravedadMs2: gravitacion,
       periodoRotacionHoras: rotacionHoras(fisico),
       inclinacionAxialGrados: oblicuidad(fisico),
+      albedoGeometrico: albedo(fisico),
+      velocidadEscapeKms: velocidadEscape(fisico, radio.valor),
     };
 
     for (const [clave, { valor, origen }] of Object.entries(campos)) {

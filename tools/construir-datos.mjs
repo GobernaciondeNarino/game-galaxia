@@ -171,6 +171,8 @@ async function principal() {
       orbita: jpl.orbita,
       temperatura: texto.temperatura,
       atmosfera: texto.atmosfera,
+      magnetosfera: texto.magnetosfera ?? null,
+      geologia: texto.geologia ?? null,
       satelitesConocidos: texto.satelitesConocidos,
       render: { ...texto.render },
       anotaciones: texto.anotaciones,

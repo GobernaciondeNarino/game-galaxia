@@ -21,14 +21,19 @@
   --verde-estado:    #3AAA35;
   --rojo-alerta:     #FF5252;
 
-  /* Texto */
-  --texto:           #D6EEF8;
-  --texto-tenue:     rgba(214, 238, 248, 0.62);
-  --texto-apagado:   rgba(214, 238, 248, 0.34);
+  /* Texto.
+     Los tres niveles alcanzan 4,5:1 sobre el fondo de panel; lo verifica
+     tools/contraste.mjs en cada push. --texto-decorativo es el ÚNICO que baja
+     de ese umbral y solo puede usarse en elementos ornamentales que no
+     transmitan información: retículas, marcos, líneas de escaneo. */
+  --texto:            #D6EEF8;
+  --texto-tenue:      rgba(214, 238, 248, 0.62);
+  --texto-apagado:    rgba(214, 238, 248, 0.56);
+  --texto-decorativo: rgba(214, 238, 248, 0.28);
 
   /* Superficies de panel */
   --panel-fondo:     rgba(10, 22, 40, 0.72);
-  --panel-borde:     rgba(79, 195, 247, 0.34);
+  --panel-borde:     rgba(79, 195, 247, 0.52);
   --panel-borde-vivo: rgba(0, 229, 255, 0.85);
   --panel-desenfoque: 6px;
 
@@ -97,6 +102,11 @@ body {
 }
 
 h1, h2, h3, h4, p, ul, ol, figure { margin: 0; }
+
+/* El atributo hidden tiene que ganar siempre. Sin esto, cualquier elemento con
+   display: grid o flex declarado en una clase seguiría visible aunque el código
+   lo hubiera ocultado — y mostraría el valor del cuerpo anterior. */
+[hidden] { display: none !important; }
 ul, ol { padding: 0; list-style: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 img, canvas, svg { display: block; max-width: 100%; }

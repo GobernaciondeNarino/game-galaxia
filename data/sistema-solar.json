@@ -28,6 +28,8 @@
         "gravedadMs2": 274,
         "periodoRotacionHoras": 609.12,
         "inclinacionAxialGrados": 7.25,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": 617.7,
         "diametroKm": 1391400
       },
       "orbita": null,
@@ -39,6 +41,8 @@
         "fuente": "NASA/JPL Horizons"
       },
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": "assets/textures/sol.jpg",
@@ -94,6 +98,11 @@
           "fuente": "JPL Horizons",
           "detalle": "Pole (RA,DEC), deg.   = (286.13, 63.87)     Obliquity to ecliptic = 7.25 deg."
         },
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Surface gravity       =  274.0 m/s^2        Escape speed, km/s    =  617.7"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. mean radius, km  = 695700              Volume, 10^12 km^3    = 1412000"
@@ -114,6 +123,8 @@
         "gravedadMs2": 3.701,
         "periodoRotacionHoras": 1407.51,
         "inclinacionAxialGrados": 0.0351667,
+        "albedoGeometrico": 0.106,
+        "velocidadEscapeKms": 4.435,
         "diametroKm": 4878.8
       },
       "orbita": {
@@ -160,6 +171,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Mercury"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 300,
+        "nota": "Campo dipolar global, unas cien veces más débil que el terrestre. Lo genera un núcleo metálico todavía parcialmente fundido.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "residual",
+        "nota": "Escarpes de compresión de cientos de kilómetros, formados al contraerse el planeta mientras su núcleo se enfriaba. Sin tectónica de placas.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 0,
@@ -219,6 +241,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Obliquity to orbit[1] =  2.11' +/- 0.1' Hill's sphere rad. Rp = 94.4 (convertido de minutos de arco a grados)"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      =     0.106       Surface emissivity    = 0.77+-0.06"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Sidereal orb. per.    = 87.969257  d    Escape vel. km/s      =  4.435"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. Mean Radius (km) =  2439.4+-0.1    Density (g cm^-3)     = 5.427"
@@ -239,6 +269,8 @@
         "gravedadMs2": 8.87,
         "periodoRotacionHoras": 5832.44,
         "inclinacionAxialGrados": 177.3,
+        "albedoGeometrico": 0.65,
+        "velocidadEscapeKms": 10.361,
         "diametroKm": 12103.7
       },
       "orbita": {
@@ -273,6 +305,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Venus"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "No tiene campo magnético global. Solo presenta una magnetosfera inducida por la interacción del viento solar con su ionosfera.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "activa",
+        "nota": "Superficie volcánica de unos 500 millones de años, muy joven para un planeta. Los datos de Magallanes reanalizados en 2023 muestran vulcanismo en curso.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 0,
@@ -333,6 +376,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Obliquity to orbit    = 177.3 deg      Hill's sphere rad.,Rp =  167.1"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      =     0.65       Potential Love # k2   = ~0.25"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Sidereal orb. per., d = 224.70079922   Escape speed, km/s    =   10.361"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. Mean Radius (km) =  6051.84+-0.01 Density (g/cm^3)      =  5.204"
@@ -353,6 +404,8 @@
         "gravedadMs2": 9.78033,
         "periodoRotacionHoras": 23.9345,
         "inclinacionAxialGrados": 23.4393,
+        "albedoGeometrico": 0.367,
+        "velocidadEscapeKms": 11.186,
         "diametroKm": 12742
       },
       "orbita": {
@@ -395,6 +448,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Earth"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 31000,
+        "nota": "Campo dipolar generado por la dinamo del núcleo externo de hierro líquido. Desvía el viento solar y protege la atmósfera.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "activa",
+        "nota": "Único cuerpo conocido con tectónica de placas: la corteza se recicla continuamente en las dorsales y las zonas de subducción.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 1,
@@ -463,6 +527,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Obliquity to orbit, deg  = 23.4392911  Sidereal orb period  = 1.0000174 y"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric albedo         = 0.367           Vis. mag. V(1,0)= -3.86"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM 1-sigma, km^3/s^2     =      0.0014     Escape velocity = 11.186 km/s"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. Mean Radius (km)    = 6371.01+-0.02   Mass x10^24 (kg)= 5.97219+-0.0006"
@@ -483,6 +555,8 @@
         "gravedadMs2": 3.71,
         "periodoRotacionHoras": 24.623,
         "inclinacionAxialGrados": 25.19,
+        "albedoGeometrico": 0.15,
+        "velocidadEscapeKms": 5.027,
         "diametroKm": 6779.84
       },
       "orbita": {
@@ -529,6 +603,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Mars"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "Perdió su campo global hace unos 4.000 millones de años. Solo quedan zonas de corteza magnetizada, testigos del campo que hubo.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "residual",
+        "nota": "Vulcanismo extinto desde hace millones de años. El sismómetro de InSight registró más de 1.300 sismos entre 2018 y 2022.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 2,
@@ -596,6 +681,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Obliquity to orbit    =   25.19 deg     Max. angular diam.    =  17.9\""
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      =    0.150"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Hill's sphere rad. Rp =  319.8          Escape speed, km/s    =   5.027"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. mean radius (km) = 3389.92+-0.04   Density (g/cm^3)      =  3.933(5+-4)"
@@ -616,6 +709,8 @@
         "gravedadMs2": 24.79,
         "periodoRotacionHoras": 9.92492,
         "inclinacionAxialGrados": 3.13,
+        "albedoGeometrico": 0.52,
+        "velocidadEscapeKms": 59.5,
         "diametroKm": 139822
       },
       "orbita": {
@@ -650,6 +745,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Jupiter"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 428000,
+        "nota": "El campo magnético más intenso del Sistema Solar después del solar. Lo genera un océano de hidrógeno metálico.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "No tiene superficie sólida donde hablar de geología: la atmósfera se comprime gradualmente hasta volverse líquida.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 97,
@@ -714,6 +820,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Vis. mag. (opposition)= -2.70             Obliquity to orbit    =  3.13 deg"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      = 0.52              Rocky core mass (Mc/M)= 0.0261"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Atmos. temp. (1 bar)  = 165+-5 K          Escape speed, km/s    =  59.5"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. Mean Radius (km) = 69911+-6          Flattening            = 0.06487"
@@ -734,6 +848,8 @@
         "gravedadMs2": 10.44,
         "periodoRotacionHoras": 10.6562,
         "inclinacionAxialGrados": 26.73,
+        "albedoGeometrico": 0.47,
+        "velocidadEscapeKms": 35.5,
         "diametroKm": 116464
       },
       "orbita": {
@@ -767,6 +883,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Saturn"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 21000,
+        "nota": "Campo casi perfectamente alineado con el eje de rotación, algo excepcional que ninguna teoría de dinamo explica del todo.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "Sin superficie sólida.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 274,
@@ -838,6 +965,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Vis. mag. (opposition)= +0.67           Obliquity to orbit     = 26.73 deg"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      = 0.47            Rocky core mass (Mc/M) =  0.1027"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Atmos. temp. (1 bar)  = 134+-4 K        Escape speed, km/s    =  35.5"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. Mean Radius (km) = 58232+-6        Flattening             =  0.09796"
@@ -858,6 +993,8 @@
         "gravedadMs2": 8.87,
         "periodoRotacionHoras": 17.24,
         "inclinacionAxialGrados": 97.77,
+        "albedoGeometrico": 0.51,
+        "velocidadEscapeKms": 21.3,
         "diametroKm": 50724
       },
       "orbita": {
@@ -896,6 +1033,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Uranus"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 23000,
+        "nota": "Eje magnético inclinado unos 59° respecto al de rotación y desplazado del centro del planeta.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "Sin superficie sólida; bajo la atmósfera hay un manto de agua, amoníaco y metano a alta presión.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 28,
@@ -962,6 +1110,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Vis. mag. (opposition)=  +5.52          Obliquity to orbit     = 97.77 deg"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      = 0.51"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Atmos. temp. (1 bar)  =  76+-2 K        Escape speed, km/s     =  21.3"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. Mean Radius (km) = 25362+-12       Flattening             =  0.02293"
@@ -982,6 +1138,8 @@
         "gravedadMs2": 11.15,
         "periodoRotacionHoras": 16.11,
         "inclinacionAxialGrados": 28.32,
+        "albedoGeometrico": 0.41,
+        "velocidadEscapeKms": 23.5,
         "diametroKm": 49248
       },
       "orbita": {
@@ -1019,6 +1177,17 @@
           }
         ],
         "fuente": "NASA Planetary Fact Sheet — Neptune"
+      },
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 14000,
+        "nota": "Eje magnético inclinado unos 47° y muy descentrado, como el de Urano.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": null,
+        "nota": "Sin superficie sólida.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 16,
@@ -1075,6 +1244,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Vis. mag. (opposition)=  +7.84          Obliquity to orbit     = 28.32 deg"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      = 0.41            Flattening             =  0.0171"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Atmos. temp. (1 bar)  =  72+-2 K        Escape speed (1 bar)  =  23.5 km/s"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. mean radius (km) = 24624+-21       Polar radius (km)      = 24342+-30"
@@ -1095,6 +1272,8 @@
         "gravedadMs2": 0.611,
         "periodoRotacionHoras": 153.293,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": 1.21,
         "diametroKm": 2376.6
       },
       "orbita": {
@@ -1133,6 +1312,12 @@
           }
         ],
         "fuente": "NASA — New Horizons"
+      },
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "activa",
+        "nota": "Sputnik Planitia no tiene un solo cráter y muestra células de convección: hay geología en marcha a 230 grados bajo cero.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
       },
       "satelitesConocidos": {
         "valor": 5,
@@ -1187,6 +1372,11 @@
           "detalle": "Sidereal rot. period  = 153.29335198 h  Sid. rot. rat, rad/s  = 0.0000113856"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "Sidereal orbit period = 249.58932 yr    Escape speed, km/s    = 1.21"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. mean radius (km) = 1188.3+-1.6     Mass ratio (Mc/Mp)    = 0.122"
@@ -1207,6 +1397,8 @@
         "gravedadMs2": 0.283877,
         "periodoRotacionHoras": 9.07417,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.09,
+        "velocidadEscapeKms": 0.516405,
         "diametroKm": 939.4
       },
       "orbita": {
@@ -1223,6 +1415,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1261,6 +1455,14 @@
           "detalle": "GM= 62.6284             RAD= 469.7              ROTPER= 9.07417"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "ALBEDO= .090            STYP= C"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM= 62.6284             RAD= 469.7              ROTPER= 9.07417"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · GM= 62.6284             RAD= 469.7              ROTPER= 9.07417"
@@ -1281,6 +1483,8 @@
         "gravedadMs2": null,
         "periodoRotacionHoras": 25.9,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": null,
         "diametroKm": 2326
       },
       "orbita": {
@@ -1297,6 +1501,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1334,6 +1540,8 @@
           "detalle": "GM= n.a.                RAD= n.a.               ROTPER= 25.9"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": null,
         "diametroKm": {
           "fuente": "literatura",
           "detalle": "diámetro = 2 × radio medio · Sicardy, B. et al. (2011). «A Pluto-like radius and a high albedo for the dwarf planet Eris from an occultation». Nature 478, 493-496.",
@@ -1355,6 +1563,8 @@
         "gravedadMs2": null,
         "periodoRotacionHoras": 22.8266,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": null,
         "diametroKm": 1430
       },
       "orbita": {
@@ -1371,6 +1581,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1404,6 +1616,8 @@
           "detalle": "GM= n.a.                RAD= n.a.               ROTPER= 22.8266"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": null,
         "diametroKm": {
           "fuente": "literatura",
           "detalle": "diámetro = 2 × radio medio · Ortiz, J. L. et al. (2012). «Albedo and atmospheric constraints of dwarf planet Makemake from a stellar occultation». Nature 491, 566-569.",
@@ -1425,6 +1639,8 @@
         "gravedadMs2": null,
         "periodoRotacionHoras": 3.9154,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": null,
         "diametroKm": 1596
       },
       "orbita": {
@@ -1441,6 +1657,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1478,6 +1696,8 @@
           "detalle": "GM= n.a.                RAD= n.a.               ROTPER= 3.9154"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": null,
         "diametroKm": {
           "fuente": "literatura",
           "detalle": "diámetro = 2 × radio medio · Ortiz, J. L. et al. (2017). «The size, shape, density and ring of the dwarf planet Haumea from a stellar occultation». Nature 550, 219-223.",
@@ -1499,6 +1719,8 @@
         "gravedadMs2": 1.62,
         "periodoRotacionHoras": 655.71797,
         "inclinacionAxialGrados": 6.67,
+        "albedoGeometrico": 0.12,
+        "velocidadEscapeKms": 2.37559,
         "diametroKm": 3475.06
       },
       "orbita": {
@@ -1515,6 +1737,17 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "Sin campo global. Conserva magnetización local en algunas regiones de la corteza.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "residual",
+        "nota": "Los sismógrafos del programa Apolo registraron sismos lunares poco frecuentes y de baja energía. El vulcanismo cesó hace unos mil millones de años.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": "assets/textures/luna.jpg",
@@ -1565,6 +1798,14 @@
           "fuente": "JPL Horizons",
           "detalle": "Obliquity to orbit    = 6.67 deg         Orbit period          = 27.321582 d"
         },
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Geometric Albedo      = 0.12             Mean solar day        = 29.5306 d"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con Radius (IAU), km      = 1737.4           GM, km^3/s^2          = 4902.800066"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Vol. mean radius, km  = 1737.53+-0.03    Mass, x10^22 kg       =    7.349"
@@ -1585,6 +1826,8 @@
         "gravedadMs2": null,
         "periodoRotacionHoras": 7.65944,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.06,
+        "velocidadEscapeKms": null,
         "diametroKm": 22.1168
       },
       "orbita": {
@@ -1601,6 +1844,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1639,6 +1884,11 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Mass (10^20 kg )        =  1.08 (10^-4)   Geometric Albedo    =  0.06"
+        },
+        "velocidadEscapeKms": null,
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · radio medio derivado de los semiejes 13.1×11.1×9.3 km — Radius (km)             = 13.1 x11.1 x9.3"
@@ -1659,6 +1909,8 @@
         "gravedadMs2": null,
         "periodoRotacionHoras": 30.3021,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.06,
+        "velocidadEscapeKms": null,
         "diametroKm": 12.4061
       },
       "orbita": {
@@ -1675,6 +1927,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1713,6 +1967,11 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Mass (10^20 kg )        = 1.80 (10^-5)    Geometric Albedo    =  0.06"
+        },
+        "velocidadEscapeKms": null,
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · radio medio derivado de los semiejes 7.8×6×5.1 km — Radius (km)             = 7.8 x 6.0 x 5.1"
@@ -1733,6 +1992,8 @@
         "gravedadMs2": 1.79633,
         "periodoRotacionHoras": 42.5112,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.63,
+        "velocidadEscapeKms": 2.55812,
         "diametroKm": 3642.98
       },
       "orbita": {
@@ -1749,6 +2010,12 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "activa",
+        "nota": "El cuerpo geológicamente más activo del Sistema Solar: más de 400 volcanes en erupción, alimentados por el calentamiento de marea de Júpiter.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1790,6 +2057,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)          = 5959.9155+- 0.004 Geometric Albedo  = 0.63  +- 0.02"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)          = 5959.9155+- 0.004 Geometric Albedo  = 0.63  +- 0.02"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean radius (km)       = 1821.49           Density (g cm^-3) = 3.528 +- 0.006"
@@ -1810,6 +2085,8 @@
         "gravedadMs2": 1.31469,
         "periodoRotacionHoras": 85.2727,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.67,
+        "velocidadEscapeKms": 2.02582,
         "diametroKm": 3121.6
       },
       "orbita": {
@@ -1826,6 +2103,12 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "activa",
+        "nota": "Tectónica de hielo: la corteza se fractura y se recompone sobre un océano líquido. Casi no hay cráteres, señal de renovación constante.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1867,6 +2150,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM   (km^3/s^2)        = 3202.7121+- 0.0054 Geometric Albedo = 0.67 +/- 0.03"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM   (km^3/s^2)        = 3202.7121+- 0.0054 Geometric Albedo = 0.67 +/- 0.03"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean radius (km)       = 1560.8   +- 0.3    Density (g cm^-3)= 3.013 +- 0.005"
@@ -1887,6 +2178,8 @@
         "gravedadMs2": 1.42821,
         "periodoRotacionHoras": 171.797,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.43,
+        "velocidadEscapeKms": 2.7415,
         "diametroKm": 5262.4
       },
       "orbita": {
@@ -1903,6 +2196,13 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": {
+        "tieneCampoGlobal": true,
+        "campoSuperficieNt": 750,
+        "nota": "Único satélite del Sistema Solar con campo magnético propio, generado por un núcleo de hierro líquido.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -1944,6 +2244,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)          = 9887.8328+- 0.0074 Geometric Albedo = 0.43  +- 0.02"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)          = 9887.8328+- 0.0074 Geometric Albedo = 0.43  +- 0.02"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean radius (km)       = 2631.2   +- 1.7    Density (g cm^-3)= 1.942 +- 0.005"
@@ -1964,6 +2272,8 @@
         "gravedadMs2": 1.23577,
         "periodoRotacionHoras": 400.49,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.17,
+        "velocidadEscapeKms": 2.44073,
         "diametroKm": 4820.6
       },
       "orbita": {
@@ -1980,6 +2290,12 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "inactiva",
+        "nota": "Superficie saturada de cráteres, prácticamente sin cambios desde hace 4.000 millones de años.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2021,6 +2337,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)         = 7179.2834 +- 0.0097 Geometric Albedo = 0.17  +- 0.02"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)         = 7179.2834 +- 0.0097 Geometric Albedo = 0.17  +- 0.02"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean radius (km)      = 2410.3 +- 1.5       Density (g cm^-3)= 1.834 +- 0.004"
@@ -2041,6 +2365,8 @@
         "gravedadMs2": 0.0633451,
         "periodoRotacionHoras": 22.7336,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.6,
+        "velocidadEscapeKms": 0.158701,
         "diametroKm": 397.6
       },
       "orbita": {
@@ -2057,6 +2383,12 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "inactiva",
+        "nota": "Superficie antigua dominada por el cráter Herschel. Datos recientes apuntan a un posible océano interior joven.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2098,6 +2430,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Mass (10^19 kg)         =   3.75           Geometric Albedo  = 0.6"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)           =   2.503489       V(1,0)            = +3.3"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean Radius (km)        = 198.8   +- 1.5   Density (g/cm^3)  = 1.152 +- 0.027"
@@ -2118,6 +2458,8 @@
         "gravedadMs2": 0.113272,
         "periodoRotacionHoras": 32.9883,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 1.04,
+        "velocidadEscapeKms": 0.239075,
         "diametroKm": 504.6
       },
       "orbita": {
@@ -2134,6 +2476,12 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "activa",
+        "nota": "Géiseres permanentes en el polo sur que expulsan agua del océano interior a través de cuatro grandes fracturas.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2175,6 +2523,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Mass (10^19 kg)         =  10.805          Geometric Albedo =  1.04"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)           =   7.210367       V(1,0)           =  +2.2"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean Radius (km)        = 252.3   +- 0.6   Density (g/cm^3) =  1.606 +- 0.012"
@@ -2195,6 +2551,8 @@
         "gravedadMs2": 0.263388,
         "periodoRotacionHoras": 108.497,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.6,
+        "velocidadEscapeKms": 0.634603,
         "diametroKm": 1529
       },
       "orbita": {
@@ -2211,6 +2569,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2252,6 +2612,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Mass (10^19 kg)         = 230.9           Geometric Albedo  =  0.6"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)           = 153.94 +- 0.16  V(1,0)            = +0.1"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean Radius (km)        = 764.5  +- 2     Density (g/cm^3)  =  1.233 +- 0.010"
@@ -2272,6 +2640,8 @@
         "gravedadMs2": 1.35352,
         "periodoRotacionHoras": 382.68,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.2,
+        "velocidadEscapeKms": 2.64045,
         "diametroKm": 5151
       },
       "orbita": {
@@ -2288,6 +2658,17 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": {
+        "tieneCampoGlobal": false,
+        "campoSuperficieNt": null,
+        "nota": "Sin campo magnético propio: queda dentro de la magnetosfera de Saturno.",
+        "fuente": "NASA Planetary Fact Sheet — Magnetic field"
+      },
+      "geologia": {
+        "estado": "activa",
+        "nota": "Ciclo activo de metano líquido con lluvia, ríos y lagos, y posibles indicios de criovulcanismo.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": "assets/textures/titan.jpg",
@@ -2340,6 +2721,14 @@
           "nota": "Rotación acoplada por marea con Saturno."
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Mass (10^19 kg)        = 13455.3           Geometric Albedo =  0.2"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)          = 8978.14  +-  0.06  V(1,0)          = -1.2"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean Radius (km)       = 2575.5   +-  2.0  Density (g/cm^3) =  1.880 +- 0.004"
@@ -2360,6 +2749,8 @@
         "gravedadMs2": 0.223396,
         "periodoRotacionHoras": 1905.19,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.6,
+        "velocidadEscapeKms": 0.57286,
         "diametroKm": 1469
       },
       "orbita": {
@@ -2376,6 +2767,12 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "inactiva",
+        "nota": "Superficie antigua y craterizada, dominada por el contraste de brillo entre sus dos hemisferios.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2417,6 +2814,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "Mass (10^19 kg)        = 180.59             Geometric Albedo=  0.6"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)          = 120.52   +- 0.03   V(1,0)          =   +1.5 (.7-2.5)"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Radius (km)            = 734.5    +- 4.0    Density (g/cm^3)=  1.088 +- 0.018"
@@ -2437,6 +2842,8 @@
         "gravedadMs2": 0.248954,
         "periodoRotacionHoras": 60.4977,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.34,
+        "velocidadEscapeKms": 0.536877,
         "diametroKm": 1157.8
       },
       "orbita": {
@@ -2453,6 +2860,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2494,6 +2903,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)         =   83.43 +- 1.40   Geometric Albedo    =  0.34"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)         =   83.43 +- 1.40   Geometric Albedo    =  0.34"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · radio medio derivado de los semiejes 581.1×577.9×577.7 km — Radius (km)           = 581.1x577.9x577.7"
@@ -2514,6 +2931,8 @@
         "gravedadMs2": 0.2498,
         "periodoRotacionHoras": 99.4744,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.18,
+        "velocidadEscapeKms": 0.540477,
         "diametroKm": 1169.4
       },
       "orbita": {
@@ -2530,6 +2949,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2571,6 +2992,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)         =  85.40 +- 1.9     Geometric Albedo    =  0.18"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)         =  85.40 +- 1.9     Geometric Albedo    =  0.18"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Radius (km)           = 584.7  +- 2.8     Density (g cm^-3)   =  1.52 +- 0.04"
@@ -2591,6 +3020,8 @@
         "gravedadMs2": 0.35799,
         "periodoRotacionHoras": 208.937,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.27,
+        "velocidadEscapeKms": 0.751556,
         "diametroKm": 1577.8
       },
       "orbita": {
@@ -2607,6 +3038,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2648,6 +3081,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)         = 222.8  +- 4.1     Geometric Albedo    =  0.27"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)         = 222.8  +- 4.1     Geometric Albedo    =  0.27"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Radius (km)           = 788.9  +- 1.8     Density (g cm^-3)   =  1.65 +- 0.03"
@@ -2668,6 +3109,8 @@
         "gravedadMs2": 0.354199,
         "periodoRotacionHoras": 323.194,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.24,
+        "velocidadEscapeKms": 0.734421,
         "diametroKm": 1522.8
       },
       "orbita": {
@@ -2684,6 +3127,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2725,6 +3170,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)         = 205.34 +- 5.8     Geometric Albedo    =  0.24"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)         = 205.34 +- 5.8     Geometric Albedo    =  0.24"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Radius (km)           = 761.4  +- 2.6     Density (g cm^-3)   =  1.66 +- 0.05"
@@ -2745,6 +3198,8 @@
         "gravedadMs2": 0.0774147,
         "periodoRotacionHoras": 33.9359,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.27,
+        "velocidadEscapeKms": 0.191024,
         "diametroKm": 471.36
       },
       "orbita": {
@@ -2761,6 +3216,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2802,6 +3259,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)         =  4.3   +- 0.2     Geometric Albedo    =  0.27"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)         =  4.3   +- 0.2     Geometric Albedo    =  0.27"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · radio medio derivado de los semiejes 240×234.2×232.9 km — Radius (km)           = 240x234.2x232.9"
@@ -2822,6 +3287,8 @@
         "gravedadMs2": 0.7808,
         "periodoRotacionHoras": 141.05,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": 0.7,
+        "velocidadEscapeKms": 1.45335,
         "diametroKm": 2705.2
       },
       "orbita": {
@@ -2838,6 +3305,12 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": {
+        "estado": "activa",
+        "nota": "La Voyager 2 fotografió géiseres de nitrógeno lanzando material a ocho kilómetros de altura.",
+        "fuente": "NASA Science — páginas de cada cuerpo y resultados de las misiones citadas"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": "assets/textures/triton.jpg",
@@ -2884,6 +3357,14 @@
           "detalle": "rotación síncrona declarada por Horizons: igual al periodo orbital"
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": {
+          "fuente": "JPL Horizons",
+          "detalle": "GM (km^3/s^2)           = 1428.495 +- 0.62 Geometric Albedo   = 0.7"
+        },
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)           = 1428.495 +- 0.62 Geometric Albedo   = 0.7"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Mean radius (km)        = 1352.6 +- 2.4    Mean dens (g cm^-3)= 2.065 +-0.011"
@@ -2904,6 +3385,8 @@
         "gravedadMs2": 0.288915,
         "periodoRotacionHoras": 153.29333,
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": 0.591747,
         "diametroKm": 1212
       },
       "orbita": {
@@ -2920,6 +3403,8 @@
       },
       "temperatura": null,
       "atmosfera": null,
+      "magnetosfera": null,
+      "geologia": null,
       "satelitesConocidos": null,
       "render": {
         "textura": null,
@@ -2962,6 +3447,11 @@
           "nota": "Plutón y Caronte están acoplados mutuamente: cada uno muestra siempre la misma cara al otro."
         },
         "inclinacionAxialGrados": null,
+        "albedoGeometrico": null,
+        "velocidadEscapeKms": {
+          "fuente": "JPL Horizons",
+          "detalle": "derivado de v = √(2GM/R) con GM (km^3/s^2)           = 106.10 +- 0.3 Density (g cm^-3)     = 1.853 +- 0.004"
+        },
         "diametroKm": {
           "fuente": "JPL Horizons",
           "detalle": "diámetro = 2 × radio medio · Radius (km, IAU2015)    = 606 +- 0.5    Geometric albedo      ="
