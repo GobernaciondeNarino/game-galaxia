@@ -21,12 +21,24 @@
 import { crear } from '../../utils/dom.js';
 import { svg } from '../graficos.js';
 import { formatearNumero } from '../../utils/math.js';
+import { App } from '../../core/App.js';
 
 const T = 420;
 const CENTRO = T / 2;
 
 /** Cuánto se queda a la vista al entrar en la vista general. */
 export const MS_VISIBLE = 3000;
+
+/**
+ * La PRIMERA vez se queda más rato, y solo si no hay ninguna entrada activa.
+ *
+ * Aquí abajo está la invitación a encender el micrófono y la cámara, y tres
+ * segundos dan para verla pero no para leerla y decidir. En cuanto una de las
+ * dos está encendida, o a partir de la segunda vez, vuelve a los tres segundos
+ * de siempre: el aviso ya ha cumplido y el centro de la pantalla hace falta
+ * para el Sistema Solar.
+ */
+const MS_PRIMERA_VEZ = 9000;
 
 /** Y cuánto, más corto, al volver el puntero después de haberlo parado. */
 const MS_TRAS_PUNTERO = 1200;
@@ -133,6 +145,8 @@ export class PanelGalactico {
         crear('span', { class: 'galaxia__nota', text: dato.nota }),
       ]);
 
+    this.invitacion = this._crearInvitacion();
+
     this.botonCerrar = crear('button', {
       class: 'galaxia__cerrar', type: 'button',
       'aria-label': 'Cerrar la interfaz galáctica',
@@ -154,6 +168,7 @@ export class PanelGalactico {
         cifra(DATOS_GALACTICOS.brazo),
       ]),
       crear('p', { class: 'panel__fuente', text: 'La forma de la Galaxia es una representación esquemática; las cifras son medidas publicadas.' }),
+      this.invitacion,
     ]);
 
     // Parar y reanudar la cuenta atrás según dónde esté la atención.
@@ -166,6 +181,68 @@ export class PanelGalactico {
 
     contenedor.append(this.panel);
     this.ocultar();
+
+    this._cancelaciones = [
+      App.al('manos:activa', () => this._reflejar('camara', true)),
+      App.al('manos:inactiva', () => this._reflejar('camara', false)),
+      App.al('voz:activa', () => this._reflejar('microfono', true)),
+      App.al('voz:inactiva', () => this._reflejar('microfono', false)),
+    ];
+  }
+
+  /**
+   * Invitación a encender el micrófono y la cámara.
+   *
+   * Los dos botones emiten exactamente los mismos eventos que los del panel de
+   * entradas, así que no hay una segunda vía de activación que mantener: son
+   * otro sitio desde el que pulsar lo mismo. Y no piden nada al construirse
+   * —el permiso se pide al pulsar, nunca al cargar la página—, que es una de
+   * las reglas que no se negocian.
+   */
+  _crearInvitacion() {
+    this.botonCamara = crear('button', {
+      class: 'invitacion__boton', type: 'button', 'aria-pressed': 'false',
+      title: 'Encender la cámara para controlar la escena con las manos',
+      onclick: () => App.emitir('entrada:solicitar-camara', {}),
+    }, [
+      crear('span', { class: 'invitacion__simbolo', 'aria-hidden': 'true', text: '◉' }),
+      crear('span', { class: 'invitacion__texto', text: 'Cámara' }),
+    ]);
+
+    this.botonMicrofono = crear('button', {
+      class: 'invitacion__boton', type: 'button', 'aria-pressed': 'false',
+      title: 'Encender el micrófono para hablarle a ORBIS',
+      onclick: () => App.emitir('entrada:solicitar-microfono', {}),
+    }, [
+      crear('span', { class: 'invitacion__simbolo', 'aria-hidden': 'true', text: '▮' }),
+      crear('span', { class: 'invitacion__texto', text: 'Micrófono' }),
+    ]);
+
+    return crear('div', { class: 'invitacion' }, [
+      crear('p', { class: 'invitacion__mensaje' }, [
+        crear('strong', { text: 'Puedes hablarle a ORBIS y moverlo con las manos.' }),
+        crear('span', { text: ' Enciende el micrófono para preguntar y la cámara para señalar. Ninguno hace falta: todo funciona también con ratón y teclado.' }),
+      ]),
+      crear('div', { class: 'invitacion__botones' }, [this.botonCamara, this.botonMicrofono]),
+    ]);
+  }
+
+  /** Refleja en el botón si esa entrada está encendida de verdad. */
+  _reflejar(canal, activa) {
+    const boton = canal === 'camara' ? this.botonCamara : this.botonMicrofono;
+    boton.setAttribute('aria-pressed', String(activa));
+    boton.querySelector('.invitacion__texto').textContent =
+      canal === 'camara'
+        ? (activa ? 'Cámara encendida' : 'Cámara')
+        : (activa ? 'Micrófono encendido' : 'Micrófono');
+    if (activa) this._yaHuboEntrada = true;
+  }
+
+  /** ¿Hay alguna entrada encendida ya? Decide cuánto se queda el panel. */
+  get msDePresentacion() {
+    if (this._yaSePresento || this._yaHuboEntrada) return MS_VISIBLE;
+    this._yaSePresento = true;
+    return MS_PRIMERA_VEZ;
   }
 
   get visible() {
@@ -217,6 +294,7 @@ export class PanelGalactico {
   }
 
   destruir() {
+    for (const cancelar of this._cancelaciones ?? []) cancelar();
     clearTimeout(this._temporizador);
     this.panel.remove();
   }

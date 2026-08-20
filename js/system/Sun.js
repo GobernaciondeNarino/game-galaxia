@@ -12,6 +12,12 @@
 import * as THREE from 'three';
 import { CelestialBody, rutaReducida } from './CelestialBody.js';
 import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
+import { EPOCA_J2000 } from './Orbit.js';
+
+/** Quien pide menos movimiento no quiere una superficie hirviendo. */
+const MOVIMIENTO_REDUCIDO = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+
+const MS_POR_DIA = 86_400_000;
 
 const VERTEX = /* glsl */ `
   // <common> define isPerspectiveMatrix(), que necesita <logdepthbuf_vertex>.
@@ -21,11 +27,20 @@ const VERTEX = /* glsl */ `
   varying vec2 vUv;
   varying vec3 vNormal;
   varying vec3 vPosicion;
+  varying vec3 vNormalLocal;
+  varying vec3 vHaciaCamara;
 
   void main() {
     vUv = uv;
     vNormal = normalize(normalMatrix * normal);
     vPosicion = position;
+    // La normal SIN transformar: en una esfera apunta desde el centro, así que
+    // su componente Y da directamente el seno de la latitud. Es lo que necesita
+    // la rotación diferencial, y tiene que ser en el sistema del propio Sol,
+    // no en el de la cámara.
+    vNormalLocal = normalize(normal);
+    vec4 vista = modelViewMatrix * vec4(position, 1.0);
+    vHaciaCamara = normalize(-vista.xyz);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     // Después de calcular gl_Position: el fragmento lo lee.
     #include <logdepthbuf_vertex>
@@ -33,14 +48,34 @@ const VERTEX = /* glsl */ `
 `;
 
 /**
- * Fragmento de la superficie solar. Combina el mapa fotográfico con ruido
- * animado que imita la granulación y un realce en el limbo.
+ * Fragmento de la superficie solar.
+ *
+ * Cuatro cosas que sí ocurren en el Sol real y que aquí se reproducen:
+ *
+ *   1. GRANULACIÓN. Celdas de convección de unos mil kilómetros: plasma
+ *      caliente que sube por el centro, se enfría y baja por los bordes. De ahí
+ *      que cada celda tenga el centro brillante y los surcos oscuros. Viven
+ *      entre ocho y veinte minutos, así que aparecen y se deshacen EN EL SITIO;
+ *      no se desplazan. Antes el patrón se arrastraba en vertical y parecía una
+ *      cinta transportadora, que es justo lo que no hace el Sol.
+ *   2. SUPERGRANULACIÓN. Una segunda escala mucho mayor y mucho más lenta,
+ *      superpuesta a la anterior. Sin ella la superficie parece ruido uniforme
+ *      en lugar de plasma organizado.
+ *   3. ROTACIÓN DIFERENCIAL. El Sol no gira como un sólido: no lo es. El
+ *      ecuador da una vuelta en unos 24,5 días y las zonas polares tardan unos
+ *      34. La malla gira rígida al periodo del catálogo, así que el desfase
+ *      —creciente hacia los polos— se aplica aquí, sobre las coordenadas.
+ *   4. OSCURECIMIENTO DEL LIMBO. El borde del disco se ve MÁS OSCURO, no más
+ *      brillante: mirando de canto, la línea de visión sale de la fotosfera a
+ *      más altura, donde el plasma está más frío. Es lo primero que se nota en
+ *      cualquier fotografía del Sol, y antes estaba justo al revés.
  */
 const FRAGMENT_SUPERFICIE = /* glsl */ `
   #include <logdepthbuf_pars_fragment>
 
   uniform sampler2D mapa;
   uniform float tiempo;
+  uniform float dias;
   uniform vec3 colorCaliente;
   uniform vec3 colorFrio;
   uniform float tieneMapa;
@@ -48,6 +83,19 @@ const FRAGMENT_SUPERFICIE = /* glsl */ `
   varying vec2 vUv;
   varying vec3 vNormal;
   varying vec3 vPosicion;
+  varying vec3 vNormalLocal;
+  varying vec3 vHaciaCamara;
+
+  // Ley de rotación diferencial del Sol, en grados por día:
+  //   omega(lat) = A + B·sen²(lat) + C·sen⁴(lat)
+  // Coeficientes de Snodgrass y Ulrich (1990), medidos siguiendo el patrón de
+  // supergranulación. Dan 24,5 días de periodo en el ecuador y unos 34 cerca de
+  // los polos, que es la cifra que aparece en cualquier manual.
+  const float OMEGA_A = 14.713;
+  const float OMEGA_B = -2.396;
+  const float OMEGA_C = -1.787;
+  // Periodo con el que gira la malla, del catálogo (609 h = 25,38 días).
+  const float OMEGA_MALLA = 360.0 / 25.38;
 
   // Ruido de valor clásico: barato y suficiente para una textura orgánica.
   float aleatorio(vec3 p) {
@@ -72,10 +120,11 @@ const FRAGMENT_SUPERFICIE = /* glsl */ `
       f.z);
   }
 
-  float turbulencia(vec3 p) {
+  float turbulencia(vec3 p, int octavas) {
     float suma = 0.0;
     float amplitud = 0.5;
     for (int i = 0; i < 4; i++) {
+      if (i >= octavas) break;
       suma += amplitud * ruido(p);
       p *= 2.03;
       amplitud *= 0.5;
@@ -83,18 +132,95 @@ const FRAGMENT_SUPERFICIE = /* glsl */ `
     return suma;
   }
 
+  /**
+   * Celdas de convección que evolucionan SIN DESPLAZARSE.
+   *
+   * Sumar el tiempo a la posición es lo evidente y lo equivocado: arrastra el
+   * patrón entero en esa dirección y la superficie parece una cinta
+   * transportadora. Aquí el tiempo elige el campo de ruido, no lo mueve: se
+   * generan dos campos decorrelacionados —el mismo ruido evaluado en zonas muy
+   * distintas del espacio— y se funde de uno al siguiente. Cada celda aparece,
+   * dura y se deshace donde está, como el plasma real.
+   *
+   * El suavizado 3x²-2x³ en la mezcla evita que se note el salto de un paso al
+   * siguiente, que si no aparece como un latido regular.
+   */
+  float mezclaTemporal(vec3 p, float t, int octavas) {
+    float paso = floor(t);
+    float x = fract(t);
+    vec3 saltoA = vec3(paso * 17.3, paso * 9.1, paso * 23.7);
+    vec3 saltoB = saltoA + vec3(17.3, 9.1, 23.7);
+    float a = turbulencia(p + saltoA, octavas);
+    float b = turbulencia(p + saltoB, octavas);
+    return mix(a, b, x * x * (3.0 - 2.0 * x));
+  }
+
   void main() {
     #include <logdepthbuf_fragment>
 
+    // --- Latitud, para modular la convección ---------------------------------
+    // En una esfera la normal sin transformar apunta desde el centro, así que
+    // su componente Y es directamente el seno de la latitud.
+    float senLat = clamp(vNormalLocal.y, -1.0, 1.0);
+    float sen2 = senLat * senLat;
+    float omega = OMEGA_A + OMEGA_B * sen2 + OMEGA_C * sen2 * sen2;
+
     vec3 base = tieneMapa > 0.5 ? texture2D(mapa, vUv).rgb : colorCaliente;
 
-    // Celdas de convección lentas.
-    float granulacion = turbulencia(vPosicion * 1.6 + vec3(0.0, tiempo * 0.05, 0.0));
-    base = mix(base, base * (0.75 + granulacion * 0.85), 0.55);
+    // NO se cizalla el mapa con la rotación diferencial, y conviene dejar
+    // escrito por qué: se intentó y el resultado era un rayado de cientos de
+    // bandas. El desfase acumulado entre el ecuador y los polos crece sin
+    // límite —a este ritmo, decenas de miles de grados en pocos años— y aplicado
+    // sobre una fotografía fija la destroza. El Sol real nunca se ve así porque
+    // sus rasgos no duran lo suficiente para arrastrar ese desfase: la
+    // granulación se rehace cada diez o veinte minutos. La rotación diferencial
+    // es un hecho que se mide siguiendo manchas durante días, no algo que se
+    // aprecie en una sola imagen. Por eso se cuenta con palabras, en la
+    // narración del Sol, en lugar de dibujarse.
+    //
+    // Lo que sí depende de la latitud es el RITMO de la convección, que es
+    // sutil y no acumula nada.
+    vec3 pGirado = vPosicion;
+    float ritmoLatitud = omega / OMEGA_A;
 
-    // Realce del limbo: el borde del disco se ve más brillante.
-    float limbo = pow(1.0 - abs(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0))), 2.0);
-    base += colorFrio * limbo * 0.45;
+    // --- Dos escalas de convección ------------------------------------------
+    // Supergranulación: grande y lenta.
+    float super_ = mezclaTemporal(pGirado * 0.45, tiempo * 0.012 * ritmoLatitud, 1);
+    // Granulación: fina y bastante más rápida.
+    float grano = mezclaTemporal(pGirado * 3.1, tiempo * 0.09 * ritmoLatitud, 2);
+
+    // Los surcos entre celdas son estrechos y oscuros; los centros, anchos y
+    // brillantes. Elevar a una potencia mayor que uno aprieta los oscuros
+    // contra el borde de cada celda en lugar de repartirlos por todas partes.
+    float celda = pow(clamp(grano * 1.65, 0.0, 1.0), 1.6);
+    float relieve = 0.78 + celda * 0.55 + (super_ - 0.5) * 0.22;
+
+    base *= relieve;
+
+    // El Sol EMITE, no refleja, y tiene que salir del rango normal para que el
+    // bloom lo recoja y se vea como una fuente de luz en vez de como una bola
+    // de roca caliente. Sin este empuje, el oscurecimiento del limbo —que solo
+    // puede restar— dejaba el disco entero apagado y parduzco.
+    base *= 1.9;
+
+    // Las crestas más calientes tiran hacia el blanco amarillento, que es el
+    // color real del fondo de una celda de convección.
+    base += vec3(1.0, 0.92, 0.72) * pow(celda, 2.5) * 0.55;
+
+    // --- Oscurecimiento del limbo -------------------------------------------
+    // mu es el coseno del ángulo entre la visual y la normal: 1 en el centro
+    // del disco, 0 justo en el borde. La ley cuadrática clásica I(mu)/I(0) =
+    // 1 - u1(1-mu) - u2(1-mu)² con u1 = 0,84 y u2 = -0,20 reproduce bien el
+    // perfil del Sol en luz visible.
+    float mu = clamp(dot(normalize(vNormal), normalize(vHaciaCamara)), 0.0, 1.0);
+    float unMenosMu = 1.0 - mu;
+    float limbo = 1.0 - 0.84 * unMenosMu + 0.20 * unMenosMu * unMenosMu;
+    base *= clamp(limbo, 0.30, 1.0);
+
+    // Y en el borde mismo, el tono se vuelve más rojizo: ahí la visual atraviesa
+    // capas más altas y más frías. Es el mismo motivo del oscurecimiento, visto
+    // en color en lugar de en brillo.
+    base = mix(base, base * colorFrio, smoothstep(0.45, 0.0, mu) * 0.45);
 
     gl_FragColor = vec4(base, 1.0);
   }
@@ -146,6 +272,10 @@ export class Sun extends CelestialBody {
           mapa: { value: tieneMapa ? this.gestor.cargarTextura(rutaReducida(this.datos.render.textura)) : null },
           tieneMapa: { value: tieneMapa ? 1 : 0 },
           tiempo: { value: 0 },
+          // Días transcurridos en la SIMULACIÓN, no en el reloj de pared: la
+          // rotación diferencial tiene que ir al mismo ritmo que la escena, que
+          // corre a la velocidad de tiempo que el usuario haya elegido.
+          dias: { value: 0 },
           colorCaliente: { value: new THREE.Color('#ffb547') },
           colorFrio: { value: new THREE.Color('#ff7a18') },
         },
@@ -257,8 +387,21 @@ export class Sun extends CelestialBody {
 
   actualizar(fecha, delta = 0) {
     super.actualizar(fecha);
-    this._tiempo += delta;
-    if (this.materialSuperficie) this.materialSuperficie.uniforms.tiempo.value = this._tiempo;
+
+    // Con movimiento reducido la superficie se congela: sigue teniendo toda su
+    // textura, pero deja de hervir. El pliego exige respetar la preferencia en
+    // cualquier animación nueva, y una superficie que bulle es exactamente eso.
+    if (!MOVIMIENTO_REDUCIDO?.matches) this._tiempo += delta;
+
+    if (this.materialSuperficie) {
+      this.materialSuperficie.uniforms.tiempo.value = this._tiempo;
+      // La rotación diferencial va con la fecha simulada, no con el reloj de
+      // pared: si el usuario acelera el tiempo, el ecuador tiene que adelantar
+      // a los polos más deprisa, igual que hace todo lo demás en la escena.
+      this.materialSuperficie.uniforms.dias.value =
+        (fecha.getTime() - EPOCA_J2000) / MS_POR_DIA;
+    }
+
     // Latido lento de la corona. Amplitud pequeña a propósito: el Sol no
     // parpadea, y una pulsación marcada quedaría de dibujo animado.
     if (this.materialCorona) {

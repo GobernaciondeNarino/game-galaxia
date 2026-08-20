@@ -342,7 +342,9 @@ export class HUD {
 
   /** Asoma el panel galáctico y deja que se retire solo. */
   _presentarGalaxia() {
-    this.panelGalactico.mostrar();
+    // La primera vez se queda más rato, porque lleva la invitación a encender
+    // el micrófono y la cámara y tres segundos no dan para leerla y decidir.
+    this.panelGalactico.mostrar(this.panelGalactico.msDePresentacion);
     this.botonGalaxia?.setAttribute('aria-pressed', 'false');
   }
 

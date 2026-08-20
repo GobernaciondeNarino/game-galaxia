@@ -207,7 +207,13 @@
    Barra superior
    ========================================================================== */
 .barra {
-  flex: 1 1 640px;
+  /* 860 y no 640: con 640 la barra aceptaba compartir fila con los controles a
+     partir de unos 1500 px, se quedaba en 644 y su columna derecha —el reloj de
+     misión y la fecha simulada, que necesitan 305— se salía por debajo del
+     panel de controles. Declarando lo que de verdad ocupa, baja a su propia
+     fila hasta que hay sitio auténtico para las dos. Se veía entre 1500 y
+     1700 px, una franja que no estaba en la lista de tamaños probados. */
+  flex: 1 1 860px;
   min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -265,7 +271,9 @@
   color: var(--texto-tenue);
 }
 
-.barra__derecha { display: grid; justify-items: end; gap: var(--e-2); }
+/* `min-width: 0` es la red de seguridad: sin él, una columna de rejilla con
+   `minmax(0, 1fr)` sigue dejando que su contenido se desborde hacia fuera. */
+.barra__derecha { display: grid; justify-items: end; gap: var(--e-2); min-width: 0; }
 .barra__tiempos {
   display: grid;
   grid-template-columns: auto auto;
@@ -558,6 +566,57 @@ body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]) {
   font-size: 11px;
   letter-spacing: 0.16em;
 }
+/* Invitación a encender el micrófono y la cámara. */
+.invitacion {
+  display: grid;
+  gap: var(--e-2);
+  margin-top: var(--e-3);
+  padding-top: var(--e-3);
+  border-top: 1px solid rgba(79, 195, 247, 0.2);
+}
+.invitacion__mensaje {
+  font-size: var(--t-menor);
+  line-height: 1.5;
+  color: var(--texto-tenue);
+}
+.invitacion__mensaje strong { color: var(--cian-brillante); font-weight: 500; }
+.invitacion__botones { display: flex; flex-wrap: wrap; gap: var(--e-2); }
+.invitacion__boton {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: 32px;
+  padding: 0 var(--e-3);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid var(--panel-borde);
+  cursor: pointer;
+  transition: color var(--dur-corta) var(--curva),
+              border-color var(--dur-corta) var(--curva),
+              background var(--dur-corta) var(--curva);
+}
+.invitacion__boton:hover,
+.invitacion__boton:focus-visible {
+  color: var(--cian-brillante);
+  border-color: var(--cian-brillante);
+  background: rgba(0, 229, 255, 0.12);
+}
+/* Encendida de verdad: verde, el mismo que usan los indicadores de la barra. */
+.invitacion__boton[aria-pressed="true"] {
+  color: var(--verde-estado);
+  border-color: rgba(58, 170, 53, 0.55);
+  background: rgba(58, 170, 53, 0.10);
+}
+.invitacion__simbolo { font-size: 10px; }
+
+@media (pointer: coarse) {
+  .invitacion__boton { min-height: 44px; }
+}
+
 .galaxia__datos {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
