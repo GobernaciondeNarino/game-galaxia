@@ -345,7 +345,7 @@ async function arrancar() {
       manos.desactivar();
       return;
     }
-    hud.entradas.mostrarEstado('Pidiendo permiso de cámara…');
+    hud.entradas.mostrarEstado('Pidiendo permiso de cámara…', 'info', 'camara');
     await manos.activar();
   });
 
@@ -354,11 +354,12 @@ async function arrancar() {
       paso === 'modelo'
         ? 'Cargando el modelo de manos (7,6 MB)…'
         : 'Esperando el permiso de la cámara…',
+      'info', 'camara',
     );
   });
 
   App.al('manos:activa', () => {
-    hud.entradas.mostrarEstado('');
+    hud.entradas.mostrarEstado('', 'info', 'camara');
     hud.entradas.establecerCamara(true);
     hud.barra.establecerIndicador('camara', 'activo', 'on');
     anunciar('Cámara activada. El vídeo se procesa en tu navegador y no se envía a ningún servidor.');
@@ -373,7 +374,7 @@ async function arrancar() {
   });
 
   App.al('manos:error', ({ mensaje }) => {
-    hud.entradas.mostrarEstado(mensaje, 'error');
+    hud.entradas.mostrarEstado(mensaje, 'error', 'camara');
     hud.entradas.establecerCamara(false);
     hud.barra.establecerIndicador('camara', 'alerta', 'error');
     anunciar(mensaje);
@@ -464,7 +465,7 @@ async function arrancar() {
       return;
     }
     // El aviso de privacidad se muestra ANTES de pedir el permiso, no después.
-    hud.entradas.mostrarEstado(voz.avisoPrivacidad);
+    hud.entradas.mostrarEstado(voz.avisoPrivacidad, 'info', 'microfono');
     await voz.activar();
   });
 
@@ -477,11 +478,11 @@ async function arrancar() {
   App.al('voz:inactiva', () => {
     hud.entradas.establecerMicrofono(false);
     hud.barra.establecerIndicador('microfono', 'inactivo', 'off');
-    hud.entradas.mostrarEstado('');
+    hud.entradas.mostrarEstado('', 'info', 'microfono');
   });
 
   App.al('voz:error', ({ mensaje }) => {
-    hud.entradas.mostrarEstado(mensaje, 'error');
+    hud.entradas.mostrarEstado(mensaje, 'error', 'microfono');
     hud.barra.establecerIndicador('microfono', 'alerta', 'error');
     anunciar(mensaje);
   });

@@ -45,7 +45,11 @@ export class EstadoEntradas {
     });
     this.esqueleto = crear('canvas', { class: 'entradas__esqueleto', 'aria-hidden': 'true' });
 
-    this.estadoCarga = crear('p', { class: 'entradas__estado', hidden: true, role: 'status' });
+    // Un mensaje por canal. Con una sola línea compartida, activar el
+    // micrófono borraba el aviso de que la cámara había sido denegada, y el
+    // usuario se quedaba sin saber por qué no funcionaba.
+    this.estadoCamara = crear('p', { class: 'entradas__estado', hidden: true, role: 'status' });
+    this.estadoMicrofono = crear('p', { class: 'entradas__estado', hidden: true, role: 'status' });
 
     this.vista = crear('div', { class: 'entradas__vista', hidden: true }, [
       this.video, this.esqueleto,
@@ -55,9 +59,10 @@ export class EstadoEntradas {
     this.panel = crear('section', { class: 'panel panel--entradas' }, [
       crear('h2', { class: 'panel__titulo', text: 'Entradas' }),
       this.vista,
-      this.estadoCarga,
       this.botonCamara,
+      this.estadoCamara,
       this.botonMicrofono,
+      this.estadoMicrofono,
       crear('p', { class: 'entradas__aviso' }, [
         crear('strong', { text: 'El vídeo se procesa en tu navegador. ' }),
         'No se envía, no se graba y no sale de este equipo.',
@@ -84,11 +89,17 @@ export class EstadoEntradas {
     this.ultimoComando.textContent = texto || '—';
   }
 
-  /** Mensaje de estado: carga del modelo, permiso denegado, error… */
-  mostrarEstado(texto, tipo = 'info') {
-    this.estadoCarga.hidden = !texto;
-    this.estadoCarga.textContent = texto ?? '';
-    this.estadoCarga.dataset.tipo = tipo;
+  /**
+   * Mensaje de estado de un canal de entrada.
+   * @param {string} texto
+   * @param {'info'|'error'} tipo
+   * @param {'camara'|'microfono'} canal
+   */
+  mostrarEstado(texto, tipo = 'info', canal = 'camara') {
+    const nodo = canal === 'microfono' ? this.estadoMicrofono : this.estadoCamara;
+    nodo.hidden = !texto;
+    nodo.textContent = texto ?? '';
+    nodo.dataset.tipo = tipo;
   }
 
   destruir() {
