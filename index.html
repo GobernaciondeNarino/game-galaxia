@@ -12,24 +12,16 @@
      el directorio padre. -->
 <base href="./">
 
-<link rel="icon" href="assets/orbis.svg" type="image/svg+xml">
+<!-- EL MAPA DE IMPORTACIONES VA AQUÍ, ANTES QUE CUALQUIER modulepreload.
+     No es una cuestión de estilo: la especificación exige que el import map
+     preceda a toda carga o precarga de módulos, y Firefox la aplica al pie de
+     la letra. Con el bloque después de los <link rel="modulepreload">, Firefox
+     lo descarta con «Import maps are not allowed after a module load or
+     preload has started» y la aplicación no arranca: el especificador «three»
+     se queda sin resolver. Chrome es más permisivo y no avisa, así que el
+     fallo solo aparece en Firefox y Safari.
 
-<!-- Precarga de lo que bloquea el primer render: fuentes y datos maestros.
-     En conexiones lentas esto adelanta la petición ~300 ms respecto a
-     descubrirlas al parsear el CSS. -->
-<link rel="preload" href="assets/fonts/Oswald-200-700-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/HindMadurai-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="data/sistema-solar.json" as="fetch" type="application/json" crossorigin>
-<link rel="modulepreload" href="js/main.js">
-<link rel="modulepreload" href="vendor/three/build/three.module.min.js">
-
-<link rel="stylesheet" href="css/fuentes.css">
-<link rel="stylesheet" href="css/nucleo.css">
-<link rel="stylesheet" href="css/hud.css">
-<link rel="stylesheet" href="css/animaciones.css">
-<link rel="stylesheet" href="css/responsive.css">
-
-<!-- Mapa de importaciones: resuelve los especificadores desnudos de los módulos
+     Mapa de importaciones: resuelve los especificadores desnudos de los módulos
      ES sin ningún empaquetador. Todo apunta a copias locales en vendor/, de
      modo que la aplicación no depende de ningún CDN de terceros en producción.
 
@@ -49,6 +41,25 @@
   }
 }
 </script>
+
+<link rel="icon" href="assets/orbis.svg" type="image/svg+xml">
+
+<!-- Precarga de lo que bloquea el primer render: fuentes y datos maestros.
+     En conexiones lentas esto adelanta la petición ~300 ms respecto a
+     descubrirlas al parsear el CSS. -->
+<link rel="preload" href="assets/fonts/Oswald-200-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/HindMadurai-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="data/sistema-solar.json" as="fetch" type="application/json" crossorigin>
+<link rel="modulepreload" href="js/main.js">
+<link rel="modulepreload" href="vendor/three/build/three.module.min.js">
+
+<link rel="stylesheet" href="css/fuentes.css">
+<link rel="stylesheet" href="css/nucleo.css">
+<link rel="stylesheet" href="css/hud.css">
+<link rel="stylesheet" href="css/animaciones.css">
+<link rel="stylesheet" href="css/responsive.css">
+
+
 </head>
 
 <body data-estado="arranque">

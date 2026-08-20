@@ -14,8 +14,11 @@
   padding: var(--e-3);
   gap: var(--e-3);
 
-  grid-template-columns: minmax(210px, 268px) 1fr minmax(220px, 286px);
-  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(210px, 268px) minmax(0, 1fr) minmax(220px, 286px);
+  /* minmax(0, 1fr) y no 1fr: con 1fr, la altura mínima del contenido de la fila
+     central impide que se encoja, y la tira de navegación queda fuera de la
+     pantalla en cuanto la ventana baja de 900 px de alto. */
+  grid-template-rows: auto minmax(0, 1fr) auto;
   grid-template-areas:
     "superior superior superior"
     "izquierda viewport derecha"
@@ -27,16 +30,21 @@
 
 #hud > *, .panel, .navegacion__pestana { pointer-events: auto; }
 
+/* La barra superior envuelve SIEMPRE. Con los controles de tiempo, escala y
+   audio, la fila entera pasa de 1.400 px; sin envolver, empujaba la rejilla más
+   allá del ancho de la ventana y recortaba la columna derecha. */
 #hud-barra-superior {
   grid-area: superior;
   display: flex;
-  gap: var(--e-3);
+  flex-wrap: wrap;
+  gap: var(--e-2) var(--e-3);
   align-items: flex-start;
   pointer-events: none;
+  min-width: 0;
 }
-#hud-panel-izquierdo  { grid-area: izquierda; display: grid; align-content: start; gap: var(--e-3); }
-#hud-viewport         { grid-area: viewport; display: grid; place-items: center; pointer-events: none; }
-#hud-panel-derecho    { grid-area: derecha; display: grid; align-content: start; gap: var(--e-3); overflow-y: auto; }
+#hud-panel-izquierdo  { grid-area: izquierda; display: grid; align-content: start; gap: var(--e-3); min-height: 0; overflow-y: auto; }
+#hud-viewport         { grid-area: viewport; display: grid; place-items: center; pointer-events: none; min-height: 0; }
+#hud-panel-derecho    { grid-area: derecha; display: grid; align-content: start; gap: var(--e-3); min-height: 0; overflow-y: auto; }
 #hud-navegacion-planetaria { grid-area: inferior; }
 
 #hud-proyeccion-orbital {
@@ -81,6 +89,7 @@
   padding: var(--e-3);
   background: var(--panel-fondo);
   border: 1px solid var(--panel-borde);
+  -webkit-backdrop-filter: blur(var(--panel-desenfoque));
   backdrop-filter: blur(var(--panel-desenfoque));
   clip-path: polygon(
     var(--corte) 0, 100% 0, 100% calc(100% - var(--corte)),
@@ -198,9 +207,10 @@
    Barra superior
    ========================================================================== */
 .barra {
-  flex: 1;
+  flex: 1 1 640px;
+  min-width: 0;
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) auto minmax(200px, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: start;
   gap: var(--e-4);
   pointer-events: auto;
@@ -291,10 +301,11 @@
 
 /* Controles de escena, a la derecha de la barra */
 .controles {
-  flex: none;
+  flex: 1 1 auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--e-2);
   padding: var(--e-2) var(--e-3);
 }
@@ -664,6 +675,7 @@
   background: var(--panel-fondo);
   border: 1px solid var(--panel-borde);
   border-bottom: 0;
+  -webkit-backdrop-filter: blur(var(--panel-desenfoque));
   backdrop-filter: blur(var(--panel-desenfoque));
   font-family: var(--fuente-titulos);
   font-size: var(--t-micro);
@@ -828,6 +840,7 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
   padding: var(--e-2) var(--e-4);
   background: rgba(5, 11, 24, 0.86);
   border: 1px solid var(--panel-borde);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   pointer-events: none;
 }
@@ -982,3 +995,80 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
   font-size: var(--t-menor);
   color: var(--cian-acento);
 }
+
+/* ==========================================================================
+   Comparador de dos cuerpos
+   ========================================================================== */
+.comparador {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 31;
+  width: min(620px, 94vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--e-4);
+}
+.comparador__cabeceras,
+.comparador__siluetas,
+.comparador__fila {
+  display: grid;
+  grid-template-columns: 1fr 8.5em 1fr;
+  gap: var(--e-3);
+  align-items: center;
+}
+.comparador__fila { grid-template-columns: 1fr 8.5em 1fr 4.5em; }
+.comparador__cabeceras { margin-bottom: var(--e-2); }
+.comparador__nombre {
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-mayor);
+  letter-spacing: 0.08em;
+  color: var(--texto);
+  text-align: center;
+}
+.comparador__vs {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+  text-align: center;
+}
+.comparador__siluetas { margin-bottom: var(--e-3); }
+/* El contenedor mide 96 px fijos y el disco un porcentaje de ese ancho: así la
+   proporción entre los dos cuerpos se conserva. Limitando la altura en vez del
+   ancho, el mayor salía como una elipse en lugar de un círculo. */
+.comparador__silueta {
+  display: flex;
+  justify-content: center;
+  width: 96px;
+  margin: 0 auto;
+}
+.comparador__disco {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: inset -8px -5px 14px rgba(0, 0, 0, 0.6);
+}
+.comparador__lista { display: grid; gap: 2px; }
+.comparador__fila {
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.12);
+  font-size: var(--t-menor);
+}
+.comparador__fila > .panel__cifra:first-child { text-align: right; }
+.comparador__etiqueta {
+  font-family: var(--fuente-titulos);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+  text-align: center;
+}
+.comparador__razon {
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  color: var(--ambar-seleccion);
+  text-align: right;
+}
+.comparador__razon--vacia { color: var(--texto-apagado); }

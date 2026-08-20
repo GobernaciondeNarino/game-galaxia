@@ -46,7 +46,10 @@ export class Galaxy {
     );
 
     if (textura) {
-      material.map = this.gestor.cargarTextura(textura);
+      // El cielo ocupa toda la pantalla al fondo: la versión de 512 px basta
+      // hasta que el resto de la escena está lista.
+      material.map = this.gestor.cargarTextura(textura.replace(/(\.\w+)$/, '@512$1'));
+      this.rutaCieloCompleta = textura;
       // El fondo estelar no debe competir con la escena: se atenúa.
       material.color.setScalar(0.55);
     }
@@ -149,6 +152,24 @@ export class Galaxy {
 
     this.disco.material.opacity = nueva;
     this.disco.visible = nueva > 0.01;
+  }
+
+  /** Sustituye el cielo por su versión completa, ya con la escena en marcha. */
+  mejorarCielo() {
+    if (!this.rutaCieloCompleta || this._mejorado) return;
+    this._mejorado = true;
+
+    const completa = this.gestor.cargarTextura(this.rutaCieloCompleta);
+    let intentos = 0;
+    const sondeo = setInterval(() => {
+      if (completa.image) {
+        clearInterval(sondeo);
+        const anterior = this.cielo.material.map;
+        this.cielo.material.map = completa;
+        this.cielo.material.needsUpdate = true;
+        if (anterior && anterior !== completa) anterior.dispose();
+      } else if (++intentos > 150) clearInterval(sondeo);
+    }, 100);
   }
 
   get objeto() {

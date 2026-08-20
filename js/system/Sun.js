@@ -10,7 +10,7 @@
  */
 
 import * as THREE from 'three';
-import { CelestialBody } from './CelestialBody.js';
+import { CelestialBody, rutaReducida } from './CelestialBody.js';
 import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
 
 const VERTEX = /* glsl */ `
@@ -132,7 +132,8 @@ export class Sun extends CelestialBody {
     this.materialSuperficie = this.gestor.registrar(
       new THREE.ShaderMaterial({
         uniforms: {
-          mapa: { value: tieneMapa ? this.gestor.cargarTextura(this.datos.render.textura) : null },
+          // Como el resto de cuerpos, el Sol arranca con la textura reducida.
+          mapa: { value: tieneMapa ? this.gestor.cargarTextura(rutaReducida(this.datos.render.textura)) : null },
           tieneMapa: { value: tieneMapa ? 1 : 0 },
           tiempo: { value: 0 },
           colorCaliente: { value: new THREE.Color('#ffb547') },
@@ -224,6 +225,24 @@ export class Sun extends CelestialBody {
     this.luz.add(destello);
     this.destello = destello;
     return destello;
+  }
+
+  /** Sustituye la textura de la fotosfera por la de resolución completa. */
+  mejorarTextura() {
+    const ruta = this.datos.render?.textura;
+    if (!ruta || this._texturaMejorada) return;
+    this._texturaMejorada = true;
+
+    const completa = this.gestor.cargarTextura(ruta);
+    let intentos = 0;
+    const sondeo = setInterval(() => {
+      if (completa.image) {
+        clearInterval(sondeo);
+        const anterior = this.materialSuperficie.uniforms.mapa.value;
+        this.materialSuperficie.uniforms.mapa.value = completa;
+        if (anterior && anterior !== completa) anterior.dispose();
+      } else if (++intentos > 100) clearInterval(sondeo);
+    }, 100);
   }
 
   actualizar(fecha, delta = 0) {

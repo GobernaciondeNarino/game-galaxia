@@ -60,4 +60,4 @@ para cualquier decisión de diseño de la HUD.
 
 ## Estado
 
-Fases 0 a 7 completadas. Ver el plan de fases en `README.md`.
+Fases 0 a 8 completadas, salvo la verificación manual en Safari. Ver el plan de fases en `README.md`.

@@ -154,6 +154,9 @@ async function arrancar() {
     App.definir('cuerpoActivo', id);
     App.definir('vista', 'cuerpo');
     rig.viajarA(cuerpo);
+    // La textura de 2K se pide justo ahora: durante el viaje de cámara, que
+    // dura más de un segundo, da tiempo a que llegue sin que se note.
+    sistema.mejorarTexturas(id);
     sfx.reproducir('seleccion');
     // La narración arranca al seleccionar, no al llegar: el viaje dura más de
     // un segundo y el silencio mientras tanto se hace largo.
@@ -193,6 +196,29 @@ async function arrancar() {
     return v;
   }
 
+  /**
+   * Cambia la escala de la escena y reencuadra la cámara: tras el cambio, las
+   * distancias son otras y dejar la cámara donde estaba la dejaría dentro de un
+   * planeta o a millones de unidades de todo.
+   */
+  function cambiarEscala(modo) {
+    const resultado = sistema.establecerEscala(modo);
+    App.preferencias.set('escala', modo);
+
+    const activo = App.estado.cuerpoActivo;
+    if (activo) {
+      rig.viajarA(sistema.obtener(activo));
+    } else {
+      // El sistema entero cabe a 300 unidades en didáctico y a nueve millones
+      // en real: la vista general tiene que adaptarse.
+      rig.volverAVistaGeneral(modo === 'real' ? 9_000_000 : 300);
+    }
+
+    anunciar(resultado.aviso);
+    App.emitir('escena:escala', resultado);
+    return resultado;
+  }
+
   function mostrarOrbitas(visible) {
     App.preferencias.set('mostrarOrbitas', visible);
     sistema.establecerVisibilidadOrbitas(visible);
@@ -206,6 +232,7 @@ async function arrancar() {
     alAlternarPausa: alternarPausa,
     alAlternarOrbitas: () => mostrarOrbitas(!App.preferencias.get('mostrarOrbitas')),
     alPedirAyuda: () => hud.mostrarAyuda(),
+    cambiarEscala,
     alAlternarSilencio: () => {
       const silenciada = !App.preferencias.get('narracionSilenciada');
       narrador?.silenciar(silenciada);
@@ -394,14 +421,15 @@ async function arrancar() {
       }
 
       case 'comparar':
-        // La comparación abre el primero y anuncia el segundo: el panel
-        // comparativo llega en la fase 8; hasta entonces, no se finge tenerlo.
-        if (cuerpo) seleccionar(cuerpo, 'voz');
-        anunciar(
-          cuerpoB
-            ? `Comparación con ${catalogo.cuerpos.find((c) => c.id === cuerpoB)?.nombre}: disponible próximamente.`
-            : 'No he entendido con qué comparar.',
-        );
+        if (cuerpo && cuerpoB && hud.compararCuerpos(cuerpo, cuerpoB)) {
+          anunciar(
+            `Comparando ${catalogo.cuerpos.find((c) => c.id === cuerpo)?.nombre} ` +
+            `con ${catalogo.cuerpos.find((c) => c.id === cuerpoB)?.nombre}.`,
+          );
+        } else if (cuerpo) {
+          seleccionar(cuerpo, 'voz');
+          anunciar('No he entendido con qué compararlo. Prueba: «comparar Marte con Venus».');
+        }
         break;
 
       case 'pausar': if (!bucle.pausado) alternarPausa(); break;
@@ -411,10 +439,8 @@ async function arrancar() {
       case 'mostrar_orbitas': mostrarOrbitas(true); break;
       case 'ocultar_orbitas': mostrarOrbitas(false); break;
 
-      case 'modo_real':
-      case 'modo_didactico':
-        anunciar('El cambio de escala llega en la fase 8.');
-        break;
+      case 'modo_real': cambiarEscala('real'); break;
+      case 'modo_didactico': cambiarEscala('didactico'); break;
 
       case 'repetir': narrador?.repetir(); break;
       case 'silencio':
@@ -530,11 +556,22 @@ async function arrancar() {
     escena: gestor, sistema, efectos, rig, bucle, controles, hud, narrador, sfx,
     manos, reconocedor, voz,
   });
-  App.acciones = { seleccionar, vistaGeneral, vecino };
+  // Superficie pública para la consola del navegador y las pruebas.
+  App.acciones = {
+    seleccionar, vistaGeneral, vecino,
+    alternarPausa, cambiarVelocidad, mostrarOrbitas, cambiarEscala,
+    ejecutarIntencion,
+    comparar: (a, b) => hud.compararCuerpos(a, b),
+  };
   App.faseImplementada = 7;
 
   sistema.establecerVisibilidadOrbitas(App.preferencias.get('mostrarOrbitas'));
   bucle.iniciar();
+
+  // El cielo de alta resolución se pide con la escena ya en marcha: llega
+  // cuando llegue y hasta entonces se ve el de 512 px, que en un fondo
+  // desenfocado por el bloom apenas se distingue.
+  setTimeout(() => sistema.mejorarEntorno(), 1200);
 
   App.definir('cargando', false);
   progresar(1, 'Listo.');

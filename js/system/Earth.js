@@ -13,7 +13,7 @@
  */
 
 import * as THREE from 'three';
-import { CelestialBody } from './CelestialBody.js';
+import { CelestialBody, rutaReducida } from './CelestialBody.js';
 import { DOS_PI } from '../utils/math.js';
 import { EPOCA_J2000 } from './Orbit.js';
 
@@ -88,9 +88,11 @@ export class Earth extends CelestialBody {
     this.materialSuperficie = this.gestor.registrar(
       new THREE.ShaderMaterial({
         uniforms: {
-          mapaDia: { value: this.gestor.cargarTextura(render.textura) },
+          // También aquí se empieza por la versión de 512 px; mejorarTextura()
+          // sustituye las tres capas al enfocar la Tierra.
+          mapaDia: { value: this.gestor.cargarTextura(rutaReducida(render.textura)) },
           mapaNoche: {
-            value: tieneNoche ? this.gestor.cargarTextura(render.texturaNoche) : null,
+            value: tieneNoche ? this.gestor.cargarTextura(rutaReducida(render.texturaNoche)) : null,
           },
           tieneNoche: { value: tieneNoche ? 1 : 0 },
           // El Sol está en el origen de la escena.
@@ -112,10 +114,11 @@ export class Earth extends CelestialBody {
    */
   _anadirNubes(ruta) {
     const geometria = this.gestor.registrar(new THREE.SphereGeometry(this.radio * 1.012, 48, 32));
+    const textura = this.gestor.cargarTextura(rutaReducida(ruta));
     const material = this.gestor.registrar(
       new THREE.MeshLambertMaterial({
-        map: this.gestor.cargarTextura(ruta),
-        alphaMap: this.gestor.cargarTextura(ruta),
+        map: textura,
+        alphaMap: textura,
         transparent: true,
         opacity: 0.62,
         depthWrite: false,
@@ -163,6 +166,45 @@ export class Earth extends CelestialBody {
 
     this.atmosfera = new THREE.Mesh(geometria, material);
     this.ejeInclinado.add(this.atmosfera);
+  }
+
+  /** Sustituye las tres capas por sus versiones completas. */
+  mejorarTextura() {
+    const render = this.datos.render;
+    if (!render?.textura || this._texturaMejorada) return;
+    this._texturaMejorada = true;
+
+    const cambiar = (uniforme, ruta) => {
+      const completa = this.gestor.cargarTextura(ruta);
+      const aplicar = () => {
+        const anterior = this.materialSuperficie.uniforms[uniforme].value;
+        this.materialSuperficie.uniforms[uniforme].value = completa;
+        if (anterior && anterior !== completa) anterior.dispose();
+      };
+      let intentos = 0;
+      const sondeo = setInterval(() => {
+        if (completa.image) { clearInterval(sondeo); aplicar(); }
+        else if (++intentos > 100) clearInterval(sondeo);
+      }, 100);
+    };
+
+    cambiar('mapaDia', render.textura);
+    if (render.texturaNoche) cambiar('mapaNoche', render.texturaNoche);
+
+    if (this.nubes && render.texturaNubes) {
+      const completa = this.gestor.cargarTextura(render.texturaNubes);
+      let intentos = 0;
+      const sondeo = setInterval(() => {
+        if (completa.image) {
+          clearInterval(sondeo);
+          const anterior = this.nubes.material.map;
+          this.nubes.material.map = completa;
+          this.nubes.material.alphaMap = completa;
+          this.nubes.material.needsUpdate = true;
+          if (anterior && anterior !== completa) anterior.dispose();
+        } else if (++intentos > 100) clearInterval(sondeo);
+      }, 100);
+    }
   }
 
   actualizar(fecha) {

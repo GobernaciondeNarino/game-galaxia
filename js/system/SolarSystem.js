@@ -24,6 +24,20 @@ import { log } from '../utils/debug.js';
 
 const MS_POR_DIA = 86_400_000;
 
+/**
+ * ESCALAS.
+ *
+ * En escala real, una unidad de escena son 1.000 km. Con eso la Tierra mide
+ * 6,37 unidades de radio, el Sol 696 y la órbita de Neptuno 4.500.000. Es el
+ * Sistema Solar tal cual es, y demuestra algo que ninguna ilustración enseña:
+ * que está esencialmente vacío. Navegarlo es incómodo a propósito.
+ *
+ * En escala didáctica los tamaños y las distancias vienen ya comprimidos desde
+ * el catálogo, con las funciones deterministas de tools/construir-datos.mjs.
+ */
+const KM_POR_UNIDAD_REAL = 1000;
+const KM_POR_UA = 149_597_870.7;
+
 export class SolarSystem {
   /**
    * @param {object} catalogo contenido de data/sistema-solar.json
@@ -42,6 +56,7 @@ export class SolarSystem {
     this.anillos = [];
 
     this._porId = new Map(catalogo.cuerpos.map((c) => [c.id, c]));
+    this.escala = 'didactico';
     this._fechaAnterior = null;
     this._seleccionables = null;
 
@@ -178,6 +193,74 @@ export class SolarSystem {
 
   obtener(id) {
     return this.cuerpos.get(id);
+  }
+
+  /**
+   * Cambia entre la escala didáctica y la real.
+   *
+   * @param {'didactico'|'real'} modo
+   * @returns {{modo:string, aviso:string|null}}
+   */
+  establecerEscala(modo) {
+    if (modo === this.escala) return { modo, aviso: null };
+    this.escala = modo;
+
+    for (const cuerpo of this.cuerpos.values()) {
+      const datos = cuerpo.datos;
+
+      // --- Radio ---------------------------------------------------------
+      let radio;
+      if (modo === 'real') {
+        radio = datos.fisica?.radioMedioKm
+          ? datos.fisica.radioMedioKm / KM_POR_UNIDAD_REAL
+          : cuerpo.radioBase;
+      } else {
+        radio = cuerpo.radioBase;
+      }
+      cuerpo.establecerRadio(radio);
+
+      // --- Semieje de la órbita -------------------------------------------
+      if (!cuerpo.orbita) continue;
+      let semieje;
+      if (modo === 'real') {
+        semieje = datos.tipo === 'satelite'
+          ? (datos.orbita?.semiejeMayorKm ?? 0) / KM_POR_UNIDAD_REAL
+          : ((datos.orbita?.semiejeMayorUA ?? 0) * KM_POR_UA) / KM_POR_UNIDAD_REAL;
+      } else {
+        semieje = datos.render?.distanciaEscalada ?? cuerpo.orbita.semieje;
+      }
+      cuerpo.orbita.establecerSemieje(semieje);
+    }
+
+    // Los cinturones se dibujan con radios propios; en escala real habría que
+    // reconstruir sus cinco mil instancias, así que se ocultan y se declara.
+    for (const cinturon of this.cinturones) cinturon.establecerVisibilidad(modo !== 'real');
+
+    return {
+      modo,
+      aviso: modo === 'real'
+        ? 'Escala real: una unidad son 1.000 km. Las distancias son enormes y la ' +
+          'mayor parte de la escena está vacía, que es justo como es el Sistema Solar. ' +
+          'Los cinturones quedan ocultos en este modo.'
+        : 'Escala didáctica: tamaños y distancias comprimidos para poder navegar.',
+    };
+  }
+
+  /**
+   * Pide la textura de resolución completa de un cuerpo y de sus satélites.
+   * Se llama al enfocar: es cuando la resolución se nota y cuando el usuario
+   * está dispuesto a esperar un instante.
+   */
+  mejorarTexturas(id) {
+    const cuerpo = this.cuerpos.get(id);
+    if (!cuerpo) return;
+    cuerpo.mejorarTextura?.();
+    for (const hijo of cuerpo.hijos) hijo.mejorarTextura?.();
+  }
+
+  /** Sube la resolución del fondo estelar. */
+  mejorarEntorno() {
+    this.galaxia.mejorarCielo();
   }
 
   /** Ids en el orden en el que aparecen en la tira de navegación. */

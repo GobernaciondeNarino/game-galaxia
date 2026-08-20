@@ -21,11 +21,11 @@ export class SceneManager {
 
     this.escena = new THREE.Scene();
 
-    // Cámara: el rango del Sistema Solar en escala didáctica va de 0,06
-    // unidades (Fobos) a más de 300 (Eris). Un `near` demasiado pequeño
-    // arruina la precisión del buffer de profundidad, así que se ajusta al
-    // tamaño real de lo que hay que ver.
-    this.camara = new THREE.PerspectiveCamera(50, this.proporcion, 0.02, 20000);
+    // Cámara. El rango que tiene que cubrir es brutal: en escala didáctica va
+    // de 0,06 unidades (Fobos) a 300 (Eris), y en escala real de 0,011 a diez
+    // millones. Un buffer de profundidad lineal no tiene precisión para eso y
+    // produce el parpadeo de superficies que se solapan.
+    this.camara = new THREE.PerspectiveCamera(50, this.proporcion, 0.001, 2e7);
     this.camara.position.set(0, 90, 220);
 
     this.renderizador = new THREE.WebGLRenderer({
@@ -33,7 +33,13 @@ export class SceneManager {
       antialias: true,
       powerPreference: 'high-performance',
       stencil: false,
+      // Resuelve el rango de profundidad extremo del modo real. Cuesta algo de
+      // relleno, pero sin él la escala real es inutilizable.
+      logarithmicDepthBuffer: true,
     });
+
+    // Evita descargar dos veces la misma textura si dos cuerpos la comparten.
+    THREE.Cache.enabled = true;
     this.renderizador.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderizador.setSize(window.innerWidth, window.innerHeight, false);
     this.renderizador.toneMapping = THREE.ACESFilmicToneMapping;
@@ -53,7 +59,7 @@ export class SceneManager {
     this.controles.rotateSpeed = 0.55;
     this.controles.zoomSpeed = 0.9;
     this.controles.panSpeed = 0.7;
-    this.controles.minDistance = 0.15;
+    this.controles.minDistance = 0.005;
     this.controles.maxDistance = 3000;
 
     // Gestor de carga: alimenta la barra de progreso REAL del arranque.

@@ -117,6 +117,28 @@ export class Orbit {
     if (this.linea) this.linea.visible = visible;
   }
 
+  /**
+   * Cambia el semieje mayor y redibuja la trayectoria. Lo usa el cambio entre
+   * escala didáctica y real: la forma de la elipse no cambia —la excentricidad
+   * y los ángulos son los mismos—, solo su tamaño.
+   */
+  establecerSemieje(nuevo) {
+    if (!nuevo || nuevo === this.semieje) return;
+    this.semieje = nuevo;
+
+    if (!this.linea) return;
+    const atributo = this.linea.geometry.attributes.position;
+    const segmentos = atributo.count - 1;
+    const b = this.semieje * Math.sqrt(1 - this.excentricidad ** 2);
+
+    for (let i = 0; i <= segmentos; i++) {
+      const E = (i / segmentos) * DOS_PI;
+      atributo.setXYZ(i, this.semieje * (Math.cos(E) - this.excentricidad), 0, -b * Math.sin(E));
+    }
+    atributo.needsUpdate = true;
+    this.linea.geometry.computeBoundingSphere();
+  }
+
   destruir() {
     if (this.linea) {
       this.linea.geometry.dispose();

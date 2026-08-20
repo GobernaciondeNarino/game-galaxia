@@ -10,9 +10,11 @@ paso de compilación, sin Node.js en producción y sin procesos en segundo plano
 > cinturones y entorno galáctico; catálogo cuyas cifras proceden de JPL
 > Horizons; HUD completa en DOM con sus dos vistas, transición interrumpible,
 > anotaciones ancladas a la superficie y arco de datos; narración por audio con
-> subtítulos sincronizados; control por gestos con MediaPipe; y control por voz
-> con parser de intenciones tolerante a errores de transcripción. Queda la
-> fase 8: optimización y pruebas cruzadas de navegador.
+> subtítulos sincronizados; control por gestos con MediaPipe; control por voz con
+> parser tolerante a errores de transcripción; y la fase 8 de optimización, con
+> las dos escalas, nivel de detalle de texturas y pruebas cruzadas.
+> **Pendiente: una pasada manual en Safari** (ver
+> [`docs/RENDIMIENTO-Y-NAVEGADORES.md`](docs/RENDIMIENTO-Y-NAVEGADORES.md)).
 > Consulta el [plan de fases](#plan-de-fases).
 
 ---
@@ -110,6 +112,13 @@ exactamente el mismo camino.
 de pantalla y navegable con Tab. Una HUD dibujada en una textura 3D se ve mejor
 en capturas y es inutilizable para quien no ve la pantalla.
 
+**Dos escalas.** La didáctica comprime tamaños y distancias con funciones
+deterministas para que el sistema sea navegable. La real usa proporciones
+verdaderas —una unidad son 1.000 km— y enseña algo que ninguna ilustración
+muestra: que el Sistema Solar está esencialmente vacío. Es incómoda de navegar a
+propósito. El rango de profundidad que exige, de 0,011 a 4,5 millones de
+unidades, obliga a usar buffer de profundidad logarítmico.
+
 **Funciona en cualquier ruta.** Todas las rutas internas —incluidas las del
 `importmap`— son relativas al directorio de la aplicación, y `js/utils/rutas.js`
 deduce la raíz de la URL de su propio módulo. ORBIS se puede servir tanto en
@@ -171,8 +180,10 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 5. **Precarga de la ruta crítica** (`preload` de tipografías y datos,
    `modulepreload` de `main.js` y Three.js) para adelantar las peticiones sin
    esperar a que el analizador de CSS las descubra.
-6. **Texturas por niveles** (fase 2): primero una versión de 512 px para que la
-   escena sea navegable de inmediato y, solo al enfocar un cuerpo, la de 2K.
+6. **Texturas por niveles.** Primero la versión de 512 px, para que la escena
+   sea navegable de inmediato; la de 2K se pide solo al enfocar un cuerpo, y el
+   intercambio ocurre durante el viaje de cámara, así que no se percibe. El
+   arranque baja de 8 MB a 1,4 MB de texturas.
 7. **Progreso real en el arranque**, medido con el `LoadingManager` de Three.js.
    Nunca una barra simulada.
 8. **Audio de narración cacheado en el servidor** y precargado únicamente para
@@ -224,6 +235,9 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 - [`docs/GESTOS-Y-COMANDOS.md`](docs/GESTOS-Y-COMANDOS.md) — referencia para la
   persona que usa la interfaz.
 - [`docs/DATOS.md`](docs/DATOS.md) — esquema del catálogo y política de rigor.
+- [`docs/RENDIMIENTO-Y-NAVEGADORES.md`](docs/RENDIMIENTO-Y-NAVEGADORES.md) —
+  qué se descarga, fugas de recursos, resultados por navegador y qué queda por
+  comprobar a mano.
 
 ## Licencia y créditos
 

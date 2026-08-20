@@ -34,6 +34,8 @@ export class Rings {
     );
 
     if (config.textura) {
+      // La textura de anillos es una tira de 1024×63: no hay versión reducida
+      // que merezca la pena, pesa 7 kB.
       material.map = gestor.cargarTextura(config.textura);
       material.alphaMap = material.map;
     } else {

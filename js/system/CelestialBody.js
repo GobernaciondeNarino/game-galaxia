@@ -15,6 +15,14 @@ import { Orbit, EPOCA_J2000 } from './Orbit.js';
 
 const MS_POR_HORA = 3_600_000;
 
+/**
+ * Ruta de la versión de 512 px de una textura.
+ * El convenio lo fija tools/texturas.mjs: jupiter.jpg → jupiter@512.jpg.
+ */
+export function rutaReducida(ruta) {
+  return ruta.replace(/(\.\w+)$/, '@512$1');
+}
+
 /** Segmentos de la esfera según su tamaño en pantalla. Un satélite de 0,06
  *  unidades no necesita los mismos triángulos que Júpiter. */
 function segmentosPara(radioEscena) {
@@ -34,7 +42,10 @@ export class CelestialBody {
     this.id = datos.id;
     this.gestor = gestor;
 
-    this.radio = datos.render.radioEscalado ?? 0.3;
+    /** Radio con el que se construyó la geometría. Nunca cambia. */
+    this.radioBase = datos.render.radioEscalado ?? 0.3;
+    /** Radio efectivo en la escena. Cambia con el modo de escala. */
+    this.radio = this.radioBase;
     this.periodoRotacionHoras = datos.fisica?.periodoRotacionHoras ?? null;
     this.inclinacionAxial = (datos.fisica?.inclinacionAxialGrados ?? 0) * GRADOS;
 
@@ -73,13 +84,17 @@ export class CelestialBody {
       }),
     );
 
-    // La textura se carga aparte y se asigna cuando llega, para no bloquear la
-    // construcción de la escena. Mientras tanto se ve el color plano.
+    // NIVEL DE DETALLE. En el arranque se carga la versión de 512 px, no la de
+    // 2048: las diecisiete texturas del sistema pasan de unos 8 MB a 1,3 MB, y
+    // en una conexión lenta esa es la diferencia entre esperar medio minuto y
+    // poder navegar de inmediato. La versión completa se pide solo cuando el
+    // usuario enfoca ese cuerpo, que es cuando se nota.
     if (render.textura) {
-      const textura = this.gestor.cargarTextura(render.textura);
+      const textura = this.gestor.cargarTextura(rutaReducida(render.textura));
       material.map = textura;
       material.color.set('#ffffff');
       material.needsUpdate = true;
+      this.texturaReducida = textura;
     }
 
     const malla = new THREE.Mesh(geometria, material);
@@ -88,6 +103,48 @@ export class CelestialBody {
     // pertenece el triángulo que ha tocado.
     malla.userData.cuerpo = this;
     return malla;
+  }
+
+  /**
+   * Sustituye la textura reducida por la de resolución completa.
+   *
+   * Es idempotente y no bloquea: si ya se pidió, no hace nada; si la descarga
+   * falla, se queda la reducida, que es peor pero no rompe nada. La reducida se
+   * libera solo cuando la nueva ya está en la GPU, para que no haya un
+   * fotograma con el cuerpo en gris.
+   */
+  mejorarTextura() {
+    const ruta = this.datos.render?.textura;
+    if (!ruta || this._texturaMejorada) return;
+    this._texturaMejorada = true;
+
+    const completa = this.gestor.cargarTextura(ruta);
+    completa.addEventListener?.('dispose', () => {});
+
+    const aplicar = () => {
+      const anterior = this.malla.material.map;
+      this.malla.material.map = completa;
+      this.malla.material.needsUpdate = true;
+      if (anterior && anterior !== completa) anterior.dispose();
+      this.texturaReducida = null;
+    };
+
+    if (completa.image) aplicar();
+    else completa.addEventListener?.('load', aplicar);
+
+    // El TextureLoader de Three no emite «load» sobre la textura, sino que
+    // rellena `image`. Se comprueba con un sondeo corto y acotado.
+    if (!completa.image) {
+      let intentos = 0;
+      const sondeo = setInterval(() => {
+        if (completa.image) {
+          clearInterval(sondeo);
+          aplicar();
+        } else if (++intentos > 100) {
+          clearInterval(sondeo);   // 10 s: se queda la reducida.
+        }
+      }, 100);
+    }
   }
 
   /** Conecta el cuerpo a una órbita construida a partir de sus elementos. */
@@ -123,6 +180,19 @@ export class CelestialBody {
 
     for (const capa of this.capas) capa.actualizar?.(fecha);
     for (const hijo of this.hijos) hijo.actualizar(fecha);
+  }
+
+  /**
+   * Cambia el radio efectivo del cuerpo.
+   *
+   * Se reescala la malla en lugar de reconstruir la geometría: crear treinta y
+   * tres esferas nuevas en cada cambio de escala provocaría un tirón y dejaría
+   * las anteriores para el recolector.
+   */
+  establecerRadio(nuevo) {
+    if (!nuevo || nuevo === this.radio) return;
+    this.radio = nuevo;
+    this.ejeInclinado.scale.setScalar(nuevo / this.radioBase);
   }
 
   /** Posición del cuerpo en coordenadas de mundo. */

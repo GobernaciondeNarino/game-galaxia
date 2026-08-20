@@ -28,6 +28,7 @@ import { Anotaciones } from './Anotaciones.js';
 import { ArcoDatos } from './ArcoDatos.js';
 import { Reticula } from './Reticula.js';
 import { Subtitles } from './Subtitles.js';
+import { Comparador } from './panels/Comparador.js';
 import { log } from '../utils/debug.js';
 
 export class HUD {
@@ -84,6 +85,7 @@ export class HUD {
     }
     this.arco = new ArcoDatos(document.body);
     this.subtitulos = new Subtitles($('#hud-subtitulos'));
+    this.comparador = new Comparador(document.body);
 
     this._montarControlesEscena();
     this._suscribir();
@@ -134,6 +136,14 @@ export class HUD {
           onchange: (e) => this.acciones.mostrarOrbitas(e.target.checked),
         }),
         crear('span', { text: 'Órbitas' }),
+      ]),
+      crear('label', { class: 'controles__interruptor', title: 'Escala real: proporciones astronómicas verdaderas' }, [
+        crear('input', {
+          type: 'checkbox',
+          checked: App.preferencias.get('escala') === 'real',
+          onchange: (e) => this.acciones.cambiarEscala(e.target.checked ? 'real' : 'didactico'),
+        }),
+        crear('span', { text: 'Escala real' }),
       ]),
       this._crearControlesNarracion(),
       crear('button', {
@@ -231,6 +241,7 @@ export class HUD {
             : 'Narración con voz sintetizada',
         );
       }),
+      App.al('escena:escala', ({ aviso }) => this.barra.establecerSubtitulo(aviso)),
       App.al('narracion:bloqueada', () => {
         this.barra.establecerSubtitulo('Toca la pantalla para permitir el audio');
       }),
@@ -345,6 +356,15 @@ export class HUD {
     cerrar.focus();
   }
 
+  /** Abre el comparador con dos cuerpos del catálogo. */
+  compararCuerpos(idA, idB) {
+    const a = this.porId.get(idA);
+    const b = this.porId.get(idB);
+    if (!a || !b) return false;
+    this.comparador.mostrar(a, b);
+    return true;
+  }
+
   /** Propuesta de alternativas cuando no se entiende un comando de voz. */
   mostrarSugerencias(texto, sugerencias) {
     if (!this.avisoSugerencias) {
@@ -382,7 +402,7 @@ export class HUD {
       this.barra, this.perfil, this.mapaOrbital, this.composicion, this.geologia,
       this.magnetosfera, this.adicionales, this.navegacion, this.proyeccion,
       this.entradas, this.panelGalactico, this.reticula, this.anotaciones, this.arco,
-      this.subtitulos,
+      this.subtitulos, this.comparador,
     ]) {
       parte?.destruir?.();
     }

@@ -168,11 +168,28 @@ export class VoiceCommands {
       return false;
     }
 
-    const tipo = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : 'audio/ogg;codecs=opus';
+    // Safari no graba webm ni ogg: solo mp4. Firefox no graba mp4. Se prueba
+    // en orden y se usa el primero que el navegador admita; api/stt.php acepta
+    // los tres. Sin esta lista, la ruta alternativa —que existe precisamente
+    // para Safari— fallaría justo en Safari.
+    const candidatos = [
+      'audio/webm;codecs=opus',
+      'audio/ogg;codecs=opus',
+      'audio/mp4',
+      'audio/mpeg',
+    ];
+    const tipo = candidatos.find((t) => MediaRecorder.isTypeSupported?.(t));
+
+    if (!tipo) {
+      App.emitir('voz:error', {
+        motivo: 'formato',
+        mensaje: 'Este navegador no puede grabar audio en un formato compatible.',
+      });
+      return false;
+    }
 
     this.grabadora = new MediaRecorder(this.flujo, { mimeType: tipo, audioBitsPerSecond: 32000 });
+    this.tipoGrabacion = tipo;
 
     this.grabadora.ondataavailable = async (evento) => {
       if (!evento.data || evento.data.size < 1200) return;   // Fragmento vacío.
@@ -187,7 +204,9 @@ export class VoiceCommands {
 
   async _transcribir(blob) {
     const formulario = new FormData();
-    formulario.append('audio', blob, 'fragmento.webm');
+    const extension = (this.tipoGrabacion ?? '').includes('mp4') ? 'mp4'
+      : (this.tipoGrabacion ?? '').includes('ogg') ? 'ogg' : 'webm';
+    formulario.append('audio', blob, `fragmento.${extension}`);
 
     try {
       const respuesta = await fetch(rutaApp('api/stt.php'), { method: 'POST', body: formulario });

@@ -43,6 +43,7 @@ Siempre disponibles.
 | Volver a la vista general | Botón `VISTA GENERAL` | `Esc` |
 | Pausar o reanudar el tiempo | Control de la barra superior | `Espacio` |
 | Mostrar u ocultar órbitas | Control de la barra superior | `O` |
+| Cambiar de escala | Interruptor `Escala real` | — |
 | Silenciar la narración | Control de volumen | `M` |
 | Ayuda | Botón `?` de la barra | `F1` o `?` |
 
@@ -92,6 +93,11 @@ Idioma: español (`es-ES` y `es-CO`). Se activan con el botón del micrófono.
 - `acelerar tiempo` · `frenar tiempo`
 - `mostrar órbitas` · `ocultar órbitas`
 - `modo real` · `modo didáctico`
+
+En **modo real** los tamaños y las distancias son los verdaderos: una unidad de
+escena son 1.000 km. Neptuno queda a cuatro millones y medio de unidades del Sol
+y navegar hasta él lleva su tiempo. Es incómodo a propósito: así es el Sistema
+Solar de verdad. Los cinturones se ocultan en este modo.
 
 ### Audio
 - `repetir` · `silencio` · `detener narración`

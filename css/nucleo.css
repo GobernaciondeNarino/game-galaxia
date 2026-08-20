@@ -176,6 +176,7 @@ body[data-estado="listo"] #arranque {
   padding: var(--e-6) var(--e-5);
   background: var(--panel-fondo);
   border: 1px solid var(--panel-borde);
+  -webkit-backdrop-filter: blur(var(--panel-desenfoque));
   backdrop-filter: blur(var(--panel-desenfoque));
   clip-path: polygon(
     var(--corte) 0, 100% 0, 100% calc(100% - var(--corte)),
