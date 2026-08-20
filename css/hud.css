@@ -1,0 +1,110 @@
+/* ==========================================================================
+   ORBIS — HUD: rejilla de zonas persistentes y estilo base de los paneles.
+   En la fase 0 solo se define la maquetación; los paneles con contenido se
+   construyen en la fase 3 (js/ui/panels/).
+   ========================================================================== */
+
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  display: grid;
+  padding: var(--e-3);
+  gap: var(--e-3);
+
+  /* Rejilla persistente. Solo cambia el contenido de #hud-viewport al
+     alternar entre VISTA DE SISTEMA y VISTA DE CUERPO: los paneles laterales
+     y las barras no se recrean nunca, por eso no parpadean. */
+  grid-template-columns: minmax(200px, 250px) 1fr minmax(210px, 270px);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "superior superior superior"
+    "izquierda viewport derecha"
+    "inferior  inferior inferior";
+
+  /* La HUD deja pasar el ratón al lienzo salvo en los paneles. */
+  pointer-events: none;
+}
+
+#hud > * { pointer-events: auto; }
+
+#hud-barra-superior          { grid-area: superior; }
+#hud-panel-izquierdo         { grid-area: izquierda; }
+#hud-viewport                { grid-area: viewport;  pointer-events: none; }
+#hud-panel-derecho           { grid-area: derecha; }
+#hud-navegacion-planetaria   { grid-area: inferior; }
+
+/* Elementos que flotan por encima de la rejilla */
+#hud-proyeccion-orbital {
+  position: fixed;
+  left: var(--e-3);
+  bottom: 108px;
+  width: clamp(180px, 17vw, 260px);
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+#hud-estado-entradas {
+  position: fixed;
+  right: var(--e-3);
+  bottom: 108px;
+  width: clamp(160px, 15vw, 220px);
+}
+
+#hud-subtitulos {
+  position: fixed;
+  left: 50%;
+  bottom: 118px;
+  transform: translateX(-50%);
+  width: min(760px, 72vw);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Panel: la pieza visual básica de toda la interfaz.
+   Borde fino luminoso, fondo translúcido y esquinas recortadas en diagonal.
+   -------------------------------------------------------------------------- */
+.panel {
+  position: relative;
+  padding: var(--e-3);
+  background: var(--panel-fondo);
+  border: 1px solid var(--panel-borde);
+  backdrop-filter: blur(var(--panel-desenfoque));
+  clip-path: polygon(
+    var(--corte) 0, 100% 0, 100% calc(100% - var(--corte)),
+    calc(100% - var(--corte)) 100%, 0 100%, 0 var(--corte));
+  box-shadow: inset 0 0 24px rgba(26, 82, 118, 0.28);
+}
+
+.panel__titulo {
+  font-family: var(--fuente-titulos);
+  font-weight: 500;
+  font-size: var(--t-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cian-acento);
+}
+
+.panel__cifra {
+  font-family: var(--fuente-cifras);
+  font-variant-numeric: tabular-nums;
+  color: var(--texto);
+}
+
+/* Un dato ausente se declara, nunca se inventa. */
+.sin-datos {
+  color: var(--texto-apagado);
+  font-style: normal;
+  letter-spacing: 0.1em;
+}
+.sin-datos::after { content: "SIN DATOS"; }
+
+/* Gráfico decorativo: se etiqueta como tal para no confundirlo con un dato. */
+.marca-simulacion {
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  color: var(--ambar-seleccion);
+  opacity: 0.72;
+}

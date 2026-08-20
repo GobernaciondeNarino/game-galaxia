@@ -1,0 +1,75 @@
+/* ==========================================================================
+   ORBIS — Reorganización por tamaño de pantalla.
+   La HUD de referencia está pensada para ≥1600 px; por debajo se recompone
+   en lugar de encogerse, y en móvil se reduce a lo esencial.
+   ========================================================================== */
+
+/* Portátiles y pantallas medianas: paneles laterales más estrechos. */
+@media (max-width: 1600px) {
+  #hud { grid-template-columns: minmax(180px, 220px) 1fr minmax(190px, 240px); }
+}
+
+/* Por debajo de 1280 px el panel derecho pasa a una fila propia: apilar es
+   más legible que comprimir cinco gráficos en 190 px. */
+@media (max-width: 1280px) {
+  #hud {
+    grid-template-columns: minmax(170px, 210px) 1fr;
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas:
+      "superior  superior"
+      "izquierda viewport"
+      "derecha   derecha"
+      "inferior  inferior";
+  }
+  #hud-panel-derecho {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(180px, 1fr);
+    gap: var(--e-3);
+    overflow-x: auto;
+  }
+  #hud-proyeccion-orbital { display: none; }   /* Decorativo: se sacrifica primero. */
+}
+
+/* Tabletas: el panel izquierdo se convierte en una tira superior. */
+@media (max-width: 1024px) {
+  #hud {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto auto;
+    grid-template-areas:
+      "superior"
+      "izquierda"
+      "viewport"
+      "derecha"
+      "inferior";
+  }
+  #hud-estado-entradas { bottom: 92px; width: 150px; }
+}
+
+/* Móvil: solo lo imprescindible — escena, perfil del cuerpo y navegación. */
+@media (max-width: 720px) {
+  :root { --corte: 6px; }
+  #hud { padding: var(--e-2); gap: var(--e-2); }
+  #hud-panel-derecho   { display: none; }
+  #hud-estado-entradas { display: none; }
+  #hud-subtitulos      { width: 92vw; bottom: 96px; }
+
+  /* En una columna estrecha, la nota de cada chequeo baja bajo su etiqueta
+     en lugar de competir por el mismo renglón. */
+  .chequeo { grid-template-columns: 1.4em 1fr; }
+  .chequeo__nota {
+    grid-column: 2;
+    margin-top: 1px;
+    line-height: 1.4;
+  }
+}
+
+/* Pantallas muy bajas (portátiles 768 px de alto en horizontal). */
+@media (max-height: 720px) {
+  #hud-proyeccion-orbital { display: none; }
+}
+
+/* Impresión: la interfaz no está pensada para papel. */
+@media print {
+  #lienzo, #hud, #arranque { display: none !important; }
+}

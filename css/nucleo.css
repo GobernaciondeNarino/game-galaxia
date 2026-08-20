@@ -1,0 +1,282 @@
+/* ==========================================================================
+   ORBIS — Núcleo: reinicio, fichas de diseño (tokens) y pantalla de arranque.
+   Cargar SIEMPRE antes de hud.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Fichas de diseño
+   -------------------------------------------------------------------------- */
+:root {
+  /* Fondo — degradado radial del espacio profundo */
+  --fondo-profundo:  #050B18;
+  --fondo-medio:     #0A1628;
+
+  /* Azules y cianes de la interfaz */
+  --azul-primario:   #1A5276;
+  --cian-acento:     #4FC3F7;
+  --cian-brillante:  #00E5FF;
+
+  /* Estados */
+  --ambar-seleccion: #E8A020;
+  --verde-estado:    #3AAA35;
+  --rojo-alerta:     #FF5252;
+
+  /* Texto */
+  --texto:           #D6EEF8;
+  --texto-tenue:     rgba(214, 238, 248, 0.62);
+  --texto-apagado:   rgba(214, 238, 248, 0.34);
+
+  /* Superficies de panel */
+  --panel-fondo:     rgba(10, 22, 40, 0.72);
+  --panel-borde:     rgba(79, 195, 247, 0.34);
+  --panel-borde-vivo: rgba(0, 229, 255, 0.85);
+  --panel-desenfoque: 6px;
+
+  /* Retícula holográfica */
+  --reticula:        rgba(79, 195, 247, 0.10);
+
+  /* Tipografía */
+  --fuente-titulos:  'Oswald', 'Arial Narrow', system-ui, sans-serif;
+  --fuente-datos:    'Hind Madurai', ui-sans-serif, system-ui, sans-serif;
+  --fuente-cifras:   ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, monospace;
+
+  /* Ritmo tipográfico */
+  --t-micro:  0.625rem;   /* 10 px — etiquetas de panel */
+  --t-menor:  0.6875rem;  /* 11 px */
+  --t-base:   0.8125rem;  /* 13 px */
+  --t-mayor:  1rem;
+  --t-titulo: 1.375rem;
+
+  /* Espaciado */
+  --e-1: 4px;  --e-2: 8px;  --e-3: 12px;  --e-4: 16px;  --e-5: 24px;  --e-6: 32px;
+
+  /* Movimiento */
+  --curva:      cubic-bezier(.2, .8, .2, 1);
+  --dur-corta:  200ms;
+  --dur-media:  350ms;
+  --dur-transicion-vista: 1100ms;
+
+  /* Geometría del panel: esquinas recortadas en diagonal */
+  --corte: 10px;
+
+  --z-lienzo: 0;
+  --z-etiquetas: 10;
+  --z-hud: 20;
+  --z-arranque: 90;
+}
+
+/* Quien pide menos movimiento no debería sufrir barridos ni parpadeos. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-corta: 1ms;
+    --dur-media: 1ms;
+    --dur-transicion-vista: 180ms;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Reinicio mínimo
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;               /* La HUD nunca desplaza la página. */
+  background: var(--fondo-profundo);
+}
+
+body {
+  font-family: var(--fuente-datos);
+  font-size: var(--t-base);
+  color: var(--texto);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+h1, h2, h3, h4, p, ul, ol, figure { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+img, canvas, svg { display: block; max-width: 100%; }
+
+/* Foco visible siempre: la aplicación debe ser navegable con Tab. */
+:focus-visible {
+  outline: 2px solid var(--cian-brillante);
+  outline-offset: 2px;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   3. Lienzo y capa de etiquetas
+   -------------------------------------------------------------------------- */
+#lienzo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--z-lienzo);
+  /* Fondo de respaldo mientras WebGL no ha pintado el primer fotograma. */
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 45%, var(--fondo-medio) 0%, var(--fondo-profundo) 70%);
+  touch-action: none;
+}
+
+#capa-etiquetas {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-etiquetas);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   4. Pantalla de arranque
+   -------------------------------------------------------------------------- */
+#arranque {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-arranque);
+  display: grid;
+  place-items: center;
+  padding: var(--e-5);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 50%, #0A1628 0%, #050B18 72%);
+  transition: opacity var(--dur-media) var(--curva),
+              visibility var(--dur-media) var(--curva);
+}
+
+body[data-estado="listo"] #arranque {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.arranque__marco {
+  width: min(560px, 100%);
+  padding: var(--e-6) var(--e-5);
+  background: var(--panel-fondo);
+  border: 1px solid var(--panel-borde);
+  backdrop-filter: blur(var(--panel-desenfoque));
+  clip-path: polygon(
+    var(--corte) 0, 100% 0, 100% calc(100% - var(--corte)),
+    calc(100% - var(--corte)) 100%, 0 100%, 0 var(--corte));
+  text-align: left;
+}
+
+.arranque__marca {
+  font-family: var(--fuente-titulos);
+  font-weight: 500;
+  font-size: clamp(2rem, 6vw, 3rem);
+  letter-spacing: 0.42em;
+  line-height: 1;
+  color: var(--cian-brillante);
+  text-shadow: 0 0 18px rgba(0, 229, 255, 0.45);
+}
+
+.arranque__lema {
+  margin-top: var(--e-2);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-menor);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+
+.arranque__barra {
+  position: relative;
+  height: 3px;
+  margin-top: var(--e-5);
+  background: rgba(79, 195, 247, 0.16);
+  overflow: hidden;
+}
+
+.arranque__relleno {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--azul-primario), var(--cian-brillante));
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.7);
+  transition: width var(--dur-media) var(--curva);
+}
+
+.arranque__detalle {
+  margin-top: var(--e-2);
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  color: var(--texto-tenue);
+  min-height: 1.2em;
+}
+
+/* Lista de chequeos del diagnóstico de arranque */
+.arranque__chequeos {
+  display: grid;
+  gap: var(--e-1);
+  margin-top: var(--e-4);
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+}
+
+.chequeo {
+  display: grid;
+  grid-template-columns: 1.4em 1fr auto;
+  gap: var(--e-2);
+  align-items: baseline;
+  color: var(--texto-apagado);
+}
+
+.chequeo__marca { text-align: center; }
+.chequeo__nota  { color: var(--texto-apagado); }
+
+.chequeo[data-resultado="ok"]       { color: var(--texto-tenue); }
+.chequeo[data-resultado="ok"] .chequeo__marca { color: var(--verde-estado); }
+.chequeo[data-resultado="aviso"]    { color: var(--texto-tenue); }
+.chequeo[data-resultado="aviso"] .chequeo__marca { color: var(--ambar-seleccion); }
+.chequeo[data-resultado="error"]    { color: var(--texto); }
+.chequeo[data-resultado="error"] .chequeo__marca { color: var(--rojo-alerta); }
+
+.arranque__aviso {
+  margin-top: var(--e-4);
+  padding-top: var(--e-3);
+  border-top: 1px solid rgba(79, 195, 247, 0.16);
+  font-size: var(--t-menor);
+  line-height: 1.55;
+  color: var(--texto-apagado);
+}
+.arranque__aviso strong { color: var(--texto-tenue); font-weight: 600; }
+
+/* Fallo irrecuperable de arranque (sin WebGL, módulos bloqueados…) */
+.arranque__marco[data-fallo] { border-color: rgba(255, 82, 82, 0.7); }
+.arranque__marco[data-fallo] .arranque__marca { color: var(--rojo-alerta); text-shadow: none; }
+
+/* --------------------------------------------------------------------------
+   5. Sin JavaScript
+   -------------------------------------------------------------------------- */
+.sin-js {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-content: center;
+  gap: var(--e-3);
+  padding: var(--e-6);
+  text-align: center;
+  background: var(--fondo-profundo);
+}
+.sin-js h1 {
+  font-family: var(--fuente-titulos);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--cian-acento);
+}

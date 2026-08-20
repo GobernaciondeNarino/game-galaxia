@@ -1,0 +1,53 @@
+# Revisión automática de cada pull request — anthropics/claude-code-action
+name: Revisión de PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+jobs:
+  revision:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Revisar los cambios
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPOSITORIO: ${{ github.repository }}
+            PR: ${{ github.event.pull_request.number }}
+
+            Revisa este pull request de ORBIS (interfaz 3D del Sistema Solar,
+            HTML + ES Modules + Three.js + PHP, sin paso de compilación).
+            Comenta en español. Presta atención especialmente a:
+
+            1. **Secretos**: ninguna clave, token o identificador de API puede
+               aparecer en archivos servidos al navegador (index.html, js/,
+               css/, data/, assets/). Es motivo de bloqueo inmediato.
+            2. **Fuga de memoria en Three.js**: toda geometría, material y
+               textura creada debe liberarse con dispose() al destruirse.
+            3. **Rigor de los datos**: ninguna cifra astronómica inventada.
+               Todo valor en data/sistema-solar.json necesita campo "fuente";
+               los huecos van a null, nunca estimados ni con Math.random().
+            4. **Degradación**: la aplicación debe seguir siendo usable con
+               ratón y teclado si se deniegan la cámara y el micrófono.
+            5. **Accesibilidad**: foco visible, navegación con Tab, subtítulos
+               en la narración y respeto a prefers-reduced-motion.
+            6. **Backend PHP**: validación de entradas en api/, límite de
+               peticiones, CURLOPT_SSL_VERIFYPEER activado y sin filtrar
+               respuestas crudas de terceros.
+
+            Usa comentarios en línea para los problemas concretos y un
+            comentario general para la valoración de conjunto.
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*)"

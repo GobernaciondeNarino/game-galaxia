@@ -1,0 +1,39 @@
+Contexto adicional para la revisión de seguridad de ORBIS.
+
+ORBIS es una aplicación web estática (HTML + módulos ES + Three.js) con un
+backend mínimo de scripts PHP que actúan de proxy. Se despliega en un hosting
+Plesk compartido, sin Node.js, sin procesos en segundo plano y sin acceso root.
+
+Presta atención prioritaria a:
+
+1. Credenciales expuestas al cliente. La clave de ElevenLabs solo puede vivir
+   en una variable de entorno del servidor o en config/secrets.php. Cualquier
+   aparición de una clave, token o cabecera "xi-api-key" en index.html, js/,
+   css/, data/, assets/ o en un archivo de configuración versionado es un
+   hallazgo crítico.
+
+2. api/tts.php como proxy abierto. El endpoint solo puede sintetizar textos
+   asociados a un bodyId existente en data/sistema-solar.json. Si acepta texto
+   arbitrario del cliente, se convierte en una pasarela gratuita a una API de
+   pago a costa del titular de la cuenta: hallazgo crítico.
+
+3. Recorrido de rutas (path traversal) al construir nombres de archivo de la
+   caché de audio a partir de datos del cliente.
+
+4. Ausencia de límite de peticiones por IP en cualquier endpoint de api/ que
+   provoque una llamada saliente o una escritura en disco.
+
+5. Verificación TLS desactivada (CURLOPT_SSL_VERIFYPEER a false) en las
+   llamadas salientes.
+
+6. Mensajes de error que devuelvan rutas del servidor, trazas de PHP o la
+   respuesta cruda de la API de terceros.
+
+7. Reglas de .htaccess que dejen accesibles config/, cache/, api/lib/ o
+   api/logs/ por HTTP.
+
+8. XSS al inyectar en la HUD contenido procedente de data/sistema-solar.json o
+   de la transcripción de voz (uso de innerHTML con datos no saneados).
+
+No informes como vulnerabilidad la ausencia de autenticación de usuarios:
+ORBIS es una experiencia pública de divulgación y no tiene cuentas.

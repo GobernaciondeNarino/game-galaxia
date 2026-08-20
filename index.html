@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="ORBIS — interfaz holográfica interactiva del Sistema Solar con control por gestos y voz.">
+<title>ORBIS · Interfaz Galáctica</title>
+
+<link rel="icon" href="assets/orbis.svg" type="image/svg+xml">
+
+<!-- Precarga de lo que bloquea el primer render: fuentes y datos maestros.
+     En conexiones lentas esto adelanta la petición ~300 ms respecto a
+     descubrirlas al parsear el CSS. -->
+<link rel="preload" href="assets/fonts/Oswald-200-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/HindMadurai-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="data/sistema-solar.json" as="fetch" type="application/json" crossorigin>
+<link rel="modulepreload" href="js/main.js">
+<link rel="modulepreload" href="vendor/three/build/three.module.min.js">
+
+<link rel="stylesheet" href="css/fuentes.css">
+<link rel="stylesheet" href="css/nucleo.css">
+<link rel="stylesheet" href="css/hud.css">
+<link rel="stylesheet" href="css/animaciones.css">
+<link rel="stylesheet" href="css/responsive.css">
+
+<!-- Mapa de importaciones: resuelve los especificadores desnudos de los módulos
+     ES sin ningún empaquetador. Todo apunta a copias locales en /vendor, de
+     modo que la aplicación no depende de ningún CDN de terceros en producción.
+     Si se edita este bloque hay que regenerar el hash CSP:
+        node tools/csp-hash.mjs                                                -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "/vendor/three/build/three.module.min.js",
+    "three/addons/": "/vendor/three/addons/",
+    "@mediapipe/tasks-vision": "/vendor/mediapipe/vision_bundle.mjs"
+  }
+}
+</script>
+</head>
+
+<body data-estado="arranque">
+
+<!-- ==========================================================================
+     Lienzo 3D. Toda la HUD vive en DOM por encima de él (nunca como textura).
+     ========================================================================== -->
+<canvas id="lienzo" aria-label="Escena tridimensional del Sistema Solar" role="img"></canvas>
+
+<!-- Capa de etiquetas 3D→2D (CSS2DRenderer). Se rellena en la fase 4. -->
+<div id="capa-etiquetas" aria-hidden="true"></div>
+
+<!-- ==========================================================================
+     Pantalla de arranque, con progreso real de carga (no simulado).
+     ========================================================================== -->
+<div id="arranque" role="status" aria-live="polite">
+  <div class="arranque__marco">
+    <p class="arranque__marca">ORBIS</p>
+    <p class="arranque__lema">Interfaz operativa del Sistema Solar · v0.1</p>
+
+    <div class="arranque__barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progreso de carga">
+      <span class="arranque__relleno" id="arranque-relleno"></span>
+    </div>
+    <p class="arranque__detalle" id="arranque-detalle">Iniciando…</p>
+
+    <!-- Diagnóstico de arranque: se rellena desde js/core/Diagnostico.js -->
+    <ul class="arranque__chequeos" id="arranque-chequeos"></ul>
+
+    <p class="arranque__aviso">
+      La cámara y el micrófono <strong>no se activan solos</strong>. ORBIS es
+      completamente usable con ratón y teclado.
+    </p>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     Esqueleto de la HUD. Los paneles se construyen en la fase 3; aquí solo
+     quedan los contenedores persistentes para que no se recreen (ni parpadeen)
+     al alternar entre VISTA DE SISTEMA y VISTA DE CUERPO.
+     ========================================================================== -->
+<div id="hud" hidden>
+  <header id="hud-barra-superior" class="hud__zona"></header>
+  <aside  id="hud-panel-izquierdo" class="hud__zona"></aside>
+  <section id="hud-viewport" class="hud__zona"></section>
+  <aside  id="hud-panel-derecho" class="hud__zona"></aside>
+  <div    id="hud-proyeccion-orbital" class="hud__zona"></div>
+  <div    id="hud-estado-entradas" class="hud__zona"></div>
+  <nav    id="hud-navegacion-planetaria" class="hud__zona" aria-label="Navegación planetaria"></nav>
+  <div    id="hud-subtitulos" class="hud__zona" role="status" aria-live="polite"></div>
+</div>
+
+<!-- Mensajería accesible: errores y avisos legibles por lector de pantalla. -->
+<div id="anuncios" class="visualmente-oculto" role="status" aria-live="polite"></div>
+
+<noscript>
+  <div class="sin-js">
+    <h1>ORBIS necesita JavaScript</h1>
+    <p>Esta interfaz renderiza el Sistema Solar en 3D con WebGL. Activa
+       JavaScript para continuar.</p>
+  </div>
+</noscript>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

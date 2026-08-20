@@ -1,0 +1,27 @@
+# Audio generado por ElevenLabs (se regenera solo; nunca al repositorio)
+cache/audio/*
+!cache/audio/.gitkeep
+
+# Registros del backend
+api/logs/*
+!api/logs/.gitkeep
+!api/logs/.htaccess
+
+# Claves reales: solo se versiona la plantilla secrets.example.php
+config/secrets.php
+
+# Texturas pesadas de terceros (ver assets/textures/FUENTES.md)
+assets/textures/*
+!assets/textures/.gitkeep
+!assets/textures/FUENTES.md
+assets/skybox/*
+!assets/skybox/.gitkeep
+
+# Modelo de MediaPipe (7,5 MB; lo descarga tools/vendor.mjs mediapipe)
+assets/models/*.task
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+*.swp
+node_modules/

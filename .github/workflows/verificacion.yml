@@ -1,0 +1,40 @@
+# Verificación estática de ORBIS. No necesita dependencias: solo PHP y Node
+# del propio runner, igual que el servidor de destino.
+name: Verificación
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl, json, mbstring
+          coverage: none
+
+      - name: Sintaxis de PHP (compatible con 8.1)
+        run: find api config -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validar los JSON de datos
+        run: |
+          for f in data/*.json; do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" \
+              && echo "✔ $f"
+          done
+
+      - name: Hashes CSP al día
+        run: node tools/csp-hash.mjs --verificar
+
+      - name: Ningún secreto en los archivos servidos al navegador
+        run: bash tools/comprobar-secretos.sh

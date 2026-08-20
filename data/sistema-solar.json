@@ -1,0 +1,11 @@
+{
+  "$esquema": "orbis/sistema-solar/1",
+  "version": "0.1.0",
+  "actualizado": "2026-08-20",
+  "notas": "Catálogo maestro de ORBIS. Se completa en la fase 2 con datos verificados de la NASA Planetary Fact Sheet y JPL Solar System Dynamics. Todo cuerpo lleva su campo 'fuente'; los datos no disponibles se declaran como null y la interfaz los muestra como SIN DATOS. Ninguna cifra se estima.",
+  "fuentes": {
+    "nasa-fact-sheet": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+    "jpl-ssd": "https://ssd.jpl.nasa.gov/"
+  },
+  "cuerpos": []
+}
