@@ -1,14 +1,18 @@
 /**
- * Cursor holográfico y aro de progreso de los gestos sostenidos.
+ * Cursor holográfico y aro de progreso del barrido.
  *
  * Sin retroalimentación, el control por gestos es adivinar: el usuario no sabe
- * si la mano se está viendo, dónde apunta ni cuánto le falta para que el gesto
+ * si la mano se está viendo, dónde está ni cuánto le falta para que el gesto
  * cuente. Estas tres cosas son las que resuelve este módulo:
  *
  *   · un punto que sigue la mano, para saber que se la está viendo y dónde;
- *   · un aro que se completa durante los gestos sostenidos, con el nombre de
- *     lo que va a ocurrir, de modo que se pueda cancelar a tiempo;
+ *   · un aro que se completa mientras se barre de un extremo a otro, con el
+ *     nombre de lo que va a ocurrir, de modo que se pueda abortar a tiempo;
  *   · el nombre del gesto reconocido, escrito.
+ *
+ * El aro solo aparece en el barrido porque es el único gesto que no se ve
+ * mientras se hace: rotar y hacer zoom mueven la escena desde el primer
+ * fotograma y se corrigen solos.
  */
 
 import { crear } from '../utils/dom.js';
@@ -16,16 +20,17 @@ import { crear } from '../utils/dom.js';
 const ETIQUETAS = {
   ninguno: '',
   pellizco: 'Pellizco · rotando',
-  'pellizco-doble': 'Pellizco doble · zoom',
-  'mano-abierta': 'Mano abierta · desplazando',
+  'pellizco-doble': 'Pellizco doble · acercar y alejar',
+  'mano-abierta': 'Mano abierta · barre para pasar',
+  // Se reconocen, pero no hacen nada: nombrarlos evita que parezca que la
+  // cámara ha dejado de ver la mano.
   apuntando: 'Apuntando',
-  puno: 'Puño · vista anclada',
-  palma: 'Palma',
+  puno: 'Puño',
 };
 
 const ACCIONES = {
-  seleccionar: 'Seleccionar',
-  'vista-general': 'Vista general',
+  siguiente: 'Siguiente',
+  anterior: 'Anterior',
 };
 
 export class CursorGestual {

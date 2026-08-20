@@ -53,24 +53,38 @@ Siempre disponibles.
 
 Requieren cámara. Se activan con el botón de la esquina inferior derecha.
 
+Son tres gestos y cuatro acciones. No hay más, a propósito.
+
 | Gesto | Acción |
 |---|---|
-| Pellizco índice-pulgar y arrastrar (una mano) | Rotar la escena / orbitar la cámara |
-| Pellizco con las dos manos, separando o juntando | Acercar o alejar |
-| Mano abierta desplazándose | Desplazamiento lateral |
-| Índice apuntando, sostenido 1,2 s sobre un cuerpo | Seleccionar ese cuerpo |
-| Puño cerrado | Detener el movimiento y anclar la vista |
-| Palma abierta hacia la cámara, 1,5 s | Volver a la vista general |
-| Deslizar horizontalmente con la mano abierta | Cuerpo anterior o siguiente |
+| Pellizco índice-pulgar y arrastrar (una mano) | Rotar el elemento / orbitar la cámara |
+| Pellizco con las dos manos, separando | Acercar |
+| Pellizco con las dos manos, juntando | Alejar |
+| Mano abierta, barriendo de un extremo a otro | Cuerpo siguiente o anterior |
+
+**Por qué tan pocos.** Hubo más: apuntar sostenido para seleccionar, puño para
+anclar la vista y palma abierta para volver a la vista general. Se retiraron
+porque se disparaban solos. La mano abierta es la postura de reposo —es lo que
+hace cualquiera al bajar el brazo o al dudar—, así que la palma sostenida abría
+la interfaz galáctica una y otra vez en mitad de la interacción. Un vocabulario
+corto que nunca se equivoca vale más que uno amplio que sí.
+
+Seleccionar un cuerpo concreto, volver a la vista general y todo lo demás siguen
+estando en el ratón, el teclado y la voz, que es donde vive el control fino. El
+puño y el índice apuntando se siguen reconociendo y se nombran en pantalla —para
+que se vea que la cámara sigue leyendo la mano— pero no hacen nada.
 
 **Cómo colocarse:** a entre 50 cm y 1,5 m de la cámara, con la mano dentro del
 encuadre y luz suficiente sobre la palma. El recuadro de la esquina inferior
 derecha muestra el esqueleto detectado; si no aparece, la mano no está siendo
-vista.
+vista. Da igual que la mano esté de frente o de canto: para el barrido cuentan
+las dos por igual.
 
-**Retroalimentación.** Un cursor holográfico sigue la mano. Los gestos
-sostenidos dibujan un aro de progreso: mientras se completa, se puede cancelar
-retirando la mano. El gesto reconocido se escribe en el panel de entradas.
+**Retroalimentación.** Un cursor holográfico sigue la mano y el gesto reconocido
+se escribe en el panel de entradas. El barrido dibuja además un aro de progreso,
+porque es el único gesto que no se ve mientras se hace: rotar y hacer zoom mueven
+la escena desde el primer fotograma, pero al barrer no ocurre nada hasta que se
+completa. Mientras el aro no se cierre, se puede abortar cerrando la mano.
 
 ---
 

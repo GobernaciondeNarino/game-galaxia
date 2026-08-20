@@ -75,6 +75,9 @@ export class HUD {
     // El viewport central: es lo ÚNICO que cambia entre los dos estados.
     this.viewport = $('#hud-viewport');
     this.panelGalactico = new PanelGalactico(this.viewport);
+    // Nace oculto y sin cuenta atrás: la presentación arranca cuando la
+    // pantalla de carga se retira, no cuando se construye la HUD, que ocurre
+    // varios segundos antes y con el arranque todavía tapándolo todo.
 
     // Piezas de la VISTA DE CUERPO. Se crean una vez y se muestran u ocultan;
     // recrearlas en cada cambio de vista provocaría el parpadeo que el pliego
@@ -101,6 +104,17 @@ export class HUD {
   _montarControlesEscena() {
     this.etiquetaVelocidad = crear('span', { class: 'controles__valor panel__cifra', text: '×100' });
 
+    this.botonGalaxia = crear('button', {
+      class: 'controles__boton', type: 'button',
+      'aria-pressed': 'false',
+      title: 'Mostrar u ocultar la interfaz galáctica',
+      onclick: () => {
+        const visible = this.panelGalactico.alternar();
+        this.botonGalaxia.setAttribute('aria-pressed', String(visible));
+      },
+      text: 'Galaxia',
+    });
+
     this.controles = crear('div', { class: 'panel controles' }, [
       crear('button', {
         class: 'controles__boton', type: 'button',
@@ -108,6 +122,7 @@ export class HUD {
         title: 'Volver a la vista general (Esc)',
         text: 'Vista general',
       }),
+      this.botonGalaxia,
       crear('div', { class: 'controles__grupo' }, [
         crear('button', {
           class: 'controles__boton controles__boton--icono', type: 'button',
@@ -242,6 +257,10 @@ export class HUD {
         );
       }),
       App.al('escena:escala', ({ aviso }) => this.barra.establecerSubtitulo(aviso)),
+      App.al('estado:cargando', ({ valor }) => {
+        // Terminada la carga: el panel galáctico se presenta y se retira solo.
+        if (!valor && document.body.dataset.vista !== 'cuerpo') this._presentarGalaxia();
+      }),
       App.al('narracion:bloqueada', () => {
         this.barra.establecerSubtitulo('Toca la pantalla para permitir el audio');
       }),
@@ -279,8 +298,11 @@ export class HUD {
     document.body.dataset.vista = vista;
 
     // El panel galáctico se retira con un barrido; no se destruye, así que
-    // volver a la vista general no cuesta ni una reconstrucción.
-    this.panelGalactico.panel.dataset.oculto = enCuerpo ? 'si' : 'no';
+    // volver a la vista general no cuesta ni una reconstrucción. Al volver se
+    // asoma unos segundos y se va: es un rótulo de contexto, no un panel de
+    // trabajo, y el centro de la pantalla lo necesita el Sistema Solar.
+    if (enCuerpo) this.panelGalactico.ocultar();
+    else if (!App.estado.cargando) this._presentarGalaxia();
 
     this.reticula?.establecerVisible(enCuerpo);
     this.arco.establecerVisible(enCuerpo);
@@ -291,6 +313,12 @@ export class HUD {
     } else {
       this.anotaciones?.limpiar();
     }
+  }
+
+  /** Asoma el panel galáctico y deja que se retire solo. */
+  _presentarGalaxia() {
+    this.panelGalactico.mostrar();
+    this.botonGalaxia?.setAttribute('aria-pressed', 'false');
   }
 
   /** Conecta las anotaciones con la malla del cuerpo mostrado. */

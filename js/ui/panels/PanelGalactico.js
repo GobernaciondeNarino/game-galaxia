@@ -9,6 +9,13 @@
  * Lo que SÍ es un dato real y citado son las dos cifras que la acompañan: la
  * distancia del Sol al centro galáctico y el periodo de su órbita alrededor de
  * él. Están en `DATOS_GALACTICOS`, con su fuente.
+ *
+ * SE RETIRA SOLO. Ocupa el centro de la pantalla, que es justo donde está el
+ * Sistema Solar, así que se muestra unos segundos al entrar en la vista general
+ * y se va. No desaparece para siempre: queda el botón «Galaxia» de la barra
+ * superior, y su propio aspa para cerrarlo antes de tiempo. La cuenta atrás se
+ * detiene mientras el puntero esté encima o el foco dentro —nadie quiere que le
+ * quiten de delante lo que está leyendo— y se reanuda al salir.
  */
 
 import { crear } from '../../utils/dom.js';
@@ -17,6 +24,12 @@ import { formatearNumero } from '../../utils/math.js';
 
 const T = 420;
 const CENTRO = T / 2;
+
+/** Cuánto se queda a la vista al entrar en la vista general. */
+export const MS_VISIBLE = 3000;
+
+/** Y cuánto, más corto, al volver el puntero después de haberlo parado. */
+const MS_TRAS_PUNTERO = 1200;
 
 /** Datos reales de la posición del Sistema Solar en la Galaxia. */
 export const DATOS_GALACTICOS = {
@@ -120,10 +133,19 @@ export class PanelGalactico {
         crear('span', { class: 'galaxia__nota', text: dato.nota }),
       ]);
 
+    this.botonCerrar = crear('button', {
+      class: 'galaxia__cerrar', type: 'button',
+      'aria-label': 'Cerrar la interfaz galáctica',
+      title: 'Cerrar',
+      onclick: () => this.ocultar(),
+      text: '✕',
+    });
+
     this.panel = crear('section', { class: 'panel galaxia' }, [
       crear('header', { class: 'panel__cabecera' }, [
         crear('h2', { class: 'panel__titulo', text: 'Interfaz galáctica — estado del sistema: activo' }),
         crear('span', { class: 'marca-simulacion', text: 'SIMULACIÓN' }),
+        this.botonCerrar,
       ]),
       this.svg,
       crear('ul', { class: 'galaxia__datos' }, [
@@ -134,10 +156,68 @@ export class PanelGalactico {
       crear('p', { class: 'panel__fuente', text: 'La forma de la Galaxia es una representación esquemática; las cifras son medidas publicadas.' }),
     ]);
 
+    // Parar y reanudar la cuenta atrás según dónde esté la atención.
+    this.panel.addEventListener('pointerenter', () => this._detenerCuenta());
+    this.panel.addEventListener('focusin', () => this._detenerCuenta());
+    this.panel.addEventListener('pointerleave', () => this._reanudarCuenta());
+    this.panel.addEventListener('focusout', (e) => {
+      if (!this.panel.contains(e.relatedTarget)) this._reanudarCuenta();
+    });
+
     contenedor.append(this.panel);
+    this.ocultar();
+  }
+
+  get visible() {
+    return this.panel.dataset.oculto !== 'si';
+  }
+
+  /**
+   * Lo muestra y programa su retirada.
+   * @param {number} ms 0 o menos lo deja fijo hasta que se cierre a mano.
+   */
+  mostrar(ms = MS_VISIBLE) {
+    clearTimeout(this._temporizador);
+    this._temporizador = null;
+    this._msPendientes = ms;
+
+    this.panel.dataset.oculto = 'no';
+    this.panel.inert = false;
+
+    if (ms > 0) this._temporizador = setTimeout(() => this.ocultar(), ms);
+  }
+
+  ocultar() {
+    clearTimeout(this._temporizador);
+    this._temporizador = null;
+    this.panel.dataset.oculto = 'si';
+    // `inert` saca de la navegación por tabulador y del árbol de accesibilidad
+    // un panel que ya no se ve: sin él, el aspa de cerrar seguiría recibiendo
+    // el foco y un lector de pantalla seguiría leyendo la Vía Láctea.
+    this.panel.inert = true;
+  }
+
+  /** Lo abre —fijo, sin cuenta atrás— o lo cierra. Es el botón de la barra. */
+  alternar() {
+    if (this.visible) this.ocultar();
+    else this.mostrar(0);
+    return this.visible;
+  }
+
+  _detenerCuenta() {
+    clearTimeout(this._temporizador);
+    this._temporizador = null;
+  }
+
+  _reanudarCuenta() {
+    // Solo se reanuda si estaba en una presentación temporal: un panel abierto
+    // a mano con el botón se queda abierto hasta que se cierre a mano.
+    if (!this.visible || !this._msPendientes || this._temporizador) return;
+    this._temporizador = setTimeout(() => this.ocultar(), MS_TRAS_PUNTERO);
   }
 
   destruir() {
+    clearTimeout(this._temporizador);
     this.panel.remove();
   }
 }

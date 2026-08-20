@@ -17,6 +17,19 @@
  * Además, todas las distancias se normalizan por el TAMAÑO DE LA MANO en la
  * imagen. Sin eso, un pellizco detectado a medio metro dejaría de detectarse a
  * un metro, porque los dedos se ven más juntos.
+ *
+ * VOCABULARIO: TRES GESTOS, CUATRO ACCIONES. Y NADA MÁS.
+ *
+ *   · pellizco con una mano, arrastrando  → rotar el elemento
+ *   · pellizco con las dos manos          → acercar (separar) y alejar (juntar)
+ *   · mano abierta de un extremo a otro   → pasar al elemento siguiente
+ *
+ * Hubo más gestos —apuntar para seleccionar, puño para anclar, palma sostenida
+ * para volver a la vista general— y estorbaban: al abrir la mano, que es el
+ * gesto de reposo natural, se disparaban acciones que nadie había pedido. Un
+ * vocabulario corto que nunca se equivoca vale más que uno amplio que sí. Todo
+ * lo que ya no se puede hacer con la mano se sigue pudiendo hacer con el ratón,
+ * el teclado y la voz, que es donde vive el control fino.
  */
 
 /** Índices de los puntos de referencia que usa ORBIS. */
@@ -40,7 +53,6 @@ export const GESTO = {
   MANO_ABIERTA: 'mano-abierta',
   APUNTANDO: 'apuntando',
   PUNO: 'puno',
-  PALMA: 'palma',
 };
 
 /** Parámetros ajustables. Todos relativos al tamaño de la mano, no en píxeles. */
@@ -55,11 +67,6 @@ export const AJUSTES = {
   // al doble. Un umbral medido sobre el tamaño total de la mano daba «estirado»
   // también con el puño cerrado, porque la punta sigue lejos de la muñeca.
   umbralExtendido: 1.5,
-  // Dispersión de profundidad entre nudillos, en unidades de tamaño de mano,
-  // por debajo de la cual se considera que la palma mira a la cámara.
-  umbralPalmaDeFrente: 0.35,
-  sostenidoApuntar: 1200,   // ms para que apuntar seleccione
-  sostenidoPalma: 1500,     // ms para que la palma vuelva a la vista general
   umbralDeslizamiento: 0.22, // fracción del ancho recorrida para contar un deslizamiento
   ventanaDeslizamiento: 450, // ms en los que debe completarse
 };
@@ -104,12 +111,10 @@ export class GestureRecognizer {
       cursor: null,              // { x, y } normalizado, para el cursor holográfico
       arrastre: null,            // { dx, dy } desde el fotograma anterior
       separacion: null,          // distancia entre pellizcos, para el zoom
-      progreso: 0,               // 0..1 de un gesto sostenido
+      progreso: 0,               // 0..1 del barrido en curso
       accionSostenida: null,     // qué se disparará al llegar a 1
     };
 
-    this._inicioSostenido = 0;
-    this._gestoSostenido = null;
     this._separacionAnterior = null;
     this._historialDeslizamiento = [];
   }
@@ -148,19 +153,12 @@ export class GestureRecognizer {
     if (pellizco < this.ajustes.umbralPellizco) return GESTO.PELLIZCO;
     if (totalEstirados === 0) return GESTO.PUNO;
     if (estirados.indice && totalEstirados === 1) return GESTO.APUNTANDO;
-    if (totalEstirados === 4) {
-      // Palma hacia la cámara frente a mano abierta de lado: si la mano está de
-      // frente, sus nudillos están todos a una profundidad parecida; de canto,
-      // el índice y el meñique quedan a distancias muy distintas de la cámara.
-      //
-      // La dispersión se normaliza por el tamaño de la mano: en valores
-      // absolutos, una mano cerca de la cámara la superaría siempre y toda
-      // palma se leería como mano de lado.
-      const profundidades = [PUNTO.INDICE_MCP, PUNTO.MENIQUE_MCP, PUNTO.MUNECA]
-        .map((i) => puntos[i].z ?? 0);
-      const dispersion = (Math.max(...profundidades) - Math.min(...profundidades)) / escala;
-      return dispersion < this.ajustes.umbralPalmaDeFrente ? GESTO.PALMA : GESTO.MANO_ABIERTA;
-    }
+    // Cuatro dedos estirados es mano abierta, esté de frente o de canto. Antes
+    // se distinguía la palma de frente por la dispersión de profundidad de los
+    // nudillos, para un gesto sostenido que ya no existe; mantener la distinción
+    // solo servía para que el barrido dejara de detectarse justo cuando la mano
+    // se pone de frente, que es como todo el mundo hace el gesto de pasar.
+    if (totalEstirados === 4) return GESTO.MANO_ABIERTA;
     return GESTO.NINGUNO;
   }
 
@@ -175,7 +173,6 @@ export class GestureRecognizer {
     const acciones = [];
 
     if (!manos?.length) {
-      this._reiniciarSostenido();
       this._separacionAnterior = null;
       this._historialDeslizamiento.length = 0;
       this.manosSuavizadas.length = 0;
@@ -199,7 +196,7 @@ export class GestureRecognizer {
         }
       }
       this._separacionAnterior = separacion;
-      this._reiniciarSostenido();
+      this._historialDeslizamiento.length = 0;
 
       this.estado = {
         ...this.estado,
@@ -214,9 +211,7 @@ export class GestureRecognizer {
     // --- Una mano ----------------------------------------------------------
     const puntos = suavizadas[0];
     const gesto = gestos[0];
-    const punta = puntos[PUNTO.INDICE_PUNTA];
-    const palma = centroPalma(puntos);
-    const cursor = gesto === GESTO.PELLIZCO || gesto === GESTO.APUNTANDO ? punta : palma;
+    const cursor = gesto === GESTO.PELLIZCO ? puntos[PUNTO.INDICE_PUNTA] : centroPalma(puntos);
 
     const anterior = this._cursorAnterior;
     let arrastre = null;
@@ -228,44 +223,29 @@ export class GestureRecognizer {
     this._cursorAnterior = { x: cursor.x, y: cursor.y };
     this._gestoAnterior = gesto;
 
-    if (gesto === GESTO.PELLIZCO && arrastre) {
-      acciones.push({ tipo: 'orbitar', ...arrastre });
-    }
-    if (gesto === GESTO.MANO_ABIERTA && arrastre) {
-      acciones.push({ tipo: 'desplazar', ...arrastre });
-      this._registrarDeslizamiento(cursor.x, ahora, acciones);
-    }
-    if (gesto === GESTO.PUNO) {
-      acciones.push({ tipo: 'anclar' });
-    }
-
-    // --- Gestos sostenidos --------------------------------------------------
-    const sostenibles = {
-      [GESTO.APUNTANDO]: { accion: 'seleccionar', duracion: this.ajustes.sostenidoApuntar },
-      [GESTO.PALMA]: { accion: 'vista-general', duracion: this.ajustes.sostenidoPalma },
-    };
-    const sostenible = sostenibles[gesto];
-
     let progreso = 0;
     let accionSostenida = null;
 
-    if (sostenible) {
-      if (this._gestoSostenido !== gesto) {
-        this._gestoSostenido = gesto;
-        this._inicioSostenido = ahora;
-      }
-      progreso = Math.min(1, (ahora - this._inicioSostenido) / sostenible.duracion);
-      accionSostenida = sostenible.accion;
-
-      if (progreso >= 1) {
-        acciones.push({ tipo: sostenible.accion, x: cursor.x, y: cursor.y });
-        this._reiniciarSostenido();
-        progreso = 0;
-        accionSostenida = null;
-      }
-    } else {
-      this._reiniciarSostenido();
+    // Pellizcar y arrastrar: rotar. Es el gesto de «agarrar y girar», y por eso
+    // el cursor se coloca en la punta del índice y no en el centro de la palma.
+    if (gesto === GESTO.PELLIZCO && arrastre) {
+      acciones.push({ tipo: 'orbitar', ...arrastre });
     }
+
+    // Mano abierta: lo único que hace es barrer de un extremo a otro. El
+    // historial se alimenta en cada fotograma, no solo cuando hay arrastre: la
+    // zona muerta descarta fotogramas sueltos y un barrido rápido se quedaría
+    // sin muestras suficientes para reconocerse.
+    if (gesto === GESTO.MANO_ABIERTA) {
+      const barrido = this._registrarDeslizamiento(cursor.x, ahora, acciones);
+      progreso = barrido.progreso;
+      accionSostenida = barrido.accion;
+    } else {
+      this._historialDeslizamiento.length = 0;
+    }
+
+    // El puño y el índice apuntando se siguen reconociendo —la interfaz los
+    // nombra para que se vea que la mano se está leyendo— pero no hacen nada.
 
     this.estado = {
       gesto, manos: suavizadas.length, cursor, arrastre,
@@ -278,6 +258,13 @@ export class GestureRecognizer {
    * Deslizamiento horizontal: recorrer suficiente distancia en poco tiempo.
    * Se mide sobre una ventana temporal, no entre dos fotogramas: un movimiento
    * rápido puede repartirse en varios y ninguno superaría el umbral por sí solo.
+   *
+   * Devuelve además el progreso del barrido en curso, para que la interfaz
+   * pueda dibujarlo: es el único gesto que no da retroalimentación por sí mismo
+   * —la escena no se mueve mientras se barre—, así que sin un indicador no hay
+   * forma de saber si falta poco o si no se está detectando nada.
+   *
+   * @returns {{progreso:number, accion:string|null}}
    */
   _registrarDeslizamiento(x, ahora, acciones) {
     this._historialDeslizamiento.push({ x, t: ahora });
@@ -286,22 +273,22 @@ export class GestureRecognizer {
     while (this._historialDeslizamiento.length && this._historialDeslizamiento[0].t < limite) {
       this._historialDeslizamiento.shift();
     }
-    if (this._historialDeslizamiento.length < 3) return;
+    if (this._historialDeslizamiento.length < 3) return { progreso: 0, accion: null };
 
     const primero = this._historialDeslizamiento[0];
     const recorrido = x - primero.x;
 
-    if (Math.abs(recorrido) >= this.ajustes.umbralDeslizamiento) {
-      // La imagen de la cámara va reflejada, así que un deslizamiento hacia la
-      // derecha del usuario reduce la x normalizada.
-      acciones.push({ tipo: 'vecino', direccion: recorrido > 0 ? -1 : 1 });
-      this._historialDeslizamiento.length = 0;
-    }
-  }
+    // La imagen de la cámara va reflejada, así que un deslizamiento hacia la
+    // derecha del usuario reduce la x normalizada.
+    const direccion = recorrido > 0 ? -1 : 1;
+    const progreso = Math.min(1, Math.abs(recorrido) / this.ajustes.umbralDeslizamiento);
 
-  _reiniciarSostenido() {
-    this._gestoSostenido = null;
-    this._inicioSostenido = 0;
+    if (progreso >= 1) {
+      acciones.push({ tipo: 'vecino', direccion });
+      this._historialDeslizamiento.length = 0;
+      return { progreso: 0, accion: null };
+    }
+    return { progreso, accion: direccion > 0 ? 'siguiente' : 'anterior' };
   }
 
   reiniciar() {
@@ -310,6 +297,5 @@ export class GestureRecognizer {
     this._gestoAnterior = null;
     this._separacionAnterior = null;
     this._historialDeslizamiento.length = 0;
-    this._reiniciarSostenido();
   }
 }

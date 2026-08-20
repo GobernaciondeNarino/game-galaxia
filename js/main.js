@@ -291,7 +291,14 @@ async function arrancar() {
     },
   });
 
-  /** Traduce una acción del reconocedor en una operación sobre la escena. */
+  /**
+   * Traduce una acción del reconocedor en una operación sobre la escena.
+   *
+   * Son tres, y no habrá más: rotar, acercar o alejar, y pasar al cuerpo
+   * siguiente. Seleccionar apuntando y volver a la vista general con la palma
+   * se retiraron porque se disparaban solos al abrir la mano; para eso están
+   * el ratón, el teclado y la voz.
+   */
   function ejecutarGesto(accion) {
     switch (accion.tipo) {
       case 'orbitar':
@@ -303,32 +310,6 @@ async function arrancar() {
 
       case 'zoom':
         controles.acercarPor(1 + accion.delta * 2.5);
-        break;
-
-      case 'desplazar':
-        controles.desplazarPor(-accion.dx * 1.4, accion.dy * 1.4);
-        break;
-
-      case 'anclar':
-        // El puño detiene el viaje de cámara en curso y deja la vista quieta.
-        rig.enTransito = false;
-        break;
-
-      case 'seleccionar': {
-        // La x se invierte igual que en el cursor: el punto de la pantalla no
-        // es el de la imagen de la cámara.
-        const cuerpo = controles.cuerpoEnPunto(1 - accion.x, accion.y);
-        if (cuerpo) {
-          seleccionar(cuerpo.id, 'gesto');
-        } else {
-          sfx.reproducir('error');
-          anunciar('No hay ningún cuerpo bajo el cursor.');
-        }
-        break;
-      }
-
-      case 'vista-general':
-        vistaGeneral();
         break;
 
       case 'vecino':

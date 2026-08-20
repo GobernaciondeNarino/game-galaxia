@@ -11,6 +11,12 @@
  * por palma abierta— y una dispersión de profundidad sin normalizar, que habría
  * clasificado mal cualquier mano cerca de la cámara.
  *
+ * El vocabulario son tres gestos y cuatro acciones: pellizcar y arrastrar rota,
+ * pellizcar con las dos manos acerca y aleja, y barrer con la mano abierta pasa
+ * al cuerpo siguiente. Buena parte de estas pruebas comprueban justamente lo
+ * contrario de lo que se espera de una prueba: que abrir la mano, cerrar el
+ * puño o apuntar NO disparen nada.
+ *
  *   node tools/pruebas-gestos.mjs
  */
 import { GestureRecognizer, GESTO, PUNTO } from '../js/input/GestureRecognizer.js';
@@ -59,7 +65,7 @@ console.log('\n▸ Clasificación de gestos');
   const r = new GestureRecognizer();
   comprobar('puño', r.clasificarMano(mano({ dedos: NINGUNO })), GESTO.PUNO);
   comprobar('apuntando', r.clasificarMano(mano({ dedos: SOLO_INDICE })), GESTO.APUNTANDO);
-  comprobar('palma de frente', r.clasificarMano(mano({ dedos: TODOS, plana: true })), GESTO.PALMA);
+  comprobar('mano abierta de frente', r.clasificarMano(mano({ dedos: TODOS, plana: true })), GESTO.MANO_ABIERTA);
   comprobar('mano abierta de lado', r.clasificarMano(mano({ dedos: TODOS, plana: false })), GESTO.MANO_ABIERTA);
   comprobar('pellizco', r.clasificarMano(mano({ dedos: SOLO_INDICE, pulgarJunto: true })), GESTO.PELLIZCO);
 }
@@ -99,28 +105,19 @@ console.log('\n▸ Arrastre con pellizco: sí debe producir órbita');
   comprobar('hay órbitas', acciones > 10, true);
 }
 
-console.log('\n▸ Gesto sostenido: apuntar 1,2 s selecciona');
+console.log('\n▸ Los gestos retirados no disparan nada');
 {
-  const r = new GestureRecognizer();
-  let t = 0;
-  let selecciones = 0;
-  const progresos = [];
-  for (let i = 0; i < 60; i++) {
-    const res = r.procesar([mano({ dedos: SOLO_INDICE })], (t += 33));
-    progresos.push(res.progreso);
-    selecciones += res.acciones.filter((a) => a.tipo === 'seleccionar').length;
+  // Esta es la prueba del problema que motivó recortar el vocabulario: abrir la
+  // mano o dejarla quieta apuntando abría paneles que nadie había pedido.
+  for (const [nombre, dedos] of [['apuntar', SOLO_INDICE], ['puño', NINGUNO], ['mano abierta quieta', TODOS]]) {
+    const r = new GestureRecognizer();
+    let t = 0;
+    const acciones = [];
+    for (let i = 0; i < 90; i++) {   // 3 s largos, mucho más que cualquier umbral antiguo
+      acciones.push(...r.procesar([mano({ dedos })], (t += 33)).acciones);
+    }
+    comprobar(`${nombre} sostenido no produce acciones`, acciones.length, 0);
   }
-  comprobar('selecciona una vez', selecciones, 1);
-  comprobar('el progreso llegó a subir', progresos.some((p) => p > 0.5), true);
-}
-
-console.log('\n▸ El progreso se reinicia si se cambia de gesto');
-{
-  const r = new GestureRecognizer();
-  let t = 0;
-  for (let i = 0; i < 20; i++) r.procesar([mano({ dedos: SOLO_INDICE })], (t += 33));
-  const res = r.procesar([mano({ dedos: NINGUNO })], (t += 33));
-  comprobar('progreso a cero', res.progreso, 0);
 }
 
 console.log('\n▸ Zoom con dos manos en pellizco');
@@ -140,17 +137,38 @@ console.log('\n▸ Zoom con dos manos en pellizco');
   comprobar('separar acerca (delta negativo)', deltas.every((d) => d < 0), true);
 }
 
-console.log('\n▸ Deslizamiento horizontal con mano abierta');
+console.log('\n▸ Barrido horizontal con mano abierta');
+{
+  for (const plana of [true, false]) {
+    const r = new GestureRecognizer();
+    let t = 0;
+    const vecinos = [];
+    const progresos = [];
+    for (let i = 0; i < 12; i++) {
+      const res = r.procesar([mano({ dedos: TODOS, plana, x: 0.2 + i * 0.03 })], (t += 30));
+      progresos.push(res.progreso);
+      for (const a of res.acciones) if (a.tipo === 'vecino') vecinos.push(a.direccion);
+    }
+    // De frente o de canto: el barrido tiene que detectarse igual, porque nadie
+    // controla la orientación de la mano mientras hace el gesto de pasar.
+    comprobar(`detecta el barrido (${plana ? 'de frente' : 'de canto'})`, vecinos.length >= 1, true);
+    comprobar(`dirección correcta (${plana ? 'de frente' : 'de canto'})`, vecinos[0], -1);
+    comprobar(`el aro de progreso sube antes de disparar (${plana ? 'de frente' : 'de canto'})`,
+      progresos.some((v) => v > 0.3 && v < 1), true);
+  }
+}
+
+console.log('\n▸ El barrido no arrastra ni desplaza la escena');
 {
   const r = new GestureRecognizer();
   let t = 0;
-  const vecinos = [];
+  const tipos = new Set();
   for (let i = 0; i < 12; i++) {
-    const res = r.procesar([mano({ dedos: TODOS, plana: false, x: 0.2 + i * 0.03 })], (t += 30));
-    for (const a of res.acciones) if (a.tipo === 'vecino') vecinos.push(a.direccion);
+    for (const a of r.procesar([mano({ dedos: TODOS, x: 0.2 + i * 0.03 })], (t += 30)).acciones) {
+      tipos.add(a.tipo);
+    }
   }
-  comprobar('detecta el deslizamiento', vecinos.length >= 1, true);
-  comprobar('dirección correcta', vecinos[0], -1);
+  comprobar('solo produce «vecino»', [...tipos].join(','), 'vecino');
 }
 
 console.log('\n▸ Sin manos: estado limpio');

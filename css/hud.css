@@ -513,6 +513,22 @@
   pointer-events: none;
   clip-path: inset(0 0 0 100%);
 }
+
+/* Aspa para cerrarlo antes de que se retire solo. */
+.galaxia__cerrar {
+  flex: none;
+  padding: 0 var(--e-1);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-base);
+  line-height: 1;
+  color: var(--texto-apagado);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color var(--dur-corta) var(--curva);
+}
+.galaxia__cerrar:hover,
+.galaxia__cerrar:focus-visible { color: var(--cian-brillante); }
 .galaxia__svg { width: 100%; height: auto; }
 .galaxia__disco { fill: rgba(26, 82, 118, 0.10); stroke: rgba(79, 195, 247, 0.16); stroke-width: 0.6; }
 .galaxia__brazo { fill: none; stroke: rgba(127, 178, 255, 0.5); stroke-width: 5; stroke-linecap: round; opacity: 0.45; }

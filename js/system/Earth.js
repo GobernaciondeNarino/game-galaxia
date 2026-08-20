@@ -20,6 +20,10 @@ import { EPOCA_J2000 } from './Orbit.js';
 const MS_POR_HORA = 3_600_000;
 
 const VERTEX = /* glsl */ `
+  // <common> define isPerspectiveMatrix(), que necesita <logdepthbuf_vertex>.
+  #include <common>
+  #include <logdepthbuf_pars_vertex>
+
   varying vec2 vUv;
   varying vec3 vNormal;
   varying vec3 vPosicionMundo;
@@ -30,10 +34,14 @@ const VERTEX = /* glsl */ `
     vec4 mundo = modelMatrix * vec4(position, 1.0);
     vPosicionMundo = mundo.xyz;
     gl_Position = projectionMatrix * viewMatrix * mundo;
+    // Después de calcular gl_Position: el fragmento lo lee.
+    #include <logdepthbuf_vertex>
   }
 `;
 
 const FRAGMENT = /* glsl */ `
+  #include <logdepthbuf_pars_fragment>
+
   uniform sampler2D mapaDia;
   uniform sampler2D mapaNoche;
   uniform vec3 posicionLuz;
@@ -45,6 +53,8 @@ const FRAGMENT = /* glsl */ `
   varying vec3 vPosicionMundo;
 
   void main() {
+    #include <logdepthbuf_fragment>
+
     vec3 haciaLuz = normalize(posicionLuz - vPosicionMundo);
     float incidencia = dot(normalize(vNormal), haciaLuz);
 
@@ -136,6 +146,8 @@ export class Earth extends CelestialBody {
       new THREE.ShaderMaterial({
         uniforms: { color: { value: new THREE.Color('#4a90e2') } },
         vertexShader: /* glsl */ `
+          #include <common>
+          #include <logdepthbuf_pars_vertex>
           varying vec3 vNormal;
           varying vec3 vPosicionMundo;
           void main() {
@@ -143,13 +155,16 @@ export class Earth extends CelestialBody {
             vec4 mundo = modelMatrix * vec4(position, 1.0);
             vPosicionMundo = mundo.xyz;
             gl_Position = projectionMatrix * viewMatrix * mundo;
+            #include <logdepthbuf_vertex>
           }
         `,
         fragmentShader: /* glsl */ `
+          #include <logdepthbuf_pars_fragment>
           uniform vec3 color;
           varying vec3 vNormal;
           varying vec3 vPosicionMundo;
           void main() {
+            #include <logdepthbuf_fragment>
             vec3 haciaCamara = normalize(cameraPosition - vPosicionMundo);
             float limbo = pow(1.0 - max(0.0, dot(normalize(vNormal), haciaCamara)), 3.0);
             // Solo brilla del lado que mira al Sol, que está en el origen.

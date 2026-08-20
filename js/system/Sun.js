@@ -14,6 +14,10 @@ import { CelestialBody, rutaReducida } from './CelestialBody.js';
 import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
 
 const VERTEX = /* glsl */ `
+  // <common> define isPerspectiveMatrix(), que necesita <logdepthbuf_vertex>.
+  #include <common>
+  #include <logdepthbuf_pars_vertex>
+
   varying vec2 vUv;
   varying vec3 vNormal;
   varying vec3 vPosicion;
@@ -23,6 +27,8 @@ const VERTEX = /* glsl */ `
     vNormal = normalize(normalMatrix * normal);
     vPosicion = position;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    // Después de calcular gl_Position: el fragmento lo lee.
+    #include <logdepthbuf_vertex>
   }
 `;
 
@@ -31,6 +37,8 @@ const VERTEX = /* glsl */ `
  * animado que imita la granulación y un realce en el limbo.
  */
 const FRAGMENT_SUPERFICIE = /* glsl */ `
+  #include <logdepthbuf_pars_fragment>
+
   uniform sampler2D mapa;
   uniform float tiempo;
   uniform vec3 colorCaliente;
@@ -76,6 +84,8 @@ const FRAGMENT_SUPERFICIE = /* glsl */ `
   }
 
   void main() {
+    #include <logdepthbuf_fragment>
+
     vec3 base = tieneMapa > 0.5 ? texture2D(mapa, vUv).rgb : colorCaliente;
 
     // Celdas de convección lentas.
