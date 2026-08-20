@@ -1,0 +1,1178 @@
+{
+  "$esquema": "orbis/textos/1",
+  "nota": "Contenido redactado de ORBIS: nombres, jerarquía, narraciones, curiosidades, anotaciones de superficie y opciones de representación. Las cifras físicas y orbitales NO están aquí: vienen de data/fisica-jpl.json (JPL Horizons) y de data/complementos.json (literatura citada). Los datos de temperatura y composición atmosférica sí viven aquí porque Horizons no los publica, y cada uno lleva su campo 'fuente'.",
+  "cuerpos": {
+    "sol": {
+      "nombre": "Sol",
+      "tipo": "estrella",
+      "padre": null,
+      "temperatura": {
+        "minC": null,
+        "mediaC": 5499,
+        "maxC": null,
+        "nota": "temperatura efectiva de la fotosfera (5772 K)",
+        "fuente": "NASA/JPL Horizons"
+      },
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": "assets/textures/sol.jpg",
+        "color": "#FFD27A",
+        "colorEtiqueta": "#E8A020",
+        "anillos": null,
+        "emisivo": true
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Zona convectiva",
+          "lat": 35,
+          "lon": -40
+        },
+        {
+          "etiqueta": "Manchas solares",
+          "lat": -15,
+          "lon": 30
+        }
+      ],
+      "satelites": [],
+      "narracion": "El Sol no es una estrella especial. Es una enana amarilla corriente, una entre cientos de miles de millones en la Vía Láctea. Lo que la hace única para nosotros es la distancia: está lo bastante cerca como para que su luz tarde apenas ocho minutos y veinte segundos en llegar hasta aquí. En su núcleo, a quince millones de grados, cada segundo se fusionan seiscientos millones de toneladas de hidrógeno en helio. Esa reacción lleva funcionando cuatro mil seiscientos millones de años y le quedan otros cinco mil millones por delante. La luz que ves salir de su superficie tardó decenas de miles de años en abrirse camino desde el núcleo hasta la fotosfera, rebotando entre capas de plasma. El Sol concentra el 99,86 % de toda la masa del Sistema Solar. Los ocho planetas, los planetas enanos, los asteroides y los cometas se reparten lo que sobró: menos de la séptima parte de un uno por ciento. Cuando miras el Sistema Solar, en realidad estás mirando el Sol y sus restos.",
+      "curiosidades": [
+        "Su superficie no es sólida: es plasma en movimiento constante, con celdas de convección del tamaño de un país.",
+        "Cada segundo pierde cuatro millones de toneladas de masa, convertidas en energía.",
+        "La corona solar está a más de un millón de grados, doscientas veces más caliente que la superficie que hay debajo. Por qué, sigue sin explicarse del todo."
+      ]
+    },
+    "mercurio": {
+      "nombre": "Mercurio",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": -173,
+        "mediaC": 167,
+        "maxC": 427,
+        "nota": "sin atmósfera que reparta el calor, la diferencia entre el día y la noche es la mayor del Sistema Solar",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "nota": "No es una atmósfera propiamente dicha, sino una exosfera tan tenue que sus átomos casi nunca chocan entre sí.",
+        "componentes": [
+          {
+            "compuesto": "O₂",
+            "porcentaje": 42
+          },
+          {
+            "compuesto": "Na",
+            "porcentaje": 29
+          },
+          {
+            "compuesto": "H₂",
+            "porcentaje": 22
+          },
+          {
+            "compuesto": "He",
+            "porcentaje": 6
+          },
+          {
+            "compuesto": "K",
+            "porcentaje": 0.5
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Mercury"
+      },
+      "satelitesConocidos": {
+        "valor": 0,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics"
+      },
+      "render": {
+        "textura": "assets/textures/mercurio.jpg",
+        "color": "#8C8A87",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Cuenca Caloris",
+          "lat": 30,
+          "lon": 190
+        },
+        {
+          "etiqueta": "Escarpes de compresión",
+          "lat": -20,
+          "lon": 60
+        }
+      ],
+      "satelites": [],
+      "narracion": "Mercurio es el planeta más pequeño y el más rápido: completa una vuelta al Sol en menos de ochenta y ocho días. De ahí su nombre, el del mensajero de los dioses romanos. Pero por dentro va lentísimo. Tarda cincuenta y nueve días terrestres en girar sobre sí mismo, atrapado en una resonancia perfecta con su órbita: tres rotaciones por cada dos vueltas al Sol. El resultado es que un día solar en Mercurio dura ciento setenta y seis días terrestres, dos años mercurianos completos. Sin atmósfera que amortigüe nada, su superficie es un campo de batalla. Al mediodía en el ecuador alcanza los 427 grados; en la cara nocturna cae a 173 bajo cero. Y sin embargo, en el fondo de algunos cráteres polares, donde la luz del Sol no ha entrado nunca, las sondas han detectado hielo de agua. Bajo la corteza esconde un núcleo metálico enorme, que ocupa cerca del ochenta y cinco por ciento de su radio. Mercurio es, en esencia, una bola de hierro con una fina cáscara de roca encima.",
+      "curiosidades": [
+        "Si pudieras plantarte en su superficie, verías el Sol tres veces más grande que desde la Tierra.",
+        "Se está encogiendo: al enfriarse su núcleo, la corteza se arruga en escarpes de cientos de kilómetros.",
+        "En algunos puntos de su órbita, el Sol parece detenerse en el cielo, retroceder y volver a avanzar."
+      ]
+    },
+    "venus": {
+      "nombre": "Venus",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": null,
+        "mediaC": 464,
+        "maxC": null,
+        "nota": "la temperatura es prácticamente la misma de día, de noche, en el ecuador y en los polos",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "nota": "La presión en la superficie es 92 veces la terrestre: equivale a estar a novecientos metros bajo el mar.",
+        "componentes": [
+          {
+            "compuesto": "CO₂",
+            "porcentaje": 96.5
+          },
+          {
+            "compuesto": "N₂",
+            "porcentaje": 3.5
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Venus"
+      },
+      "satelitesConocidos": {
+        "valor": 0,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics"
+      },
+      "render": {
+        "textura": "assets/textures/venus.jpg",
+        "color": "#D9B27C",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "texturaSuperficie": "assets/textures/venus-superficie.jpg"
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Maxwell Montes",
+          "lat": 65,
+          "lon": 3
+        },
+        {
+          "etiqueta": "Ishtar Terra",
+          "lat": 70,
+          "lon": 30
+        }
+      ],
+      "satelites": [],
+      "narracion": "Venus es casi gemelo de la Tierra en tamaño, masa y composición. En todo lo demás es su contrario. Su atmósfera, casi de dióxido de carbono puro, atrapa el calor en un efecto invernadero desbocado que mantiene la superficie a 464 grados: más caliente que Mercurio, aunque esté al doble de distancia del Sol. Sobre esa superficie flota una capa permanente de nubes de ácido sulfúrico que nunca deja ver el suelo desde fuera. Venus gira al revés que casi todo el Sistema Solar, y lo hace tan despacio que su día dura más que su año: 243 días terrestres para una rotación, frente a 225 para dar la vuelta al Sol. Nadie sabe con certeza qué lo puso a girar así; la hipótesis más aceptada es un impacto colosal en su juventud. Las sondas soviéticas Venera llegaron a posarse en su superficie en los años setenta. La que más aguantó resistió dos horas antes de ser aplastada y cocida. Las fotografías que envió siguen siendo las únicas que tenemos del suelo venusiano.",
+      "curiosidades": [
+        "Es el objeto más brillante del cielo nocturno después de la Luna: el lucero del alba y el de la tarde son el mismo planeta.",
+        "Sus vientos en altura dan la vuelta al planeta en cuatro días, sesenta veces más rápido que su propia rotación.",
+        "Si el Sol saliera por algún sitio en Venus, saldría por el oeste."
+      ]
+    },
+    "tierra": {
+      "nombre": "Tierra",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": -89,
+        "mediaC": 15,
+        "maxC": 58,
+        "nota": "mínima registrada en la base Vostok (Antártida) y máxima en el desierto de Lut (Irán)",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "nota": "Composición del aire seco a nivel del mar. El vapor de agua varía entre el 0 % y el 4 % según el lugar.",
+        "componentes": [
+          {
+            "compuesto": "N₂",
+            "porcentaje": 78.08
+          },
+          {
+            "compuesto": "O₂",
+            "porcentaje": 20.95
+          },
+          {
+            "compuesto": "Ar",
+            "porcentaje": 0.93
+          },
+          {
+            "compuesto": "CO₂",
+            "porcentaje": 0.04
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Earth"
+      },
+      "satelitesConocidos": {
+        "valor": 1,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics"
+      },
+      "render": {
+        "textura": "assets/textures/tierra.jpg",
+        "texturaNubes": "assets/textures/tierra-nubes.jpg",
+        "texturaNoche": "assets/textures/tierra-noche.jpg",
+        "color": "#3A6EA5",
+        "colorEtiqueta": "#00E5FF",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Océanos",
+          "lat": -10,
+          "lon": -150
+        },
+        {
+          "etiqueta": "Atmósfera",
+          "lat": 55,
+          "lon": -20
+        },
+        {
+          "etiqueta": "Biosfera",
+          "lat": -5,
+          "lon": -60
+        }
+      ],
+      "satelites": [
+        "luna"
+      ],
+      "narracion": "La Tierra es, hasta donde sabemos, el único lugar del universo donde hay vida. Tres cuartas partes de su superficie están cubiertas de agua líquida, algo que solo es posible porque orbita a la distancia justa del Sol: un poco más cerca y los océanos se habrían evaporado como en Venus; un poco más lejos y estarían congelados como en Marte. Su atmósfera de nitrógeno y oxígeno no es un accidente, sino el residuo de tres mil millones de años de fotosíntesis. El oxígeno que respiras lo fabricaron seres vivos. Bajo la corteza, un núcleo de hierro fundido gira y genera un campo magnético que desvía el viento solar y protege la atmósfera de ser arrancada, que es exactamente lo que le ocurrió a Marte. Su eje está inclinado 23,44 grados, y esa inclinación es la que produce las estaciones. La Luna, inusualmente grande para el tamaño del planeta, estabiliza ese eje y evita que oscile de forma caótica. Sin ella, el clima terrestre sería mucho menos previsible.",
+      "curiosidades": [
+        "Hemos cartografiado mejor la superficie de Marte que el fondo de nuestros propios océanos.",
+        "El punto más profundo del mar, la fosa de las Marianas, está a casi once kilómetros bajo la superficie.",
+        "La Tierra no es una esfera perfecta: la rotación la ensancha por el ecuador unos veintiún kilómetros."
+      ]
+    },
+    "marte": {
+      "nombre": "Marte",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": -153,
+        "mediaC": -65,
+        "maxC": 20,
+        "nota": "mínimas en los polos en invierno, máximas al mediodía en el ecuador en verano",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "nota": "La presión en superficie es menos del 1 % de la terrestre: el agua líquida se evapora casi al instante.",
+        "componentes": [
+          {
+            "compuesto": "CO₂",
+            "porcentaje": 95.32
+          },
+          {
+            "compuesto": "N₂",
+            "porcentaje": 2.7
+          },
+          {
+            "compuesto": "Ar",
+            "porcentaje": 1.6
+          },
+          {
+            "compuesto": "O₂",
+            "porcentaje": 0.13
+          },
+          {
+            "compuesto": "CO",
+            "porcentaje": 0.08
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Mars"
+      },
+      "satelitesConocidos": {
+        "valor": 2,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics"
+      },
+      "render": {
+        "textura": "assets/textures/marte.jpg",
+        "color": "#C1440E",
+        "colorEtiqueta": "#E8A020",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Monte Olimpo",
+          "lat": 18.65,
+          "lon": -133.8
+        },
+        {
+          "etiqueta": "Valles Marineris",
+          "lat": -14,
+          "lon": -59
+        },
+        {
+          "etiqueta": "Casquete polar norte",
+          "lat": 85,
+          "lon": 0
+        }
+      ],
+      "satelites": [
+        "fobos",
+        "deimos"
+      ],
+      "narracion": "Marte fue en su día un planeta con ríos, lagos y probablemente un océano en el hemisferio norte. Los cauces secos siguen ahí, grabados en la superficie. Lo que perdió fue el campo magnético: cuando su núcleo se enfrió, hace unos cuatro mil millones de años, la atmósfera quedó a merced del viento solar y se fue disipando durante eones. Sin atmósfera densa no hay presión, y sin presión el agua líquida no puede existir en superficie. Lo que queda es un desierto helado de óxido de hierro, que es de donde viene su color. Aun así, Marte guarda los récords geológicos del Sistema Solar. El Monte Olimpo es un volcán de veintidós kilómetros de altura, casi tres veces el Everest, con una base del tamaño de Francia. Valles Marineris es un cañón de cuatro mil kilómetros de largo y hasta siete de profundidad; junto a él, el Gran Cañón del Colorado es un arañazo. Su día dura veinticuatro horas y treinta y siete minutos, y su eje está inclinado veinticinco grados: tiene estaciones, como la Tierra, solo que duran el doble.",
+      "curiosidades": [
+        "Sus casquetes polares no son solo de hielo de agua: en invierno se les añade una capa de dióxido de carbono congelado.",
+        "Las tormentas de polvo pueden cubrir el planeta entero y durar meses.",
+        "Hay más vehículos robóticos operativos en Marte que en ningún otro mundo salvo la Tierra."
+      ]
+    },
+    "jupiter": {
+      "nombre": "Júpiter",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": null,
+        "mediaC": -108,
+        "maxC": null,
+        "nota": "medida en el nivel de presión de 1 bar; no tiene superficie sólida donde medir",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "nota": "Composición de la atmósfera exterior. Hacia el interior el hidrógeno se comprime hasta volverse metálico y conductor.",
+        "componentes": [
+          {
+            "compuesto": "H₂",
+            "porcentaje": 89.8
+          },
+          {
+            "compuesto": "He",
+            "porcentaje": 10.2
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Jupiter"
+      },
+      "satelitesConocidos": {
+        "valor": 97,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics — Planetary Satellite Discovery Circumstances"
+      },
+      "render": {
+        "textura": "assets/textures/jupiter.jpg",
+        "color": "#C8A165",
+        "colorEtiqueta": "#E8A020",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Gran Mancha Roja",
+          "lat": -22,
+          "lon": 0
+        },
+        {
+          "etiqueta": "Bandas ecuatoriales",
+          "lat": 5,
+          "lon": 120
+        }
+      ],
+      "satelites": [
+        "io",
+        "europa",
+        "ganimedes",
+        "calisto"
+      ],
+      "narracion": "Júpiter tiene dos veces y media más masa que todos los demás planetas juntos. Es tan grande que el centro de masas alrededor del cual giran él y el Sol queda fuera de la superficie solar: técnicamente, el Sol no está quieto, orbita con Júpiter. No tiene superficie. Si intentaras aterrizar, la atmósfera se iría espesando hasta que el hidrógeno, aplastado por millones de atmósferas de presión, se convierte en un líquido metálico que conduce la electricidad. Ese océano es el que genera el campo magnético más potente del Sistema Solar después del solar, veinte mil veces el terrestre. La Gran Mancha Roja es una tormenta anticiclónica observada de forma continuada desde hace más de ciento cincuenta años, y probablemente desde el siglo XVII. Cabría la Tierra entera dentro, aunque lleva décadas encogiendo. Pese a su tamaño, Júpiter gira más rápido que ningún otro planeta: una vuelta completa en menos de diez horas. Esa rotación es la que estira sus nubes en las bandas paralelas que lo hacen reconocible, y la que lo achata visiblemente por los polos.",
+      "curiosidades": [
+        "Su campo magnético se extiende tanto que, si fuera visible desde la Tierra, ocuparía el doble que la Luna llena.",
+        "Actúa como escudo del Sistema Solar interior: su gravedad desvía o captura cometas que podrían llegar hasta nosotros.",
+        "Galileo descubrió sus cuatro lunas mayores en 1610, y fue la primera prueba de que no todo giraba alrededor de la Tierra."
+      ]
+    },
+    "saturno": {
+      "nombre": "Saturno",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": null,
+        "mediaC": -139,
+        "maxC": null,
+        "nota": "medida en el nivel de presión de 1 bar",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "componentes": [
+          {
+            "compuesto": "H₂",
+            "porcentaje": 96.3
+          },
+          {
+            "compuesto": "He",
+            "porcentaje": 3.25
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Saturn"
+      },
+      "satelitesConocidos": {
+        "valor": 274,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics — Planetary Satellite Discovery Circumstances",
+        "nota": "El recuento cambia con cada campaña de observación; conviene refrescarlo desde la fuente."
+      },
+      "render": {
+        "textura": "assets/textures/saturno.jpg",
+        "color": "#E3D2A2",
+        "colorEtiqueta": "#E8A020",
+        "anillos": {
+          "textura": "assets/textures/saturno-anillos.png",
+          "radioInternoRadios": 1.24,
+          "radioExternoRadios": 2.27,
+          "fuente": "NASA Saturn Fact Sheet — anillos C a A, de 74.500 a 136.780 km del centro"
+        }
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Hexágono polar",
+          "lat": 78,
+          "lon": 0
+        },
+        {
+          "etiqueta": "División de Cassini",
+          "lat": 0,
+          "lon": 90
+        }
+      ],
+      "satelites": [
+        "mimas",
+        "encelado",
+        "rea",
+        "titan",
+        "japeto"
+      ],
+      "narracion": "Los anillos de Saturno son lo más reconocible del Sistema Solar y, a la vez, lo más frágil. Se extienden más de doscientos ochenta mil kilómetros de lado a lado, pero su grosor medio es de apenas diez metros: si redujeras Saturno al tamaño de un plato, los anillos serían mil veces más finos que una hoja de papel. No son sólidos. Son miles de millones de fragmentos de hielo de agua, desde granos de polvo hasta bloques del tamaño de una casa, cada uno orbitando por su cuenta. Los datos de la sonda Cassini apuntan a que son jóvenes, quizá de hace solo cien millones de años, y que se están desmoronando sobre el planeta. Saturno es también el planeta menos denso del Sistema Solar: 0,69 gramos por centímetro cúbico, menos que el agua. En un océano lo bastante grande, flotaría. En su polo norte hay una corriente en chorro con forma de hexágono casi perfecto, de treinta mil kilómetros de lado, que lleva girando desde que la vimos por primera vez en 1981 y para la que no hay una explicación cerrada.",
+      "curiosidades": [
+        "Un año en Saturno dura veintinueve años y medio terrestres.",
+        "Sus anillos desaparecen de la vista desde la Tierra cada quince años, cuando los vemos exactamente de canto.",
+        "El hexágono polar es una única corriente de viento; nada parecido se ha visto en ningún otro planeta."
+      ]
+    },
+    "urano": {
+      "nombre": "Urano",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": null,
+        "mediaC": -195,
+        "maxC": null,
+        "nota": "el planeta más frío del Sistema Solar, más que Neptuno pese a estar más cerca del Sol",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "nota": "El metano absorbe la luz roja y refleja la azul: de ahí su color.",
+        "componentes": [
+          {
+            "compuesto": "H₂",
+            "porcentaje": 82.5
+          },
+          {
+            "compuesto": "He",
+            "porcentaje": 15.2
+          },
+          {
+            "compuesto": "CH₄",
+            "porcentaje": 2.3
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Uranus"
+      },
+      "satelitesConocidos": {
+        "valor": 28,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics — Planetary Satellite Discovery Circumstances"
+      },
+      "render": {
+        "textura": "assets/textures/urano.jpg",
+        "color": "#9CD3DB",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": {
+          "textura": null,
+          "radioInternoRadios": 1.64,
+          "radioExternoRadios": 2.0,
+          "fuente": "NASA Uranus Fact Sheet — anillos principales, de 41.800 a 51.100 km del centro",
+          "nota": "Sin mapa fotográfico disponible: se representan como bandas finas de color, marcadas como SIMULACIÓN."
+        }
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Polo orientado al Sol",
+          "lat": 88,
+          "lon": 0
+        }
+      ],
+      "satelites": [
+        "miranda",
+        "ariel",
+        "umbriel",
+        "titania",
+        "oberon"
+      ],
+      "narracion": "Urano gira tumbado. Su eje está inclinado casi noventa y ocho grados respecto al plano de su órbita, así que en lugar de girar como una peonza, rueda como una bola de bolos. La consecuencia es el ciclo estacional más extremo del Sistema Solar: cada polo pasa cuarenta y dos años seguidos bajo la luz continua del Sol y otros cuarenta y dos en oscuridad total. La explicación más aceptada es un impacto contra un cuerpo del tamaño de la Tierra durante la formación del Sistema Solar. Es el primer planeta descubierto con telescopio, por William Herschel en 1781, que al principio lo tomó por un cometa. Bajo su atmósfera de hidrógeno, helio y metano no hay roca ni gas, sino un manto de agua, amoníaco y metano a alta presión que los planetólogos llaman «hielos», aunque estén a miles de grados. Solo una nave lo ha visitado: la Voyager 2, en 1986, durante un sobrevuelo de unas horas. Casi todo lo que sabemos de él viene de aquel encuentro fugaz.",
+      "curiosidades": [
+        "También tiene anillos, descubiertos en 1977, pero son oscuros y finos, muy distintos de los de Saturno.",
+        "Su campo magnético está descentrado y torcido casi sesenta grados respecto al eje de rotación.",
+        "Un año en Urano dura ochenta y cuatro años terrestres: desde su descubrimiento solo ha dado tres vueltas al Sol."
+      ]
+    },
+    "neptuno": {
+      "nombre": "Neptuno",
+      "tipo": "planeta",
+      "padre": "sol",
+      "temperatura": {
+        "minC": null,
+        "mediaC": -201,
+        "maxC": null,
+        "nota": "medida en el nivel de presión de 1 bar",
+        "fuente": "NASA Planetary Fact Sheet"
+      },
+      "atmosfera": {
+        "componentes": [
+          {
+            "compuesto": "H₂",
+            "porcentaje": 80
+          },
+          {
+            "compuesto": "He",
+            "porcentaje": 19
+          },
+          {
+            "compuesto": "CH₄",
+            "porcentaje": 1.5
+          }
+        ],
+        "fuente": "NASA Planetary Fact Sheet — Neptune"
+      },
+      "satelitesConocidos": {
+        "valor": 16,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics — Planetary Satellite Discovery Circumstances"
+      },
+      "render": {
+        "textura": "assets/textures/neptuno.jpg",
+        "color": "#3E5EF0",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Gran Mancha Oscura",
+          "lat": -22,
+          "lon": 30
+        }
+      ],
+      "satelites": [
+        "triton"
+      ],
+      "narracion": "Neptuno se descubrió con lápiz y papel antes que con un telescopio. A mediados del siglo XIX, la órbita de Urano no cuadraba con las predicciones, y Urbain Le Verrier calculó dónde tendría que estar el planeta desconocido que la estaba perturbando. La noche del 23 de septiembre de 1846, el observatorio de Berlín apuntó a esas coordenadas y ahí estaba, a un grado de la posición prevista. Es el planeta más lejano y uno de los más violentos. Sus vientos superan los dos mil kilómetros por hora, los más rápidos que se han medido en el Sistema Solar, y lo hacen recibiendo apenas un uno por mil de la luz solar que llega a la Tierra. De dónde sale esa energía es una de las preguntas abiertas: Neptuno emite más calor del que recibe del Sol. Su luna mayor, Tritón, orbita en sentido contrario a la rotación del planeta, señal casi inequívoca de que no se formó allí, sino que fue capturada del cinturón de Kuiper.",
+      "curiosidades": [
+        "Tarda ciento sesenta y cinco años en dar una vuelta al Sol: desde su descubrimiento solo ha completado una.",
+        "Su Gran Mancha Oscura, fotografiada por la Voyager 2 en 1989, había desaparecido cuando el Hubble volvió a mirar en 1994.",
+        "Llueven diamantes: la presión descompone el metano y el carbono cristaliza al caer. Es una hipótesis respaldada por experimentos de laboratorio."
+      ]
+    },
+    "pluton": {
+      "nombre": "Plutón",
+      "tipo": "planeta-enano",
+      "padre": "sol",
+      "temperatura": {
+        "minC": -240,
+        "mediaC": -229,
+        "maxC": -218,
+        "nota": "varía con su distancia al Sol a lo largo de la órbita",
+        "fuente": "NASA — New Horizons"
+      },
+      "atmosfera": {
+        "nota": "Atmósfera tenue y estacional: se congela sobre la superficie cuando Plutón se aleja del Sol. Las proporciones exactas no están bien determinadas.",
+        "componentes": [
+          {
+            "compuesto": "N₂",
+            "porcentaje": null
+          },
+          {
+            "compuesto": "CH₄",
+            "porcentaje": null
+          },
+          {
+            "compuesto": "CO",
+            "porcentaje": null
+          }
+        ],
+        "fuente": "NASA — New Horizons"
+      },
+      "satelitesConocidos": {
+        "valor": 5,
+        "recuentoA": "2025",
+        "fuente": "JPL Solar System Dynamics"
+      },
+      "render": {
+        "textura": null,
+        "color": "#C8B49B",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: se representa con un color plano y la interfaz lo marca como SIMULACIÓN."
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Sputnik Planitia",
+          "lat": 20,
+          "lon": 175
+        }
+      ],
+      "satelites": [
+        "caronte"
+      ],
+      "narracion": "Plutón fue el noveno planeta durante setenta y seis años. En 2006 la Unión Astronómica Internacional aprobó una definición de planeta que exigía haber despejado gravitatoriamente su órbita, y Plutón no lo cumple: comparte el cinturón de Kuiper con miles de cuerpos parecidos. La reclasificación no cambió nada de Plutón, solo cómo lo llamamos. En 2015 la sonda New Horizons pasó a doce mil kilómetros de su superficie tras nueve años y medio de viaje, y lo que devolvió no se parecía a lo que se esperaba. En lugar de un mundo muerto y craterizado, apareció una llanura de nitrógeno congelado sin un solo cráter, con células de convección de decenas de kilómetros: geología activa a 230 grados bajo cero. Esa llanura, Sputnik Planitia, forma el lóbulo izquierdo de la figura de corazón que se hizo célebre. Plutón y su luna Caronte están acoplados mutuamente por marea: cada uno muestra siempre la misma cara al otro, y giran alrededor de un centro de masas que queda fuera de ambos.",
+      "curiosidades": [
+        "Su órbita es tan excéntrica que entre 1979 y 1999 estuvo más cerca del Sol que Neptuno.",
+        "Es más pequeño que la Luna terrestre.",
+        "Las señales de New Horizons tardan más de cuatro horas en llegar a la Tierra."
+      ]
+    },
+    "ceres": {
+      "nombre": "Ceres",
+      "tipo": "planeta-enano",
+      "padre": "sol",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#8F8B84",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin cartografía disponible de este cuerpo: se representa con un color plano y la interfaz lo marca como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Ceres es el objeto más grande del cinturón de asteroides y el único planeta enano del Sistema Solar interior. Cuando Giuseppe Piazzi lo descubrió en 1801 se le consideró un planeta; medio siglo después, al encontrarse decenas de cuerpos parecidos en la misma región, pasó a ser un asteroide. En 2006 volvió a cambiar de categoría, esta vez a planeta enano. Concentra alrededor de un tercio de toda la masa del cinturón, y aun así solo mide unos novecientos cincuenta kilómetros de diámetro. La sonda Dawn lo orbitó entre 2015 y 2018 y encontró depósitos brillantes de sales en el fondo del cráter Occator, restos de salmuera que ascendió desde el interior y se evaporó. Bajo la corteza hay indicios de una capa de agua: puede que Ceres tenga hoy más agua dulce que la Tierra.",
+      "curiosidades": [
+        "Su nombre viene de la diosa romana de la agricultura; el elemento cerio se llama así por él.",
+        "Los puntos brillantes del cráter Occator son carbonato de sodio, depositado por salmuera que llegó desde el interior.",
+        "Dawn fue la primera nave en orbitar dos cuerpos distintos: primero Vesta y después Ceres."
+      ]
+    },
+    "eris": {
+      "nombre": "Eris",
+      "tipo": "planeta-enano",
+      "padre": "sol",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#CFCFC8",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "No existe cartografía de Eris; en Wikimedia hay texturas de este cuerpo, pero son invenciones artísticas y ORBIS no las usa."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Eris es lo que descolocó la definición de planeta. Cuando Mike Brown y su equipo lo descubrieron en 2005, las primeras estimaciones lo hacían mayor que Plutón, y la comunidad astronómica tuvo que decidir si aceptaba un décimo planeta o revisaba las reglas. Optó por lo segundo, y Plutón dejó de ser planeta. Hoy sabemos que Eris es algo más pequeño que Plutón en diámetro pero un veintisiete por ciento más masivo. Su órbita es extrema: tarda más de quinientos cincuenta años en dar la vuelta al Sol y llega a alejarse casi cien unidades astronómicas, tres veces más que Neptuno. Su superficie, cubierta de metano congelado, es de las más reflectantes del Sistema Solar. Su nombre es el de la diosa griega de la discordia, y está bien puesto.",
+      "curiosidades": [
+        "Su descubrimiento provocó la reclasificación de Plutón en 2006.",
+        "Refleja cerca del 96 % de la luz que recibe: es casi tan blanco como la nieve recién caída.",
+        "Tiene un satélite, Disnomia, cuya órbita permitió medir la masa de Eris."
+      ]
+    },
+    "makemake": {
+      "nombre": "Makemake",
+      "tipo": "planeta-enano",
+      "padre": "sol",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#C3A08A",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "No existe cartografía de Makemake; las texturas que circulan de este cuerpo son invenciones artísticas y ORBIS no las usa."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Makemake es el segundo objeto más brillante del cinturón de Kuiper después de Plutón, y uno de los cuatro planetas enanos reconocidos más allá de Neptuno. Se descubrió en 2005, poco después de Pascua, y su nombre provisional fue «Easterbunny» antes de recibir el del dios creador del pueblo rapanui de la isla de Pascua. Tarda unos trescientos cinco años en dar la vuelta al Sol. Una ocultación estelar observada en 2011 permitió medir su tamaño y descubrir que, a diferencia de Plutón, no tiene una atmósfera apreciable. Su superficie está cubierta de metano y etano congelados. En 2016 el telescopio Hubble le encontró un satélite pequeño y oscuro, apodado MK 2.",
+      "curiosidades": [
+        "Su nombre honra al dios creador de la mitología rapanui, de la isla de Pascua.",
+        "La ocultación de 2011 descartó que tenga una atmósfera global, al contrario que Plutón.",
+        "Su satélite es tan oscuro que costó mil veces más detectarlo que al propio Makemake."
+      ]
+    },
+    "haumea": {
+      "nombre": "Haumea",
+      "tipo": "planeta-enano",
+      "padre": "sol",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#DDD8D0",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "No existe cartografía de Haumea; las texturas que circulan de este cuerpo son invenciones artísticas y ORBIS no las usa."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Haumea no es esférico: gira tan rápido —una vuelta cada menos de cuatro horas— que la fuerza centrífuga lo ha estirado hasta darle forma de balón de rugby, con un eje casi el doble de largo que el más corto. Es el objeto grande de rotación más veloz que se conoce en el Sistema Solar. Esa rotación, sus dos satélites y una familia de fragmentos helados que comparten su órbita apuntan a una colisión violenta en el pasado remoto. En 2017, una ocultación estelar reveló algo que nadie esperaba en un cuerpo tan pequeño: Haumea tiene un anillo. Fue el primero descubierto alrededor de un objeto transneptuniano y obligó a revisar la idea de que los anillos son cosa de planetas gigantes.",
+      "curiosidades": [
+        "Gira sobre sí mismo en menos de cuatro horas, el más rápido de los cuerpos grandes del Sistema Solar.",
+        "Tiene un anillo, descubierto en 2017 por ocultación estelar.",
+        "Sus satélites, Hi'iaka y Namaka, llevan nombres de hijas de la diosa hawaiana Haumea."
+      ]
+    },
+    "luna": {
+      "nombre": "Luna",
+      "tipo": "satelite",
+      "padre": "tierra",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": "assets/textures/luna.jpg",
+        "color": "#9A9A96",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Mar de la Tranquilidad",
+          "lat": 8.5,
+          "lon": 31.4
+        }
+      ],
+      "satelites": [],
+      "narracion": "La Luna es, en proporción a su planeta, el satélite más grande del Sistema Solar. La hipótesis dominante es que se formó hace unos cuatro mil quinientos millones de años, cuando un cuerpo del tamaño de Marte chocó contra la Tierra recién nacida y los escombros del impacto se agregaron en órbita. Está acoplada por marea: tarda exactamente lo mismo en girar sobre sí misma que en dar una vuelta a la Tierra, por eso siempre vemos la misma cara. La otra no se conoció hasta 1959, cuando la sonda soviética Luna 3 la fotografió. Se aleja de nosotros unos tres centímetros y ocho milímetros al año, y ese frenado gravitatorio va alargando el día terrestre poco a poco.",
+      "curiosidades": [
+        "Doce personas han caminado sobre ella, todas entre 1969 y 1972.",
+        "Sus huellas seguirán ahí millones de años: no hay atmósfera ni viento que las borre.",
+        "Estabiliza el eje de rotación de la Tierra y con ello hace previsible nuestro clima."
+      ]
+    },
+    "fobos": {
+      "nombre": "Fobos",
+      "tipo": "satelite",
+      "padre": "marte",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#7A6E63",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Fobos es la mayor de las dos lunas de Marte y una de las más extrañas del Sistema Solar. Orbita tan cerca de la superficie marciana —a menos de seis mil kilómetros— que da tres vueltas al planeta cada día marciano, y desde el suelo se ve salir por el oeste y ponerse por el este. Esa cercanía la está condenando: la marea de Marte la acerca casi dos centímetros al año, y dentro de unas decenas de millones de años se romperá para formar un anillo o se estrellará contra el planeta. Su forma irregular y su baja densidad han hecho pensar que podría ser un asteroide capturado, aunque su órbita casi circular y ecuatorial no encaja bien con esa idea.",
+      "curiosidades": [
+        "Su nombre significa «miedo» en griego: es uno de los hijos de Ares.",
+        "Su gravedad es tan débil que un salto humano normal alcanzaría la velocidad de escape.",
+        "El cráter Stickney, de nueve kilómetros, casi la partió en dos."
+      ]
+    },
+    "deimos": {
+      "nombre": "Deimos",
+      "tipo": "satelite",
+      "padre": "marte",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#8A7E70",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Deimos es la más pequeña y lejana de las dos lunas marcianas: apenas doce kilómetros de lado a lado. Vista desde la superficie de Marte no sería más que un punto brillante, algo mayor que Venus visto desde la Tierra. Su superficie está cubierta de regolito, una capa suelta de polvo y fragmentos que suaviza sus cráteres y le da un aspecto liso comparado con Fobos. Al contrario que su compañera, Deimos se aleja lentamente de Marte. Asaph Hall descubrió ambas en 1877, tras varias noches de búsqueda y a punto de abandonar.",
+      "curiosidades": [
+        "Su nombre significa «terror»: el otro hijo de Ares que acompañaba a su padre en la batalla.",
+        "Tarda treinta horas en dar la vuelta a Marte, algo más que el día marciano.",
+        "Hall estuvo a punto de rendirse; fue su mujer, Angeline Stickney, quien lo animó a seguir una noche más."
+      ]
+    },
+    "io": {
+      "nombre": "Ío",
+      "tipo": "satelite",
+      "padre": "jupiter",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#E8D26A",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Ío es el cuerpo con más actividad volcánica del Sistema Solar. Tiene más de cuatrocientos volcanes activos, y algunas de sus erupciones lanzan azufre a trescientos kilómetros de altura. La energía no viene del calor residual de su formación, sino de la lucha gravitatoria en la que está atrapada: Júpiter tira de ella por un lado y Europa y Ganímedes por otro, deformando su interior sin descanso. Esa fricción la mantiene fundida por dentro. Su superficie se renueva tan rápido que no tiene prácticamente cráteres de impacto, y su color amarillo y anaranjado viene de los compuestos de azufre que la cubren.",
+      "curiosidades": [
+        "Su superficie se renueva por completo cada pocos millones de años.",
+        "Deja tras de sí un toroide de plasma que alimenta las auroras de Júpiter.",
+        "Es el objeto geológicamente más activo que conocemos, por delante de la Tierra."
+      ]
+    },
+    "europa": {
+      "nombre": "Europa",
+      "tipo": "satelite",
+      "padre": "jupiter",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#C9BCA5",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Bajo la corteza de hielo de Europa, de entre quince y veinticinco kilómetros de grosor, hay un océano de agua salada líquida que podría contener más del doble de agua que todos los océanos terrestres juntos. Lo mantiene líquido el mismo calor de marea que hace erupcionar a Ío, y el fondo de ese océano está en contacto con roca, la combinación que en la Tierra alimenta ecosistemas enteros alrededor de fuentes hidrotermales. Por eso Europa es, junto a Encélado, el destino más prometedor en la búsqueda de vida fuera de la Tierra. Su superficie es la más lisa del Sistema Solar, surcada por grietas rojizas de sales que delatan el agua de debajo.",
+      "curiosidades": [
+        "Su superficie es la más lisa que se conoce: apenas hay relieve de más de unos cientos de metros.",
+        "La misión Europa Clipper de la NASA fue lanzada en 2024 para estudiar su habitabilidad.",
+        "El Hubble ha detectado posibles penachos de vapor de agua saliendo por sus grietas."
+      ]
+    },
+    "ganimedes": {
+      "nombre": "Ganímedes",
+      "tipo": "satelite",
+      "padre": "jupiter",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#9E9384",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Ganímedes es el satélite más grande del Sistema Solar: con cinco mil doscientos kilómetros de diámetro supera a Mercurio, aunque tiene menos de la mitad de su masa por estar compuesto en buena parte de hielo. Es el único satélite conocido con campo magnético propio, generado por un núcleo de hierro líquido, y ese campo produce auroras alrededor de sus polos. Observando cómo oscilan esas auroras, el Hubble dedujo que bajo la superficie hay un océano salado y conductor, a unos ciento cincuenta kilómetros de profundidad. Su superficie mezcla terrenos oscuros y antiguos, llenos de cráteres, con zonas claras surcadas por ranuras tectónicas.",
+      "curiosidades": [
+        "Es más grande que Mercurio y que Plutón.",
+        "Es el único satélite del Sistema Solar con un campo magnético generado por sí mismo.",
+        "La misión europea JUICE, lanzada en 2023, tiene previsto entrar en órbita a su alrededor."
+      ]
+    },
+    "calisto": {
+      "nombre": "Calisto",
+      "tipo": "satelite",
+      "padre": "jupiter",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#6E6459",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Calisto es la luna más craterizada del Sistema Solar. Su superficie lleva prácticamente intacta cuatro mil millones de años, sin actividad geológica que la borre, así que es un registro casi completo de los impactos recibidos desde la formación del sistema joviano. La estructura más llamativa es Valhalla, una cuenca de impacto rodeada de anillos concéntricos que se extienden hasta mil novecientos kilómetros del centro. Está lo bastante lejos de Júpiter como para librarse del calentamiento de marea que funde a Ío y Europa, y también de la peor radiación del planeta, lo que la ha convertido en la candidata favorita para una futura base tripulada en el sistema de Júpiter.",
+      "curiosidades": [
+        "Es el objeto con más cráteres que se conoce: su superficie está saturada.",
+        "Recibe mucha menos radiación que las otras lunas galileanas, lo que la hace más accesible.",
+        "También parece esconder un océano subterráneo, a unos cien kilómetros de profundidad."
+      ]
+    },
+    "mimas": {
+      "nombre": "Mimas",
+      "tipo": "satelite",
+      "padre": "saturno",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#B8B3AC",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Mimas es el cuerpo más pequeño del Sistema Solar que la gravedad ha conseguido redondear. Lo domina el cráter Herschel, de ciento treinta kilómetros de diámetro: casi un tercio del ancho de la propia luna. El impacto que lo formó estuvo cerca de destrozarla, y en el lado opuesto todavía se aprecian fracturas provocadas por las ondas de choque. Ese cráter con su pico central le da un parecido inevitable con la Estrella de la Muerte de La guerra de las galaxias, aunque las primeras imágenes de Mimas son anteriores a la película. Datos recientes de la sonda Cassini apuntan a que puede esconder un océano líquido joven bajo la corteza.",
+      "curiosidades": [
+        "El cráter Herschel mide un tercio del diámetro de la luna entera.",
+        "Su parecido con la Estrella de la Muerte es casualidad: las fotos nítidas llegaron con la Voyager en 1980.",
+        "Su órbita abre la División de Cassini, el hueco más visible de los anillos de Saturno."
+      ]
+    },
+    "encelado": {
+      "nombre": "Encélado",
+      "tipo": "satelite",
+      "padre": "saturno",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#F2F2F0",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Encélado mide apenas quinientos kilómetros de diámetro, pero por su polo sur expulsa al espacio chorros de vapor de agua, hielo y compuestos orgánicos a través de cuatro grandes fracturas apodadas «rayas de tigre». La sonda Cassini voló directamente a través de esos penachos y analizó su composición: agua salada, amoníaco, metano y sílice, procedentes de un océano global bajo la corteza en contacto con roca caliente. Es la evidencia más directa que tenemos de un entorno potencialmente habitable fuera de la Tierra. Parte del material expulsado no vuelve a caer: alimenta el anillo E de Saturno.",
+      "curiosidades": [
+        "Refleja más del noventa por ciento de la luz que recibe: es el cuerpo más blanco del Sistema Solar.",
+        "Cassini atravesó sus chorros y detectó moléculas orgánicas complejas.",
+        "Sus géiseres son la fuente del anillo E de Saturno."
+      ]
+    },
+    "rea": {
+      "nombre": "Rea",
+      "tipo": "satelite",
+      "padre": "saturno",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#C4BFB6",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Rea es la segunda luna más grande de Saturno y está formada en sus tres cuartas partes por hielo de agua. Su superficie, muy craterizada y de un blanco brillante, indica que lleva mucho tiempo geológicamente tranquila. En su hemisferio posterior se ven grietas claras que la Voyager tomó por depósitos de hielo y que Cassini reveló como acantilados de hielo de varios kilómetros de altura. En 2008 hubo indicios de que Rea podría tener su propio sistema de anillos, lo que la habría convertido en la primera luna con anillos conocida, pero observaciones posteriores no lo confirmaron.",
+      "curiosidades": [
+        "Está compuesta en un setenta y cinco por ciento de hielo de agua.",
+        "Sus «arañazos» blancos son en realidad acantilados de hielo de varios kilómetros.",
+        "Tiene una exosfera tenue de oxígeno y dióxido de carbono."
+      ]
+    },
+    "titan": {
+      "nombre": "Titán",
+      "tipo": "satelite",
+      "padre": "saturno",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": "assets/textures/titan.jpg",
+        "color": "#D9A441",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Kraken Mare",
+          "lat": 68,
+          "lon": 310
+        },
+        {
+          "etiqueta": "Xanadu",
+          "lat": -10,
+          "lon": 100
+        }
+      ],
+      "satelites": [],
+      "narracion": "Titán es la única luna del Sistema Solar con una atmósfera densa, y es más gruesa que la terrestre: la presión en su superficie es un cincuenta por ciento mayor que la nuestra. Es también el único mundo, aparte de la Tierra, donde hay líquido estable en la superficie. Pero no es agua: a menos ciento setenta y nueve grados, lo que llueve, corre por los ríos y llena los lagos es metano y etano. Titán tiene un ciclo meteorológico completo, con evaporación, nubes y lluvia, solo que de hidrocarburos. En 2005 la sonda europea Huygens se posó en su superficie y envió imágenes de un terreno de guijarros redondeados por el paso de líquido, la primera y única vez que hemos aterrizado en el Sistema Solar exterior.",
+      "curiosidades": [
+        "Su atmósfera es de nitrógeno, como la terrestre, pero con metano en lugar de oxígeno.",
+        "Sus lagos de metano están concentrados cerca del polo norte.",
+        "La NASA prepara Dragonfly, un dron que volará de un punto a otro de su superficie."
+      ]
+    },
+    "japeto": {
+      "nombre": "Jápeto",
+      "tipo": "satelite",
+      "padre": "saturno",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#9D9285",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Jápeto tiene una cara oscura como el carbón y otra blanca como la nieve; la diferencia de brillo entre ambas llega a ser de diez a uno. Giovanni Cassini ya lo notó en 1671: solo conseguía verlo a un lado de Saturno. La explicación es que Jápeto barre polvo oscuro procedente de la luna Febe mientras avanza en su órbita, ese polvo calienta el hemisferio delantero y el hielo se sublima y vuelve a condensarse en la cara fría. Además, un cordón montañoso de trece kilómetros de altura recorre su ecuador casi de punta a punta, y le da un aspecto de nuez que nadie ha explicado de forma concluyente.",
+      "curiosidades": [
+        "Su hemisferio delantero es diez veces más oscuro que el trasero.",
+        "Una cordillera ecuatorial de trece kilómetros lo rodea como una costura.",
+        "Cassini dedujo su rotación acoplada en 1671, sin poder verlo más que a un lado del planeta."
+      ]
+    },
+    "ariel": {
+      "nombre": "Ariel",
+      "tipo": "satelite",
+      "padre": "urano",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#B9B4AE",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Ariel es la más brillante de las lunas de Urano y la que muestra la superficie más joven. Está surcada por valles de fondo plano y fallas profundas que indican actividad tectónica relativamente reciente en términos geológicos, probablemente alimentada por calentamiento de marea cuando su órbita era más excéntrica. Todo lo que sabemos de ella viene del sobrevuelo de la Voyager 2 en 1986, que además solo pudo fotografiar el hemisferio sur: por la inclinación extrema de Urano, la mitad norte del sistema estaba en oscuridad.",
+      "curiosidades": [
+        "Es la luna uraniana con la superficie menos craterizada, y por tanto la más joven.",
+        "Sus cañones tienen fondos lisos, señal de que algo los rellenó después de abrirse.",
+        "Solo conocemos su hemisferio sur: el norte estaba a oscuras cuando pasó la Voyager 2."
+      ]
+    },
+    "umbriel": {
+      "nombre": "Umbriel",
+      "tipo": "satelite",
+      "padre": "urano",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#6F6A66",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Umbriel es la más oscura de las grandes lunas de Urano: refleja menos de la mitad de la luz que Ariel, aunque sean de tamaño casi idéntico. Su superficie está saturada de cráteres y no muestra señales de renovación, lo que la convierte en la más antigua del sistema uraniano. La única estructura llamativa es un anillo brillante de unos cuarenta kilómetros en el fondo del cráter Wunda, apodado «la corona», cuyo origen sigue sin aclararse.",
+      "curiosidades": [
+        "Es la más oscura de las lunas mayores de Urano.",
+        "El anillo brillante del cráter Wunda no tiene explicación aceptada.",
+        "Su superficie apenas ha cambiado desde el bombardeo intenso temprano."
+      ]
+    },
+    "titania": {
+      "nombre": "Titania",
+      "tipo": "satelite",
+      "padre": "urano",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#B0A79E",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Titania es la mayor de las lunas de Urano, con unos mil quinientos ochenta kilómetros de diámetro. Su superficie combina cráteres antiguos con enormes cañones tectónicos: Messina Chasma se extiende más de mil quinientos kilómetros. Esas fracturas se abrieron probablemente cuando el agua de su interior se congeló y, al expandirse, resquebrajó la corteza desde dentro. Debe su nombre, como el resto de las lunas de Urano, a personajes de Shakespeare y de Alexander Pope, en este caso a la reina de las hadas de El sueño de una noche de verano.",
+      "curiosidades": [
+        "Es la octava luna más grande del Sistema Solar.",
+        "Sus cañones se abrieron al congelarse y expandirse el agua de su interior.",
+        "Las lunas de Urano son las únicas que no llevan nombres de la mitología griega o romana."
+      ]
+    },
+    "oberon": {
+      "nombre": "Oberón",
+      "tipo": "satelite",
+      "padre": "urano",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#8E8479",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Oberón es la más exterior de las grandes lunas de Urano y una de las más craterizadas. Varios de sus cráteres tienen el fondo oscuro, como si material teñido hubiera ascendido desde el interior tras el impacto. En su limbo, la Voyager 2 fotografió una montaña de unos once kilómetros de altura que asoma sobre el borde del disco. Su superficie lleva miles de millones de años prácticamente sin cambios.",
+      "curiosidades": [
+        "Una montaña de once kilómetros asoma en su borde en las imágenes de la Voyager 2.",
+        "Los fondos oscuros de sus cráteres sugieren material ascendido tras los impactos.",
+        "Es la luna uraniana más alejada del planeta entre las cinco principales."
+      ]
+    },
+    "miranda": {
+      "nombre": "Miranda",
+      "tipo": "satelite",
+      "padre": "urano",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#A8A29B",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Miranda es la más pequeña de las cinco lunas principales de Urano y, con diferencia, la más extraña. Su superficie parece un collage: terrenos de edades muy distintas pegados unos a otros, separados por escarpes abruptos. Verona Rupes es un acantilado de hasta veinte kilómetros de altura, el más alto conocido del Sistema Solar; un objeto tardaría unos doce minutos en caer desde arriba. Durante un tiempo se pensó que Miranda se había roto y recompuesto varias veces, aunque hoy se atribuye más bien a un calentamiento de marea desigual.",
+      "curiosidades": [
+        "Verona Rupes, de hasta veinte kilómetros, es el mayor acantilado conocido del Sistema Solar.",
+        "Su superficie mezcla terrenos de edades muy distintas sin transición.",
+        "Caer desde lo alto de Verona Rupes duraría unos doce minutos."
+      ]
+    },
+    "triton": {
+      "nombre": "Tritón",
+      "tipo": "satelite",
+      "padre": "neptuno",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": "assets/textures/triton.jpg",
+        "color": "#C7BFC4",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null
+      },
+      "anotaciones": [
+        {
+          "etiqueta": "Casquete polar sur",
+          "lat": -70,
+          "lon": 0
+        }
+      ],
+      "satelites": [],
+      "narracion": "Tritón orbita Neptuno en sentido contrario a la rotación del planeta, y es el único satélite grande del Sistema Solar que lo hace. Esa órbita retrógrada es la prueba de que no se formó junto a Neptuno, sino que fue capturado del cinturón de Kuiper: Tritón es, en origen, un cuerpo hermano de Plutón. La captura lo deformó y lo calentó, y todavía hoy sigue activo: la Voyager 2 fotografió géiseres lanzando nitrógeno y polvo a ocho kilómetros de altura sobre una superficie a menos doscientos treinta y cinco grados, una de las más frías medidas en el Sistema Solar. Su órbita decae poco a poco, y dentro de unos miles de millones de años acabará despedazado en un anillo alrededor de Neptuno.",
+      "curiosidades": [
+        "Es el único satélite grande del Sistema Solar con órbita retrógrada.",
+        "Su superficie está a unos 235 grados bajo cero, de las más frías que se han medido.",
+        "Buena parte de su terreno tiene aspecto de piel de melón, y no se conoce nada parecido en ningún otro lugar."
+      ]
+    },
+    "caronte": {
+      "nombre": "Caronte",
+      "tipo": "satelite",
+      "padre": "pluton",
+      "temperatura": null,
+      "atmosfera": null,
+      "satelitesConocidos": null,
+      "render": {
+        "textura": null,
+        "color": "#A39A93",
+        "colorEtiqueta": "#4FC3F7",
+        "anillos": null,
+        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+      },
+      "anotaciones": [],
+      "satelites": [],
+      "narracion": "Caronte mide la mitad que Plutón, una proporción sin igual en el Sistema Solar. Es tan grande en comparación que el centro de masas del sistema queda fuera de la superficie de Plutón: en lugar de girar Caronte alrededor de Plutón, ambos giran alrededor de un punto vacío entre los dos. Por eso se habla a veces de un planeta doble. Están acoplados mutuamente por marea, de modo que cada uno muestra siempre la misma cara al otro y desde un hemisferio de Plutón Caronte cuelga inmóvil en el cielo. Su polo norte tiene una mancha rojiza, Mordor Macula, formada por metano escapado de Plutón que se condensa y se procesa allí con la luz solar.",
+      "curiosidades": [
+        "Plutón y Caronte orbitan alrededor de un punto situado fuera de ambos.",
+        "Su mancha polar rojiza está hecha de metano fugado de la atmósfera de Plutón.",
+        "Se descubrió en 1978 al notar un bulto que deformaba la imagen de Plutón en las placas fotográficas."
+      ]
+    }
+  }
+}

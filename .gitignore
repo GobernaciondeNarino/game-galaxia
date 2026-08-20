@@ -10,12 +10,14 @@ api/logs/*
 # Claves reales: solo se versiona la plantilla secrets.example.php
 config/secrets.php
 
-# Texturas pesadas de terceros (ver assets/textures/FUENTES.md)
-assets/textures/*
-!assets/textures/.gitkeep
-!assets/textures/FUENTES.md
+# Las texturas SÍ se versionan: 13 MB que permiten desplegar en Plesk con un
+# solo «git pull», sin subir nada aparte. Licencias en CREDITOS.json.
+# Se descargan y actualizan con: node tools/texturas.mjs
 assets/skybox/*
 !assets/skybox/.gitkeep
+
+# Respuestas crudas de JPL Horizons: caché local de tools/datos-jpl.mjs
+.cache-horizons/
 
 # Modelo de MediaPipe (7,5 MB; lo descarga tools/vendor.mjs mediapipe)
 assets/models/*.task

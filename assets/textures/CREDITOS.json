@@ -1,0 +1,142 @@
+{
+  "nota": "Generado por tools/texturas.mjs. La atribución se lee de la propia fuente, no se escribe a mano. La interfaz la muestra en el panel de créditos.",
+  "generado": null,
+  "texturas": [
+    {
+      "archivo": "sol.jpg",
+      "obra": "Solarsystemscope texture 2k sun.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20sun.jpg"
+    },
+    {
+      "archivo": "mercurio.jpg",
+      "obra": "Solarsystemscope texture 2k mercury.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20mercury.jpg"
+    },
+    {
+      "archivo": "venus.jpg",
+      "obra": "Solarsystemscope texture 2k venus atmosphere.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20venus%20atmosphere.jpg"
+    },
+    {
+      "archivo": "venus-superficie.jpg",
+      "obra": "Solarsystemscope texture 2k venus surface.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20venus%20surface.jpg"
+    },
+    {
+      "archivo": "tierra.jpg",
+      "obra": "Solarsystemscope texture 2k earth daymap.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20earth%20daymap.jpg"
+    },
+    {
+      "archivo": "tierra-noche.jpg",
+      "obra": "Solarsystemscope texture 2k earth nightmap.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20earth%20nightmap.jpg"
+    },
+    {
+      "archivo": "tierra-nubes.jpg",
+      "obra": "Solarsystemscope texture 2k earth clouds.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20earth%20clouds.jpg"
+    },
+    {
+      "archivo": "marte.jpg",
+      "obra": "Solarsystemscope texture 2k mars.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20mars.jpg"
+    },
+    {
+      "archivo": "jupiter.jpg",
+      "obra": "Solarsystemscope texture 2k jupiter.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20jupiter.jpg"
+    },
+    {
+      "archivo": "saturno.jpg",
+      "obra": "Solarsystemscope texture 2k saturn.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20saturn.jpg"
+    },
+    {
+      "archivo": "saturno-anillos.png",
+      "obra": "Solarsystemscope texture 2k saturn ring alpha.png",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20saturn%20ring%20alpha.png"
+    },
+    {
+      "archivo": "urano.jpg",
+      "obra": "Solarsystemscope texture 2k uranus.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20uranus.jpg"
+    },
+    {
+      "archivo": "neptuno.jpg",
+      "obra": "Solarsystemscope texture 2k neptune.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20neptune.jpg"
+    },
+    {
+      "archivo": "luna.jpg",
+      "obra": "Solarsystemscope texture 2k moon.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20moon.jpg"
+    },
+    {
+      "archivo": "estrellas.jpg",
+      "obra": "Solarsystemscope texture 2k stars milky way.jpg",
+      "autor": "Solar System Scope",
+      "licencia": "CC BY 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solarsystemscope%20texture%202k%20stars%20milky%20way.jpg"
+    },
+    {
+      "archivo": "titan.jpg",
+      "obra": "Titan map April 2011 full.png",
+      "autor": "NASA",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Titan%20map%20April%202011%20full.png"
+    },
+    {
+      "archivo": "triton.jpg",
+      "obra": "Triton map no grid.jpg",
+      "autor": "Image selection, radiometric calibration, geographic registration and photometric correction, and final mosaic assembly were performed by Dr. Paul Schenk at the Lunar and Planetary Institute, Houston, Texas. Image data from Voyager 2 (NASA, JPL).",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Triton%20map%20no%20grid.jpg"
+    }
+  ]
+}

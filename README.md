@@ -5,9 +5,11 @@ Interfaz holográfica e inmersiva del Sistema Solar completo, con navegación po
 íntegramente en el navegador y se despliega como estáticos sobre Apache: **sin
 paso de compilación, sin Node.js en producción y sin procesos en segundo plano**.
 
-> **Estado: fase 0 completada.** Están la estructura, el arranque con
-> diagnóstico real, la configuración de Apache y el backend de salud. La escena
-> tridimensional llega en la fase 1. Consulta el [plan de fases](#plan-de-fases).
+> **Estado: fases 0, 1 y 2 completadas.** Hay escena tridimensional navegable
+> con el Sol, los ocho planetas, cinco planetas enanos, diecinueve satélites,
+> anillos, cinturones y entorno galáctico, sobre un catálogo cuyas cifras
+> proceden de JPL Horizons. La HUD llega en la fase 3.
+> Consulta el [plan de fases](#plan-de-fases).
 
 ---
 
@@ -71,13 +73,16 @@ js/
                     FallbackControls
   audio/            Narrator · SFX
   utils/            dom · storage (memoria) · debug · math
-data/               sistema-solar.json (catálogo maestro) · comandos-voz.json
+data/               sistema-solar.json (GENERADO, catálogo maestro)
+                    fisica-jpl.json (GENERADO desde Horizons)
+                    complementos.json · textos.json · comandos-voz.json
 assets/             textures · skybox · models · fonts · sfx
 api/                health.php · tts.php · stt.php · lib/
 config/             secrets.example.php (la copia real nunca se versiona)
 cache/audio/        MP3 generados, con nombre por hash
 vendor/             Three.js y MediaPipe, versión fijada
-tools/              vendor.mjs · csp-hash.mjs · comprobar-secretos.sh
+tools/              vendor.mjs · texturas.mjs · datos-jpl.mjs
+                    construir-datos.mjs · csp-hash.mjs · comprobar-secretos.sh
 docs/               Despliegue, gestos y comandos, notas técnicas
 ```
 
@@ -110,6 +115,18 @@ distingue un fallo del navegador (WebGL desactivado) de un fallo del despliegue
 (falta `vendor/`, MIME mal configurado, PHP apagado) y, en el segundo caso,
 muestra la ruta exacta que falta y el comando para arreglarlo. Nunca anuncia
 «tu navegador no puede» cuando lo que falla es el servidor.
+
+**Ninguna cifra se escribe a mano.** El catálogo se genera con
+`tools/datos-jpl.mjs`, que consulta la API de JPL Horizons y guarda, junto a
+cada valor, la línea literal de la que se extrajo. Lo que Horizons no publica
+—el radio de Eris, por ejemplo— se toma de literatura citada en
+`data/complementos.json`. Lo que no está en ninguna de las dos vale `null` y la
+interfaz lo muestra como `SIN DATOS`. Ver `docs/DATOS.md`.
+
+**Órbitas keplerianas reales.** Cada cuerpo se sitúa resolviendo la ecuación de
+Kepler con sus seis elementos orbitales referidos a J2000. Si el reloj de la
+escena marca una fecha, los planetas están donde estaban ese día — no en una
+fase decorativa.
 
 **Estado en memoria, nunca en `localStorage`.** Las preferencias
 (`js/utils/storage.js`) duran lo que dure la pestaña. No se deja rastro en el
@@ -166,8 +183,8 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 | Fase | Entregable | Estado |
 |---|---|---|
 | 0 | Estructura, `index.html` con importmap, `.htaccess`, `api/health.php`, documentación inicial | ✅ Completada |
-| 1 | Escena Three.js: Sol, ocho planetas, órbitas, skybox, controles de ratón, bloom | Pendiente |
-| 2 | `sistema-solar.json` con datos verificados, satélites, anillos y cinturón de asteroides | Pendiente |
+| 1 | Escena Three.js: Sol, ocho planetas, órbitas, skybox, controles de ratón, bloom | ✅ Completada |
+| 2 | `sistema-solar.json` con datos verificados, satélites, anillos y cinturón de asteroides | ✅ Completada |
 | 3 | HUD en DOM: elementos persistentes, `VISTA DE SISTEMA`, gráficos y tira de navegación | Pendiente |
 | 4 | `VISTA DE CUERPO`, transición interrumpible, `CameraRig`, anotaciones y arco de datos | Pendiente |
 | 5 | `api/tts.php` con caché y límite de peticiones; `Narrator.js` con subtítulos | Pendiente |

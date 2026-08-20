@@ -1,0 +1,58 @@
+{
+  "$esquema": "orbis/complementos/1",
+  "nota": "Datos que JPL Horizons NO publica para ciertos cuerpos. Cada valor lleva su referencia bibliográfica concreta y verificable. Es la única vía por la que una cifra entra en ORBIS sin venir de Horizons; nada se estima ni se redondea 'a ojo'. Si un dato no está aquí ni en Horizons, queda en null y la interfaz muestra SIN DATOS.",
+  "cuerpos": {
+    "eris": {
+      "radioMedioKm": {
+        "valor": 1163,
+        "fuente": "Sicardy, B. et al. (2011). «A Pluto-like radius and a high albedo for the dwarf planet Eris from an occultation». Nature 478, 493-496.",
+        "nota": "Radio medio 1163 ± 6 km, medido por ocultación estelar."
+      },
+      "masaKg": {
+        "valor": 1.6466e22,
+        "fuente": "Brown, M. E. & Schaller, E. L. (2007). «The Mass of Dwarf Planet Eris». Science 316, 1585.",
+        "nota": "Determinada a partir de la órbita de su satélite Disnomia."
+      }
+    },
+    "makemake": {
+      "radioMedioKm": {
+        "valor": 715,
+        "fuente": "Ortiz, J. L. et al. (2012). «Albedo and atmospheric constraints of dwarf planet Makemake from a stellar occultation». Nature 491, 566-569.",
+        "nota": "Elipsoide de 1430 × 1502 km medido por ocultación; radio medio equivalente."
+      }
+    },
+    "haumea": {
+      "radioMedioKm": {
+        "valor": 798,
+        "fuente": "Ortiz, J. L. et al. (2017). «The size, shape, density and ring of the dwarf planet Haumea from a stellar occultation». Nature 550, 219-223.",
+        "nota": "Cuerpo muy alargado por su rápida rotación; radio de la esfera de volumen equivalente."
+      },
+      "masaKg": {
+        "valor": 4.006e21,
+        "fuente": "Ragozzine, D. & Brown, M. E. (2009). «Orbits and Masses of the Satellites of the Dwarf Planet Haumea». The Astronomical Journal 137, 4766.",
+        "nota": "Determinada a partir de las órbitas de Hi'iaka y Namaka."
+      }
+    },
+    "luna": {
+      "periodoRotacionHoras": {
+        "valor": 655.71797,
+        "fuente": "NASA/JPL Horizons — «Orbit period = 27.321582 d» y acoplamiento de marea documentado.",
+        "nota": "Rotación acoplada por marea: la Luna tarda en girar sobre sí misma exactamente lo que tarda en dar una vuelta a la Tierra, por eso muestra siempre la misma cara."
+      }
+    },
+    "titan": {
+      "periodoRotacionHoras": {
+        "valor": 382.68,
+        "fuente": "NASA/JPL Horizons — «Orbital period = 15.945421 d» y rotación síncrona documentada.",
+        "nota": "Rotación acoplada por marea con Saturno."
+      }
+    },
+    "caronte": {
+      "periodoRotacionHoras": {
+        "valor": 153.29333,
+        "fuente": "NASA/JPL Horizons — «Orbital period = 6.387222 d» y acoplamiento doble con Plutón.",
+        "nota": "Plutón y Caronte están acoplados mutuamente: cada uno muestra siempre la misma cara al otro."
+      }
+    }
+  }
+}

@@ -1,0 +1,1119 @@
+{
+  "$esquema": "orbis/fisica-jpl/1",
+  "nota": "GENERADO POR tools/datos-jpl.mjs — no editar a mano. Cada cifra procede de la API de JPL Horizons; el campo «origen» guarda la línea literal de la que se extrajo, para poder auditarla. Lo que no se pudo extraer queda en null y la interfaz lo muestra como SIN DATOS.",
+  "fuente": "NASA/JPL Horizons — https://ssd.jpl.nasa.gov/api/horizons.api",
+  "epocaElementos": "2000-01-01 TDB",
+  "cuerpos": {
+    "sol": {
+      "horizons": "10",
+      "tipo": "estrella",
+      "revisado": "2024-Oct-30",
+      "fisica": {
+        "radioMedioKm": 695700,
+        "masaKg": 1.98841e+30,
+        "densidadGcm3": 1.408,
+        "gravedadMs2": 274,
+        "periodoRotacionHoras": 609.12,
+        "inclinacionAxialGrados": 7.25
+      },
+      "orbita": null,
+      "origen": {
+        "radioMedioKm": "Vol. mean radius, km  = 695700              Volume, 10^12 km^3    = 1412000",
+        "masaKg": "GM, km^3/s^2          = 132712440041.93938  Mass, 10^24 kg        = ~1988410",
+        "densidadGcm3": "Solar radius (IAU2015)= 695700 km           Mean density, g/cm^3  = 1.408",
+        "gravedadMs2": "Surface gravity       =  274.0 m/s^2        Escape speed, km/s    =  617.7",
+        "periodoRotacionHoras": "Flatness, f           = 0.00005             Adopted sid. rot. per.= 25.38 d",
+        "inclinacionAxialGrados": "Pole (RA,DEC), deg.   = (286.13, 63.87)     Obliquity to ecliptic = 7.25 deg."
+      },
+      "rotacionSincrona": false
+    },
+    "mercurio": {
+      "horizons": "199",
+      "tipo": "planeta",
+      "revisado": "2024-Mar-04",
+      "fisica": {
+        "radioMedioKm": 2439.4,
+        "masaKg": 3.302e+23,
+        "densidadGcm3": 5.427,
+        "gravedadMs2": 3.701,
+        "periodoRotacionHoras": 1407.51,
+        "inclinacionAxialGrados": 0.0351667
+      },
+      "orbita": {
+        "excentricidad": 0.20563,
+        "inclinacionGrados": 7.00501,
+        "nodoAscendenteGrados": 48.3305,
+        "argumentoPeriastroGrados": 29.1243,
+        "anomaliaMediaGrados": 172.74971,
+        "periodoOrbitalDias": 87.969103,
+        "semiejeMayorUA": 0.38709823,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. Mean Radius (km) =  2439.4+-0.1    Density (g cm^-3)     = 5.427",
+        "masaKg": "Mass x10^23 (kg)      =     3.302       Volume (x10^10 km^3)  = 6.085",
+        "densidadGcm3": "Vol. Mean Radius (km) =  2439.4+-0.1    Density (g cm^-3)     = 5.427",
+        "gravedadMs2": "Mom. of Inertia       =     0.33        Equ. gravity  m/s^2   = 3.701",
+        "periodoRotacionHoras": "Sidereal rot. period  =    58.6463 d    Sid. rot. rate (rad/s)= 0.00000124001",
+        "inclinacionAxialGrados": "Obliquity to orbit[1] =  2.11' +/- 0.1' Hill's sphere rad. Rp = 94.4 (convertido de minutos de arco a grados)"
+      },
+      "rotacionSincrona": false
+    },
+    "venus": {
+      "horizons": "299",
+      "tipo": "planeta",
+      "revisado": "2020-Oct-19",
+      "fisica": {
+        "radioMedioKm": 6051.84,
+        "masaKg": 4.8685e+24,
+        "densidadGcm3": 5.204,
+        "gravedadMs2": 8.87,
+        "periodoRotacionHoras": 5832.44,
+        "inclinacionAxialGrados": 177.3
+      },
+      "orbita": {
+        "excentricidad": 0.0067557,
+        "inclinacionGrados": 3.39459,
+        "nodoAscendenteGrados": 76.6784,
+        "argumentoPeriastroGrados": 55.1854,
+        "anomaliaMediaGrados": 49.314252,
+        "periodoOrbitalDias": 224.69829,
+        "semiejeMayorUA": 0.72332685,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. Mean Radius (km) =  6051.84+-0.01 Density (g/cm^3)      =  5.204",
+        "masaKg": "Mass x10^23 (kg)      =    48.685      Volume (x10^10 km^3)  = 92.843",
+        "densidadGcm3": "Vol. Mean Radius (km) =  6051.84+-0.01 Density (g/cm^3)      =  5.204",
+        "gravedadMs2": "Mean solar day        =   116.7490 d   Equ. gravity  m/s^2   =  8.870",
+        "periodoRotacionHoras": "Sidereal rot. period  =   243.018484 d Sid. Rot. Rate (rad/s)= -0.00000029924",
+        "inclinacionAxialGrados": "Obliquity to orbit    = 177.3 deg      Hill's sphere rad.,Rp =  167.1"
+      },
+      "rotacionSincrona": false
+    },
+    "tierra": {
+      "horizons": "399",
+      "tipo": "planeta",
+      "revisado": "May 9, 2022",
+      "fisica": {
+        "radioMedioKm": 6371.01,
+        "masaKg": 5.97219e+24,
+        "densidadGcm3": 5.51,
+        "gravedadMs2": 9.78033,
+        "periodoRotacionHoras": 23.9345,
+        "inclinacionAxialGrados": 23.4393
+      },
+      "orbita": {
+        "excentricidad": 0.0170424,
+        "inclinacionGrados": 0.000266881,
+        "nodoAscendenteGrados": 163.975,
+        "argumentoPeriastroGrados": 297.767,
+        "anomaliaMediaGrados": 358.18914,
+        "periodoOrbitalDias": 365.46009,
+        "semiejeMayorUA": 1.0003718,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. Mean Radius (km)    = 6371.01+-0.02   Mass x10^24 (kg)= 5.97219+-0.0006",
+        "masaKg": "Vol. Mean Radius (km)    = 6371.01+-0.02   Mass x10^24 (kg)= 5.97219+-0.0006",
+        "densidadGcm3": "Density, g/cm^3          = 5.51              crust         = 2.6   x 10^22 kg",
+        "gravedadMs2": "g_e, m/s^2  (equatorial) = 9.7803267715      inner core    = 9.675 x 10^22 kg",
+        "periodoRotacionHoras": "Mean sidereal day, hr    = 23.9344695944     land          = 1.48 x 10^8 km",
+        "inclinacionAxialGrados": "Obliquity to orbit, deg  = 23.4392911  Sidereal orb period  = 1.0000174 y"
+      },
+      "rotacionSincrona": false
+    },
+    "marte": {
+      "horizons": "499",
+      "tipo": "planeta",
+      "revisado": "2025-Jun-02",
+      "fisica": {
+        "radioMedioKm": 3389.92,
+        "masaKg": 6.4171e+23,
+        "densidadGcm3": 3.933,
+        "gravedadMs2": 3.71,
+        "periodoRotacionHoras": 24.623,
+        "inclinacionAxialGrados": 25.19
+      },
+      "orbita": {
+        "excentricidad": 0.0933146,
+        "inclinacionGrados": 1.84988,
+        "nodoAscendenteGrados": 49.562,
+        "argumentoPeriastroGrados": 286.537,
+        "anomaliaMediaGrados": 19.094509,
+        "periodoOrbitalDias": 686.97073,
+        "semiejeMayorUA": 1.5236782,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. mean radius (km) = 3389.92+-0.04   Density (g/cm^3)      =  3.933(5+-4)",
+        "masaKg": "Mass x10^23 (kg)      =    6.4171       Flattening, f         =  1/169.779",
+        "densidadGcm3": "Vol. mean radius (km) = 3389.92+-0.04   Density (g/cm^3)      =  3.933(5+-4)",
+        "gravedadMs2": "Core radius (km)      = ~1700           Equ. gravity  m/s^2   =  3.71",
+        "periodoRotacionHoras": "Sidereal rot. period  =   24.622962 hr  Sid. rot. rate, rad/s =  0.0000708822",
+        "inclinacionAxialGrados": "Obliquity to orbit    =   25.19 deg     Max. angular diam.    =  17.9\""
+      },
+      "rotacionSincrona": false
+    },
+    "jupiter": {
+      "horizons": "599",
+      "tipo": "planeta",
+      "revisado": "2025-Jan-30",
+      "fisica": {
+        "radioMedioKm": 69911,
+        "masaKg": 1.89819e+27,
+        "densidadGcm3": 1.3262,
+        "gravedadMs2": 24.79,
+        "periodoRotacionHoras": 9.92492,
+        "inclinacionAxialGrados": 3.13
+      },
+      "orbita": {
+        "excentricidad": 0.0489231,
+        "inclinacionGrados": 1.30466,
+        "nodoAscendenteGrados": 100.489,
+        "argumentoPeriastroGrados": 275.12,
+        "anomaliaMediaGrados": 18.724924,
+        "periodoOrbitalDias": 4335.4674,
+        "semiejeMayorUA": 5.2051086,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. Mean Radius (km) = 69911+-6          Flattening            = 0.06487",
+        "masaKg": "Mass x 10^26 (kg)     = 18.9819           Density (g/cm^3)  = 1.3262 +- .0003",
+        "densidadGcm3": "Mass x 10^26 (kg)     = 18.9819           Density (g/cm^3)  = 1.3262 +- .0003",
+        "gravedadMs2": "Equ. grav, ge (m/s^2) = 24.79             Pol. grav, gp (m/s^2) =  28.34",
+        "periodoRotacionHoras": "Sid. rot. period (III)= 9h 55m 29.711 s",
+        "inclinacionAxialGrados": "Vis. mag. (opposition)= -2.70             Obliquity to orbit    =  3.13 deg"
+      },
+      "rotacionSincrona": false
+    },
+    "saturno": {
+      "horizons": "699",
+      "tipo": "planeta",
+      "revisado": "January 26, 2022",
+      "fisica": {
+        "radioMedioKm": 58232,
+        "masaKg": 5.6834e+26,
+        "densidadGcm3": 0.687,
+        "gravedadMs2": 10.44,
+        "periodoRotacionHoras": 10.6562,
+        "inclinacionAxialGrados": 26.73
+      },
+      "orbita": {
+        "excentricidad": 0.0555993,
+        "inclinacionGrados": 2.48437,
+        "nodoAscendenteGrados": 113.693,
+        "argumentoPeriastroGrados": 335.901,
+        "anomaliaMediaGrados": 320.37987,
+        "periodoOrbitalDias": 10831.369,
+        "semiejeMayorUA": 9.581452,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. Mean Radius (km) = 58232+-6        Flattening             =  0.09796",
+        "masaKg": "Mass x10^26 (kg)      = 5.6834          Density (g/cm^3)       =  0.687+-.001",
+        "densidadGcm3": "Mass x10^26 (kg)      = 5.6834          Density (g/cm^3)       =  0.687+-.001",
+        "gravedadMs2": "Equ. grav, ge (m/s^2) = 10.44           Pol. grav, gp (m/s^2)  = 12.14+-0.01",
+        "periodoRotacionHoras": "Sid. rot. period (III)= 10h 39m 22.4s",
+        "inclinacionAxialGrados": "Vis. mag. (opposition)= +0.67           Obliquity to orbit     = 26.73 deg"
+      },
+      "rotacionSincrona": false
+    },
+    "urano": {
+      "horizons": "799",
+      "tipo": "planeta",
+      "revisado": "September 25, 2025",
+      "fisica": {
+        "radioMedioKm": 25362,
+        "masaKg": 8.6813e+25,
+        "densidadGcm3": 1.271,
+        "gravedadMs2": 8.87,
+        "periodoRotacionHoras": 17.24,
+        "inclinacionAxialGrados": 97.77
+      },
+      "orbita": {
+        "excentricidad": 0.0443937,
+        "inclinacionGrados": 0.772381,
+        "nodoAscendenteGrados": 73.9629,
+        "argumentoPeriastroGrados": 96.608,
+        "anomaliaMediaGrados": 142.90793,
+        "periodoOrbitalDias": 30800.359,
+        "semiejeMayorUA": 19.229938,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. Mean Radius (km) = 25362+-12       Flattening             =  0.02293",
+        "masaKg": "Mass x10^24 (kg)      = 86.813          Density (g/cm^3)       =  1.271",
+        "densidadGcm3": "Mass x10^24 (kg)      = 86.813          Density (g/cm^3)       =  1.271",
+        "gravedadMs2": "Equ. grav, ge (m/s^2) =  8.87           Pol. grav, gp (m/s^2)  =   9.19+-0.02",
+        "periodoRotacionHoras": "Sid. rot. period (III)= 17.24+-0.01 h   Sid. rot. rate (rad/s) = -0.000101237",
+        "inclinacionAxialGrados": "Vis. mag. (opposition)=  +5.52          Obliquity to orbit     = 97.77 deg"
+      },
+      "rotacionSincrona": false
+    },
+    "neptuno": {
+      "horizons": "899",
+      "tipo": "planeta",
+      "revisado": "July 08, 2026",
+      "fisica": {
+        "radioMedioKm": 24624,
+        "masaKg": 1.02409e+26,
+        "densidadGcm3": 1.638,
+        "gravedadMs2": 11.15,
+        "periodoRotacionHoras": 16.11,
+        "inclinacionAxialGrados": 28.32
+      },
+      "orbita": {
+        "excentricidad": 0.0111479,
+        "inclinacionGrados": 1.77347,
+        "nodoAscendenteGrados": 131.769,
+        "argumentoPeriastroGrados": 266.822,
+        "anomaliaMediaGrados": 266.605,
+        "periodoOrbitalDias": 60307.618,
+        "semiejeMayorUA": 30.097005,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. mean radius (km) = 24624+-21       Polar radius (km)      = 24342+-30",
+        "masaKg": "Mass x10^24 (kg)      = 102.409         Density (g/cm^3)       =  1.638",
+        "densidadGcm3": "Mass x10^24 (kg)      = 102.409         Density (g/cm^3)       =  1.638",
+        "gravedadMs2": "Equ. grav, ge (m/s^2) = 11.15           Pol. grav, gp (m/s^2)  = 11.41+-0.03",
+        "periodoRotacionHoras": "Sid. rot. period (III)= 16.11+-0.01 hr  Sid. rot. rate (rad/s) =  0.000108338",
+        "inclinacionAxialGrados": "Vis. mag. (opposition)=  +7.84          Obliquity to orbit     = 28.32 deg"
+      },
+      "rotacionSincrona": false
+    },
+    "pluton": {
+      "horizons": "999",
+      "tipo": "planeta-enano",
+      "revisado": "Apr 03, 2024",
+      "fisica": {
+        "radioMedioKm": 1188.3,
+        "masaKg": 1.307e+22,
+        "densidadGcm3": 1.86,
+        "gravedadMs2": 0.611,
+        "periodoRotacionHoras": 153.293,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.247857,
+        "inclinacionGrados": 17.1659,
+        "nodoAscendenteGrados": 110.244,
+        "argumentoPeriastroGrados": 115.151,
+        "anomaliaMediaGrados": 14.093393,
+        "periodoOrbitalDias": 90678.389,
+        "semiejeMayorUA": 39.50059,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. mean radius (km) = 1188.3+-1.6     Mass ratio (Mc/Mp)    = 0.122",
+        "masaKg": "Mass x10^22 (kg)      = 1.307+-0.018    Volume, 10^10 km^3    = 0.697",
+        "densidadGcm3": "GM (planet) km^3/s^2  = 869.326         Density (R=1195 km)   = 1.86 g/cm^3",
+        "gravedadMs2": "GM 1-sigma, km^3/s^2  = 0.4             Surface gravity       = 0.611 m/s^2",
+        "periodoRotacionHoras": "Sidereal rot. period  = 153.29335198 h  Sid. rot. rat, rad/s  = 0.0000113856",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": false
+    },
+    "ceres": {
+      "horizons": "'DES=2000001;'",
+      "tipo": "planeta-enano",
+      "revisado": null,
+      "fisica": {
+        "radioMedioKm": 469.7,
+        "masaKg": 938352000000000000000,
+        "densidadGcm3": null,
+        "gravedadMs2": 0.283877,
+        "periodoRotacionHoras": 9.07417,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.0783751,
+        "inclinacionGrados": 10.5834,
+        "nodoAscendenteGrados": 80.4944,
+        "argumentoPeriastroGrados": 73.9228,
+        "anomaliaMediaGrados": 6.0696224,
+        "periodoOrbitalDias": 1680.7112,
+        "semiejeMayorUA": 2.7664943,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "GM= 62.6284             RAD= 469.7              ROTPER= 9.07417",
+        "masaKg": "derivado de M = GM/G con GM= 62.6284             RAD= 469.7              ROTPER= 9.07417",
+        "densidadGcm3": null,
+        "gravedadMs2": "derivado de g = GM/R² con GM= 62.6284             RAD= 469.7              ROTPER= 9.07417",
+        "periodoRotacionHoras": "GM= 62.6284             RAD= 469.7              ROTPER= 9.07417",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": false
+    },
+    "eris": {
+      "horizons": "'DES=2136199;'",
+      "tipo": "planeta-enano",
+      "revisado": null,
+      "fisica": {
+        "radioMedioKm": null,
+        "masaKg": null,
+        "densidadGcm3": null,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": 25.9,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.432503,
+        "inclinacionGrados": 43.7405,
+        "nodoAscendenteGrados": 36.1285,
+        "argumentoPeriastroGrados": 150.845,
+        "anomaliaMediaGrados": 194.28884,
+        "periodoOrbitalDias": 205447.69,
+        "semiejeMayorUA": 68.139963,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": null,
+        "masaKg": null,
+        "densidadGcm3": null,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": "GM= n.a.                RAD= n.a.               ROTPER= 25.9",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": false
+    },
+    "makemake": {
+      "horizons": "'DES=2136472;'",
+      "tipo": "planeta-enano",
+      "revisado": null,
+      "fisica": {
+        "radioMedioKm": null,
+        "masaKg": null,
+        "densidadGcm3": null,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": 22.8266,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.164526,
+        "inclinacionGrados": 29.0002,
+        "nodoAscendenteGrados": 79.275,
+        "argumentoPeriastroGrados": 296.28,
+        "anomaliaMediaGrados": 139.71969,
+        "periodoOrbitalDias": 111629.46,
+        "semiejeMayorUA": 45.371898,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": null,
+        "masaKg": null,
+        "densidadGcm3": null,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": "GM= n.a.                RAD= n.a.               ROTPER= 22.8266",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": false
+    },
+    "haumea": {
+      "horizons": "'DES=2136108;'",
+      "tipo": "planeta-enano",
+      "revisado": null,
+      "fisica": {
+        "radioMedioKm": null,
+        "masaKg": null,
+        "densidadGcm3": null,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": 3.9154,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.199923,
+        "inclinacionGrados": 28.2062,
+        "nodoAscendenteGrados": 121.933,
+        "argumentoPeriastroGrados": 240.59,
+        "anomaliaMediaGrados": 189.59408,
+        "periodoOrbitalDias": 102665.31,
+        "semiejeMayorUA": 42.909178,
+        "semiejeMayorKm": null,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": null,
+        "masaKg": null,
+        "densidadGcm3": null,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": "GM= n.a.                RAD= n.a.               ROTPER= 3.9154",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": false
+    },
+    "luna": {
+      "horizons": "301",
+      "tipo": "satelite",
+      "revisado": "2018-Aug-15",
+      "fisica": {
+        "radioMedioKm": 1737.53,
+        "masaKg": 7.349e+22,
+        "densidadGcm3": 3.3437,
+        "gravedadMs2": 1.62,
+        "periodoRotacionHoras": null,
+        "inclinacionAxialGrados": 6.67
+      },
+      "orbita": {
+        "excentricidad": 0.0647669,
+        "inclinacionGrados": 5.24001,
+        "nodoAscendenteGrados": 123.984,
+        "argumentoPeriastroGrados": 308.136,
+        "anomaliaMediaGrados": 140.74026,
+        "periodoOrbitalDias": 26.946595,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 381218.69,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Vol. mean radius, km  = 1737.53+-0.03    Mass, x10^22 kg       =    7.349",
+        "masaKg": "Vol. mean radius, km  = 1737.53+-0.03    Mass, x10^22 kg       =    7.349",
+        "densidadGcm3": "Density, g/cm^3       =    3.3437        GM 1-sigma, km^3/s^2  =  +-0.0001",
+        "gravedadMs2": "V(1,0)                =   +0.21          Surface accel., m/s^2 =    1.62",
+        "periodoRotacionHoras": null,
+        "inclinacionAxialGrados": "Obliquity to orbit    = 6.67 deg         Orbit period          = 27.321582 d"
+      },
+      "rotacionSincrona": false
+    },
+    "fobos": {
+      "horizons": "401",
+      "tipo": "satelite",
+      "revisado": "Jun 02, 2025",
+      "fisica": {
+        "radioMedioKm": 11.0584,
+        "masaKg": 108000000000000000000,
+        "densidadGcm3": 1.9,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": 7.65944,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.0154255,
+        "inclinacionGrados": 26.0527,
+        "nodoAscendenteGrados": 84.8103,
+        "argumentoPeriastroGrados": 342.444,
+        "anomaliaMediaGrados": 345.74477,
+        "periodoOrbitalDias": 0.31914317,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 9378.2863,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "radio medio derivado de los semiejes 13.1×11.1×9.3 km — Radius (km)             = 13.1 x11.1 x9.3",
+        "masaKg": "Mass (10^20 kg )        =  1.08 (10^-4)   Geometric Albedo    =  0.06",
+        "densidadGcm3": "Radius (km)             = 13.1 x11.1 x9.3 Density (g cm^-3)   =  1.90 +- 0.08",
+        "gravedadMs2": null,
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "deimos": {
+      "horizons": "402",
+      "tipo": "satelite",
+      "revisado": "Jun 02, 2025",
+      "fisica": {
+        "radioMedioKm": 6.20305,
+        "masaKg": 180000000000000000000,
+        "densidadGcm3": 1.76,
+        "gravedadMs2": null,
+        "periodoRotacionHoras": 30.3021,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.000236922,
+        "inclinacionGrados": 27.5692,
+        "nodoAscendenteGrados": 83.6703,
+        "argumentoPeriastroGrados": 190.189,
+        "anomaliaMediaGrados": 244.21101,
+        "periodoOrbitalDias": 1.2625874,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 23458.888,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "radio medio derivado de los semiejes 7.8×6×5.1 km — Radius (km)             = 7.8 x 6.0 x 5.1",
+        "masaKg": "Mass (10^20 kg )        = 1.80 (10^-5)    Geometric Albedo    =  0.06",
+        "densidadGcm3": "Radius (km)             = 7.8 x 6.0 x 5.1 Density (g cm^-3)   =  1.76 +- 0.30",
+        "gravedadMs2": null,
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "io": {
+      "horizons": "501",
+      "tipo": "satelite",
+      "revisado": "Mar 12, 2021",
+      "fisica": {
+        "radioMedioKm": 1821.49,
+        "masaKg": 8.92965e+22,
+        "densidadGcm3": 3.528,
+        "gravedadMs2": 1.79633,
+        "periodoRotacionHoras": 42.5112,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00376353,
+        "inclinacionGrados": 2.21269,
+        "nodoAscendenteGrados": 336.852,
+        "argumentoPeriastroGrados": 62.9565,
+        "anomaliaMediaGrados": 236.6157,
+        "periodoOrbitalDias": 1.7712981,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 422020.92,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean radius (km)       = 1821.49           Density (g cm^-3) = 3.528 +- 0.006",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)          = 5959.9155+- 0.004 Geometric Albedo  = 0.63  +- 0.02",
+        "densidadGcm3": "Mean radius (km)       = 1821.49           Density (g cm^-3) = 3.528 +- 0.006",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)          = 5959.9155+- 0.004 Geometric Albedo  = 0.63  +- 0.02",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "europa": {
+      "horizons": "502",
+      "tipo": "satelite",
+      "revisado": "Mar 12, 2021",
+      "fisica": {
+        "radioMedioKm": 1560.8,
+        "masaKg": 4.79857e+22,
+        "densidadGcm3": 3.013,
+        "gravedadMs2": 1.31469,
+        "periodoRotacionHoras": 85.2727,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00970612,
+        "inclinacionGrados": 1.79096,
+        "nodoAscendenteGrados": 332.628,
+        "argumentoPeriastroGrados": 254.324,
+        "anomaliaMediaGrados": 295.06249,
+        "periodoOrbitalDias": 3.55303,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 671226.31,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean radius (km)       = 1560.8   +- 0.3    Density (g cm^-3)= 3.013 +- 0.005",
+        "masaKg": "derivado de M = GM/G con GM   (km^3/s^2)        = 3202.7121+- 0.0054 Geometric Albedo = 0.67 +/- 0.03",
+        "densidadGcm3": "Mean radius (km)       = 1560.8   +- 0.3    Density (g cm^-3)= 3.013 +- 0.005",
+        "gravedadMs2": "derivado de g = GM/R² con GM   (km^3/s^2)        = 3202.7121+- 0.0054 Geometric Albedo = 0.67 +/- 0.03",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "ganimedes": {
+      "horizons": "503",
+      "tipo": "satelite",
+      "revisado": "Mar 12, 2021",
+      "fisica": {
+        "radioMedioKm": 2631.2,
+        "masaKg": 1.48148e+23,
+        "densidadGcm3": 1.942,
+        "gravedadMs2": 1.42821,
+        "periodoRotacionHoras": 171.797,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00138495,
+        "inclinacionGrados": 2.21413,
+        "nodoAscendenteGrados": 343.172,
+        "argumentoPeriastroGrados": 311.228,
+        "anomaliaMediaGrados": 260.47096,
+        "periodoOrbitalDias": 7.1582274,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 1070732.6,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean radius (km)       = 2631.2   +- 1.7    Density (g cm^-3)= 1.942 +- 0.005",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)          = 9887.8328+- 0.0074 Geometric Albedo = 0.43  +- 0.02",
+        "densidadGcm3": "Mean radius (km)       = 2631.2   +- 1.7    Density (g cm^-3)= 1.942 +- 0.005",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)          = 9887.8328+- 0.0074 Geometric Albedo = 0.43  +- 0.02",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "calisto": {
+      "horizons": "504",
+      "tipo": "satelite",
+      "revisado": "Mar 12, 2021",
+      "fisica": {
+        "radioMedioKm": 2410.3,
+        "masaKg": 1.07566e+23,
+        "densidadGcm3": 1.834,
+        "gravedadMs2": 1.23577,
+        "periodoRotacionHoras": 400.49,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00734673,
+        "inclinacionGrados": 2.01691,
+        "nodoAscendenteGrados": 337.943,
+        "argumentoPeriastroGrados": 15.0059,
+        "anomaliaMediaGrados": 75.461834,
+        "periodoOrbitalDias": 16.687065,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 1882467.9,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean radius (km)      = 2410.3 +- 1.5       Density (g cm^-3)= 1.834 +- 0.004",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)         = 7179.2834 +- 0.0097 Geometric Albedo = 0.17  +- 0.02",
+        "densidadGcm3": "Mean radius (km)      = 2410.3 +- 1.5       Density (g cm^-3)= 1.834 +- 0.004",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)         = 7179.2834 +- 0.0097 Geometric Albedo = 0.17  +- 0.02",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "mimas": {
+      "horizons": "601",
+      "tipo": "satelite",
+      "revisado": "Jan 26, 2022",
+      "fisica": {
+        "radioMedioKm": 198.8,
+        "masaKg": 37500000000000000000,
+        "densidadGcm3": 1.152,
+        "gravedadMs2": 0.0633451,
+        "periodoRotacionHoras": 22.7336,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.0176059,
+        "inclinacionGrados": 26.9927,
+        "nodoAscendenteGrados": 172.039,
+        "argumentoPeriastroGrados": 99.1832,
+        "anomaliaMediaGrados": 215.94946,
+        "periodoOrbitalDias": 0.94723276,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 186005.57,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean Radius (km)        = 198.8   +- 1.5   Density (g/cm^3)  = 1.152 +- 0.027",
+        "masaKg": "Mass (10^19 kg)         =   3.75           Geometric Albedo  = 0.6",
+        "densidadGcm3": "Mean Radius (km)        = 198.8   +- 1.5   Density (g/cm^3)  = 1.152 +- 0.027",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)           =   2.503489       V(1,0)            = +3.3",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "encelado": {
+      "horizons": "602",
+      "tipo": "satelite",
+      "revisado": "Jan 26, 2022",
+      "fisica": {
+        "radioMedioKm": 252.3,
+        "masaKg": 108050000000000000000,
+        "densidadGcm3": 1.606,
+        "gravedadMs2": 0.113272,
+        "periodoRotacionHoras": 32.9883,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00413193,
+        "inclinacionGrados": 28.052,
+        "nodoAscendenteGrados": 169.507,
+        "argumentoPeriastroGrados": 114.525,
+        "anomaliaMediaGrados": 256.54441,
+        "periodoOrbitalDias": 1.3745122,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 238407.85,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean Radius (km)        = 252.3   +- 0.6   Density (g/cm^3) =  1.606 +- 0.012",
+        "masaKg": "Mass (10^19 kg)         =  10.805          Geometric Albedo =  1.04",
+        "densidadGcm3": "Mean Radius (km)        = 252.3   +- 0.6   Density (g/cm^3) =  1.606 +- 0.012",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)           =   7.210367       V(1,0)           =  +2.2",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "rea": {
+      "horizons": "605",
+      "tipo": "satelite",
+      "revisado": "Jan 26, 2022",
+      "fisica": {
+        "radioMedioKm": 764.5,
+        "masaKg": 2.309e+21,
+        "densidadGcm3": 1.233,
+        "gravedadMs2": 0.263388,
+        "periodoRotacionHoras": 108.497,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.000727853,
+        "inclinacionGrados": 28.2415,
+        "nodoAscendenteGrados": 168.984,
+        "argumentoPeriastroGrados": 180.677,
+        "anomaliaMediaGrados": 152.16497,
+        "periodoOrbitalDias": 4.5207276,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 527263.39,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean Radius (km)        = 764.5  +- 2     Density (g/cm^3)  =  1.233 +- 0.010",
+        "masaKg": "Mass (10^19 kg)         = 230.9           Geometric Albedo  =  0.6",
+        "densidadGcm3": "Mean Radius (km)        = 764.5  +- 2     Density (g/cm^3)  =  1.233 +- 0.010",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)           = 153.94 +- 0.16  V(1,0)            = +0.1",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "titan": {
+      "horizons": "606",
+      "tipo": "satelite",
+      "revisado": "Jan 26, 2022",
+      "fisica": {
+        "radioMedioKm": 2575.5,
+        "masaKg": 1.34553e+23,
+        "densidadGcm3": 1.88,
+        "gravedadMs2": 1.35352,
+        "periodoRotacionHoras": null,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.0285912,
+        "inclinacionGrados": 27.7183,
+        "nodoAscendenteGrados": 169.239,
+        "argumentoPeriastroGrados": 164.441,
+        "anomaliaMediaGrados": 152.11611,
+        "periodoOrbitalDias": 15.947697,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 1221952.7,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean Radius (km)       = 2575.5   +-  2.0  Density (g/cm^3) =  1.880 +- 0.004",
+        "masaKg": "Mass (10^19 kg)        = 13455.3           Geometric Albedo =  0.2",
+        "densidadGcm3": "Mean Radius (km)       = 2575.5   +-  2.0  Density (g/cm^3) =  1.880 +- 0.004",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)          = 8978.14  +-  0.06  V(1,0)          = -1.2",
+        "periodoRotacionHoras": null,
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": false
+    },
+    "japeto": {
+      "horizons": "608",
+      "tipo": "satelite",
+      "revisado": "Jan 26, 2022",
+      "fisica": {
+        "radioMedioKm": 734.5,
+        "masaKg": 1.8059e+21,
+        "densidadGcm3": 1.088,
+        "gravedadMs2": 0.223396,
+        "periodoRotacionHoras": 1905.19,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.027972,
+        "inclinacionGrados": 17.238,
+        "nodoAscendenteGrados": 139.689,
+        "argumentoPeriastroGrados": 229.827,
+        "anomaliaMediaGrados": 205.58156,
+        "periodoOrbitalDias": 79.382778,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 3562100.1,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Radius (km)            = 734.5    +- 4.0    Density (g/cm^3)=  1.088 +- 0.018",
+        "masaKg": "Mass (10^19 kg)        = 180.59             Geometric Albedo=  0.6",
+        "densidadGcm3": "Radius (km)            = 734.5    +- 4.0    Density (g/cm^3)=  1.088 +- 0.018",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)          = 120.52   +- 0.03   V(1,0)          =   +1.5 (.7-2.5)",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "ariel": {
+      "horizons": "701",
+      "tipo": "satelite",
+      "revisado": "Sep 24, 2025",
+      "fisica": {
+        "radioMedioKm": 578.898,
+        "masaKg": 1.25002e+21,
+        "densidadGcm3": 1.54,
+        "gravedadMs2": 0.248954,
+        "periodoRotacionHoras": 60.4977,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00162621,
+        "inclinacionGrados": 97.7193,
+        "nodoAscendenteGrados": 167.646,
+        "argumentoPeriastroGrados": 47.3769,
+        "anomaliaMediaGrados": 79.351865,
+        "periodoOrbitalDias": 2.5207374,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 190941.94,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "radio medio derivado de los semiejes 581.1×577.9×577.7 km — Radius (km)           = 581.1x577.9x577.7",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)         =   83.43 +- 1.40   Geometric Albedo    =  0.34",
+        "densidadGcm3": "Radius (km)           = 581.1x577.9x577.7 Density (g cm^-3)   = 1.54 +- 0.026",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)         =   83.43 +- 1.40   Geometric Albedo    =  0.34",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "umbriel": {
+      "horizons": "702",
+      "tipo": "satelite",
+      "revisado": "Sep 24, 2025",
+      "fisica": {
+        "radioMedioKm": 584.7,
+        "masaKg": 1.27953e+21,
+        "densidadGcm3": 1.52,
+        "gravedadMs2": 0.2498,
+        "periodoRotacionHoras": 99.4744,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00412833,
+        "inclinacionGrados": 97.6661,
+        "nodoAscendenteGrados": 167.638,
+        "argumentoPeriastroGrados": 335.787,
+        "anomaliaMediaGrados": 226.95409,
+        "periodoOrbitalDias": 4.1447658,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 266000.82,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Radius (km)           = 584.7  +- 2.8     Density (g cm^-3)   =  1.52 +- 0.04",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)         =  85.40 +- 1.9     Geometric Albedo    =  0.18",
+        "densidadGcm3": "Radius (km)           = 584.7  +- 2.8     Density (g cm^-3)   =  1.52 +- 0.04",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)         =  85.40 +- 1.9     Geometric Albedo    =  0.18",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "titania": {
+      "horizons": "703",
+      "tipo": "satelite",
+      "revisado": "Sep 24, 2025",
+      "fisica": {
+        "radioMedioKm": 788.9,
+        "masaKg": 3.33818e+21,
+        "densidadGcm3": 1.65,
+        "gravedadMs2": 0.35799,
+        "periodoRotacionHoras": 208.937,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.00248571,
+        "inclinacionGrados": 97.8184,
+        "nodoAscendenteGrados": 167.618,
+        "argumentoPeriastroGrados": 200.769,
+        "anomaliaMediaGrados": 55.086156,
+        "periodoOrbitalDias": 8.7057016,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 436270.25,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Radius (km)           = 788.9  +- 1.8     Density (g cm^-3)   =  1.65 +- 0.03",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)         = 222.8  +- 4.1     Geometric Albedo    =  0.27",
+        "densidadGcm3": "Radius (km)           = 788.9  +- 1.8     Density (g cm^-3)   =  1.65 +- 0.03",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)         = 222.8  +- 4.1     Geometric Albedo    =  0.27",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "oberon": {
+      "horizons": "704",
+      "tipo": "satelite",
+      "revisado": "Sep 24, 2025",
+      "fisica": {
+        "radioMedioKm": 761.4,
+        "masaKg": 3.07658e+21,
+        "densidadGcm3": 1.66,
+        "gravedadMs2": 0.354199,
+        "periodoRotacionHoras": 323.194,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.000532827,
+        "inclinacionGrados": 97.8759,
+        "nodoAscendenteGrados": 167.756,
+        "argumentoPeriastroGrados": 248.193,
+        "anomaliaMediaGrados": 85.945994,
+        "periodoOrbitalDias": 13.466401,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 583517.5,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Radius (km)           = 761.4  +- 2.6     Density (g cm^-3)   =  1.66 +- 0.05",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)         = 205.34 +- 5.8     Geometric Albedo    =  0.24",
+        "densidadGcm3": "Radius (km)           = 761.4  +- 2.6     Density (g cm^-3)   =  1.66 +- 0.05",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)         = 205.34 +- 5.8     Geometric Albedo    =  0.24",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "miranda": {
+      "horizons": "705",
+      "tipo": "satelite",
+      "revisado": "Sep 24, 2025",
+      "fisica": {
+        "radioMedioKm": 235.68,
+        "masaKg": 64426200000000000000,
+        "densidadGcm3": 1.18,
+        "gravedadMs2": 0.0774147,
+        "periodoRotacionHoras": 33.9359,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.0015432,
+        "inclinacionGrados": 97.2527,
+        "nodoAscendenteGrados": 172.087,
+        "argumentoPeriastroGrados": 247.569,
+        "anomaliaMediaGrados": 308.16589,
+        "periodoOrbitalDias": 1.4139974,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 129871.35,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "radio medio derivado de los semiejes 240×234.2×232.9 km — Radius (km)           = 240x234.2x232.9",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)         =  4.3   +- 0.2     Geometric Albedo    =  0.27",
+        "densidadGcm3": "Radius (km)           = 240x234.2x232.9   Density (g cm^-3)   =  1.18 +- 0.05",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)         =  4.3   +- 0.2     Geometric Albedo    =  0.27",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "triton": {
+      "horizons": "801",
+      "tipo": "satelite",
+      "revisado": "Jul 08, 2026",
+      "fisica": {
+        "radioMedioKm": 1352.6,
+        "masaKg": 2.14029e+22,
+        "densidadGcm3": 2.065,
+        "gravedadMs2": 0.7808,
+        "periodoRotacionHoras": 141.05,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.000141935,
+        "inclinacionGrados": 130.261,
+        "nodoAscendenteGrados": 215.859,
+        "argumentoPeriastroGrados": 86.662,
+        "anomaliaMediaGrados": 317.34094,
+        "periodoOrbitalDias": 5.8770986,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 354766.91,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Mean radius (km)        = 1352.6 +- 2.4    Mean dens (g cm^-3)= 2.065 +-0.011",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)           = 1428.495 +- 0.62 Geometric Albedo   = 0.7",
+        "densidadGcm3": "Mean radius (km)        = 1352.6 +- 2.4    Mean dens (g cm^-3)= 2.065 +-0.011",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)           = 1428.495 +- 0.62 Geometric Albedo   = 0.7",
+        "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": true
+    },
+    "caronte": {
+      "horizons": "901",
+      "tipo": "satelite",
+      "revisado": "Apr 03, 2024",
+      "fisica": {
+        "radioMedioKm": 606,
+        "masaKg": 1.58968e+21,
+        "densidadGcm3": 1.853,
+        "gravedadMs2": 0.288915,
+        "periodoRotacionHoras": null,
+        "inclinacionAxialGrados": null
+      },
+      "orbita": {
+        "excentricidad": 0.000160951,
+        "inclinacionGrados": 112.891,
+        "nodoAscendenteGrados": 227.392,
+        "argumentoPeriastroGrados": 172.607,
+        "anomaliaMediaGrados": 120.46215,
+        "periodoOrbitalDias": 6.3872218,
+        "semiejeMayorUA": null,
+        "semiejeMayorKm": 19595.764,
+        "planoReferencia": "eclíptica J2000",
+        "epoca": "2000-01-01 TDB (elementos osculadores)"
+      },
+      "origen": {
+        "radioMedioKm": "Radius (km, IAU2015)    = 606 +- 0.5    Geometric albedo      =",
+        "masaKg": "derivado de M = GM/G con GM (km^3/s^2)           = 106.10 +- 0.3 Density (g cm^-3)     = 1.853 +- 0.004",
+        "densidadGcm3": "GM (km^3/s^2)           = 106.10 +- 0.3 Density (g cm^-3)     = 1.853 +- 0.004",
+        "gravedadMs2": "derivado de g = GM/R² con GM (km^3/s^2)           = 106.10 +- 0.3 Density (g cm^-3)     = 1.853 +- 0.004",
+        "periodoRotacionHoras": null,
+        "inclinacionAxialGrados": null
+      },
+      "rotacionSincrona": false
+    }
+  }
+}
