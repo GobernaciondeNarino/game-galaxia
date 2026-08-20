@@ -52,17 +52,50 @@ final class Catalogo
     }
 
     /**
-     * Texto que se debe narrar para un cuerpo. Devuelve null si el cuerpo no
-     * existe o no tiene narración escrita.
+     * Texto que se debe narrar para un cuerpo.
+     *
+     * Cada cuerpo tiene varias narraciones y el cliente elige cuál con un
+     * NÚMERO, nunca con un texto: esa es la razón de ser de esta clase. El
+     * número se envuelve con módulo, así que cualquier valor —un 7, un 99, un
+     * negativo— cae dentro del rango en lugar de fallar. No hay nada que
+     * validar contra un ataque porque no hay forma de salirse.
+     *
+     * @param int $variante índice de la narración; se envuelve al rango real
+     * @return string|null null si el cuerpo no existe o no tiene narración
      */
-    public static function narracion(string $id): ?string
+    public static function narracion(string $id, int $variante = 0): ?string
     {
-        $cuerpo = self::cuerpo($id);
-        if ($cuerpo === null) {
+        $variantes = self::narraciones($id);
+        if ($variantes === []) {
             return null;
         }
-        $texto = trim((string) ($cuerpo['narracion'] ?? ''));
-        return $texto === '' ? null : $texto;
+        $indice = $variante % count($variantes);
+        if ($indice < 0) {
+            $indice += count($variantes);
+        }
+        return $variantes[$indice];
+    }
+
+    /**
+     * Todas las narraciones escritas para un cuerpo, ya limpias y sin vacías.
+     *
+     * @return string[] lista vacía si el cuerpo no existe o no tiene ninguna
+     */
+    public static function narraciones(string $id): array
+    {
+        $cuerpo = self::cuerpo($id);
+        if ($cuerpo === null || !isset($cuerpo['narraciones']) || !is_array($cuerpo['narraciones'])) {
+            return [];
+        }
+
+        $limpias = [];
+        foreach ($cuerpo['narraciones'] as $texto) {
+            $texto = trim((string) $texto);
+            if ($texto !== '') {
+                $limpias[] = $texto;
+            }
+        }
+        return $limpias;
     }
 
     /** @return string[] todos los identificadores válidos */

@@ -25,6 +25,9 @@ header('X-Content-Type-Options: nosniff');
 const PHP_MINIMO = '8.1.0';
 const RAIZ = __DIR__ . '/..';
 
+// Para Config::VOZ_PREDETERMINADA: qué voz se usa si nadie la sustituye.
+require_once __DIR__ . '/lib/Config.php';
+
 /** @var array<int,array<string,mixed>> */
 $comprobaciones = [];
 
@@ -125,6 +128,41 @@ comprobar(
     $origenClave !== null
         ? 'configurada (origen: ' . $origenClave . ')'
         : 'ausente — la narración usará la voz del navegador'
+);
+
+// --------------------------------------------------------------------------
+// 4b. Qué voz se está usando, y de dónde sale
+//     Un id de voz es público —sin la clave de API no sirve de nada—, así que
+//     se puede publicar aquí. Es lo que responde a «he cambiado la voz y suena
+//     igual»: puede que una variable de entorno antigua esté ganando al valor
+//     del código, o puede que ni siquiera se esté usando ElevenLabs porque
+//     falta la clave y todo va con la voz del navegador.
+// --------------------------------------------------------------------------
+$vozEntorno = getenv('ELEVENLABS_VOICE_ID');
+$origenVoz = null;
+$vozActiva = Config::VOZ_PREDETERMINADA;
+
+if ($vozEntorno !== false && $vozEntorno !== '') {
+    $vozActiva = $vozEntorno;
+    $origenVoz = 'variable de entorno ELEVENLABS_VOICE_ID';
+} elseif (is_file(RAIZ . '/config/secrets.php')) {
+    $secretosVoz = require RAIZ . '/config/secrets.php';
+    if (is_array($secretosVoz) && !empty($secretosVoz['ELEVENLABS_VOICE_ID'])) {
+        $vozActiva = (string) $secretosVoz['ELEVENLABS_VOICE_ID'];
+        $origenVoz = 'config/secrets.php';
+    }
+}
+if ($origenVoz === null) {
+    $origenVoz = 'valor fijado en api/lib/Config.php';
+}
+
+comprobar(
+    'voz_elevenlabs', 'voz de la narración',
+    $origenClave === null ? 'aviso' : 'ok',
+    $origenClave === null
+        ? 'se usaría ' . $vozActiva . ' (origen: ' . $origenVoz . '), pero sin clave de API '
+          . 'no se llega a ElevenLabs y suena la voz del navegador'
+        : $vozActiva . ' (origen: ' . $origenVoz . ')'
 );
 
 // --------------------------------------------------------------------------

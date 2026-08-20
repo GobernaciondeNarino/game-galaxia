@@ -16,6 +16,16 @@ declare(strict_types=1);
 
 final class Config
 {
+    /**
+     * Voz de la narración de ORBIS en ElevenLabs.
+     *
+     * Un identificador de voz es PÚBLICO: sin la clave de API no sirve para
+     * nada, así que puede vivir en el repositorio. Se sustituye sin tocar el
+     * código con la variable de entorno ELEVENLABS_VOICE_ID o con
+     * config/secrets.php; api/health.php dice cuál está ganando.
+     */
+    const VOZ_PREDETERMINADA = 'lE5ZJB6jGeeuvSNxOvs2';
+
     /** @var array<string,string>|null */
     private static $secretos = null;
 

@@ -54,6 +54,15 @@ export class Narrator {
     /** Elementos de precarga de los vecinos, por id. */
     this.precargas = new Map();
 
+    /**
+     * Cuántas veces se ha narrado ya cada cuerpo, para ir alternando entre sus
+     * narraciones. Vive en memoria y solo en memoria: el pliego prohíbe
+     * localStorage, así que al recargar la página se empieza otra vez por la
+     * primera. Es lo correcto además de lo obligado —la gracia es no repetirse
+     * dentro de una misma visita, no llevar un historial de nadie—.
+     */
+    this.visitas = new Map();
+
     // Si el diagnóstico de arranque ya nos dijo que el servidor no puede
     // sintetizar, se empieza directamente con la voz del navegador. Así se
     // evita una petición condenada al fracaso —y su error en consola— por cada
@@ -112,42 +121,72 @@ export class Narrator {
    *   204 si el audio no está generado, en lugar de generarlo. Precargar no
    *   debe gastar el cupo por hora del visitante ni la cuota de la cuenta.
    */
-  _url(id, soloCache = false) {
-    const base = `${rutaApp('api/tts.php')}?bodyId=${encodeURIComponent(id)}`;
+  _url(id, soloCache = false, variante = 0) {
+    const base = `${rutaApp('api/tts.php')}?bodyId=${encodeURIComponent(id)}&variante=${variante}`;
     return soloCache ? `${base}&soloCache=1` : base;
+  }
+
+  /** Las narraciones escritas para un cuerpo, o lista vacía si no tiene. */
+  _narraciones(id) {
+    const lista = this.porId.get(id)?.narraciones;
+    return Array.isArray(lista) ? lista.filter(Boolean) : [];
+  }
+
+  /**
+   * Qué narración toca la PRÓXIMA vez que se narre este cuerpo.
+   *
+   * Rotación, no azar. Con tres textos al azar hay una posibilidad entre tres
+   * de oír el mismo dos veces seguidas, que es justo lo que se quiere evitar;
+   * rotando, no puede pasar hasta haberlos oído todos. Y siendo determinista se
+   * puede probar, cosa que con Math.random() no.
+   */
+  _siguienteVariante(id) {
+    const total = this._narraciones(id).length;
+    return total ? (this.visitas.get(id) ?? 0) % total : 0;
   }
 
   /**
    * Narra un cuerpo. Si ya se estaba narrando otro, se corta de inmediato:
    * dos voces solapadas son peores que ninguna.
    */
-  async narrar(id) {
+  async narrar(id, varianteForzada = null) {
     const cuerpo = this.porId.get(id);
-    if (!cuerpo?.narracion) {
+    const narraciones = this._narraciones(id);
+    if (!cuerpo || !narraciones.length) {
       this.detener();
       return;
     }
 
     if (this.idActual === id && this.reproduciendo) return;
 
+    if (varianteForzada === null) {
+      // Se avanza el contador al empezar, no al terminar: quien corta la
+      // narración a los dos segundos y vuelve más tarde también merece oír otra.
+      this.varianteActual = this._siguienteVariante(id);
+      this.visitas.set(id, (this.visitas.get(id) ?? 0) + 1);
+    } else {
+      this.varianteActual = varianteForzada % narraciones.length;
+    }
+    const texto = narraciones[this.varianteActual];
+
     this.detener();
     this.idActual = id;
-    this.subtitulos.preparar(cuerpo.narracion, cuerpo.nombre);
+    this.subtitulos.preparar(texto, cuerpo.nombre);
 
     if (this.motor === 'navegador') {
-      this._narrarConNavegador(cuerpo);
+      this._narrarConNavegador(cuerpo, texto);
       this._precargarVecinos(id);
       return;
     }
 
-    this.audio.src = this._url(id);
+    this.audio.src = this._url(id, false, this.varianteActual);
     this.audio.currentTime = 0;
 
     try {
       await this.audio.play();
       this.reproduciendo = true;
       this._fundir(this.volumenObjetivo, FUNDIDO_ENTRADA);
-      App.emitir('narracion:inicio', { id, motor: this.motor });
+      App.emitir('narracion:inicio', { id, motor: this.motor, variante: this.varianteActual });
     } catch (err) {
       // Los navegadores bloquean la reproducción automática hasta que hay una
       // interacción del usuario. No es un error del servidor y no debe hacer
@@ -196,19 +235,21 @@ export class Narrator {
 
     for (const vecino of deseados) {
       if (this.precargas.has(vecino)) continue;
-      if (!this.porId.get(vecino)?.narracion) continue;
+      if (!this._narraciones(vecino).length) continue;
       const elemento = new Audio();
       elemento.preload = 'auto';
       // Un 204 hace que el elemento dispare `error`. Es lo esperado y no debe
       // cambiar el motor de narración ni ensuciar la consola.
       elemento.addEventListener('error', (e) => e.stopPropagation(), { once: true });
-      elemento.src = this._url(vecino, true);
+      // La que le tocará a ese vecino cuando le llegue el turno, que es la que
+      // de verdad se va a pedir: precargar otra sería descargar para nada.
+      elemento.src = this._url(vecino, true, this._siguienteVariante(vecino));
       this.precargas.set(vecino, elemento);
     }
   }
 
   /** Voz del navegador: peor calidad, pero siempre disponible. */
-  _narrarConNavegador(cuerpo) {
+  _narrarConNavegador(cuerpo, texto = null) {
     if (!('speechSynthesis' in window)) {
       this.motor = 'ninguno';
       App.emitir('narracion:sin-motor', {});
@@ -217,7 +258,9 @@ export class Narrator {
 
     window.speechSynthesis.cancel();
 
-    const locucion = new SpeechSynthesisUtterance(cuerpo.narracion);
+    const locucion = new SpeechSynthesisUtterance(
+      texto ?? this._narraciones(cuerpo.id)[this.varianteActual ?? 0] ?? '',
+    );
     locucion.lang = 'es-ES';
     locucion.rate = 0.98;
     locucion.pitch = 1;
@@ -236,7 +279,7 @@ export class Narrator {
     this._locucion = locucion;
     this.reproduciendo = true;
     window.speechSynthesis.speak(locucion);
-    App.emitir('narracion:inicio', { id: cuerpo.id, motor: 'navegador' });
+    App.emitir('narracion:inicio', { id: cuerpo.id, motor: 'navegador', variante: this.varianteActual ?? 0 });
   }
 
   /** Cambia al motor del navegador y reintenta con el cuerpo actual. */
@@ -280,11 +323,17 @@ export class Narrator {
   }
 
   /** Repite la narración del cuerpo actual desde el principio. */
+  /**
+   * Repite lo que se acaba de decir. La MISMA narración, no la siguiente: quien
+   * pide repetir es porque no ha entendido algo, y darle otro texto distinto
+   * sería exactamente lo contrario de lo que ha pedido.
+   */
   repetir() {
     if (this.idActual) {
       const id = this.idActual;
+      const variante = this.varianteActual ?? 0;
       this.idActual = null;
-      this.narrar(id);
+      this.narrar(id, variante);
     }
   }
 

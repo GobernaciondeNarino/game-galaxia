@@ -162,6 +162,16 @@ Solar de verdad. Los cinturones se ocultan en este modo.
   `detener`, `parar`, `para ya`, `alto`, `stop`, `basta`, `ya basta`,
   `suficiente`, `no sigas`, `no hables`, `para de hablar`, `deja de hablar`.
 
+**Cada cuerpo tiene tres narraciones.** Se van alternando en visitas sucesivas,
+así que volver a Marte por segunda vez no es oír lo mismo otra vez: son tres
+textos distintos, cada uno con un enfoque propio, y al cuarto paso se vuelve al
+primero. La rotación es determinista, no aleatoria: al azar habría una
+posibilidad entre tres de repetir dos veces seguidas, que es justo lo que se
+quiere evitar. El contador vive solo en memoria —el pliego prohíbe
+`localStorage`—, así que al recargar la página se empieza otra vez por la
+primera. `repetir` repite la misma, no da la siguiente: quien pide repetir es
+porque no ha entendido algo.
+
 **`silencio` y `detente` no son lo mismo.** `silencio` apaga la narración hasta
 que se vuelva a activar; `detente` corta lo que se está diciendo ahora, pero la
 siguiente narración vuelve a sonar. El puño y el guiño hacen lo segundo.

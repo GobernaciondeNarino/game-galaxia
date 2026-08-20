@@ -53,6 +53,7 @@ if ($metodo === 'GET') {
     $peticion = [
         'bodyId' => $_GET['bodyId'] ?? '',
         'voiceId' => $_GET['voiceId'] ?? null,
+        'variante' => $_GET['variante'] ?? 0,
         'soloCache' => isset($_GET['soloCache']) && $_GET['soloCache'] === '1',
     ];
 } elseif ($metodo === 'POST') {
@@ -79,7 +80,12 @@ if (preg_match('/^[a-z0-9-]{1,40}$/', $bodyId) !== 1) {
     Respuesta::error(400, 'id_invalido', 'El identificador del cuerpo no tiene un formato válido.');
 }
 
-$texto = Catalogo::narracion($bodyId);
+// Qué narración de las varias que tiene el cuerpo. Llega como número y se
+// envuelve al rango real en Catalogo: el cliente elige CUÁL, nunca QUÉ dice.
+// Aunque mandara un 9999 o un texto, saldría una de las narraciones escritas.
+$variante = (int) ($peticion['variante'] ?? 0);
+
+$texto = Catalogo::narracion($bodyId, $variante);
 if ($texto === null) {
     Respuesta::error(
         404,
@@ -111,9 +117,7 @@ if (mb_strlen($texto) > $LIMITE_CARACTERES) {
 //    Se puede sustituir sin tocar el código con la variable de entorno
 //    ELEVENLABS_VOICE_ID o con config/secrets.php.
 // ---------------------------------------------------------------------------
-const VOZ_ORBIS = 'lE5ZJB6jGeeuvSNxOvs2';
-
-$vozPredeterminada = Config::obtener('ELEVENLABS_VOICE_ID', VOZ_ORBIS);
+$vozPredeterminada = Config::obtener('ELEVENLABS_VOICE_ID', Config::VOZ_PREDETERMINADA);
 $modelo = Config::obtener('ELEVENLABS_MODEL_ID', 'eleven_multilingual_v2');
 
 $vocesPermitidas = array_filter(array_map(

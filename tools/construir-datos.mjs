@@ -76,13 +76,26 @@ const CINTURONES = [
         'JPL Small-Body Database.',
     },
     render: { color: '#8A8175', instancias: 5000 },
-    narracion:
+    narraciones: [
       'Entre Marte y Júpiter orbitan más de un millón de asteroides de más de un kilómetro. ' +
       'Pese al nombre, el cinturón está prácticamente vacío: la distancia media entre dos ' +
       'asteroides vecinos es de cientos de miles de kilómetros, y las sondas que lo han ' +
       'atravesado no han tenido que esquivar nada. Toda su masa junta no llega ni al 5 % de ' +
       'la de la Luna. No son los restos de un planeta destruido, sino material que nunca ' +
       'llegó a agregarse: la gravedad de Júpiter lo impidió.',
+      'El cinturón de asteroides está mucho más vacío de lo que sugiere cualquier ilustración. La ' +
+      'distancia media entre dos asteroides vecinos es de cientos de miles de kilómetros: las sondas que ' +
+      'lo han atravesado no han tenido que esquivar nada, y ninguna ha corrido peligro. Toda la masa del ' +
+      'cinturón junta no alcanza el 5 % de la masa de la Luna, y Ceres, el mayor de sus cuerpos, ' +
+      'concentra por sí solo cerca de un tercio de esa masa. Es decir: casi todo el cinturón es un puñado ' +
+      'de objetos grandes y una inmensidad de espacio entre ellos.',
+      'Los huecos del cinturón no están vacíos por casualidad. Se llaman lagunas de Kirkwood y los abre ' +
+      'Júpiter a distancia, por resonancia: los asteroides que orbitan en esas franjas completan un ' +
+      'número exacto de vueltas por cada una de Júpiter, así que reciben su tirón gravitatorio siempre en ' +
+      'el mismo punto, una y otra vez, hasta que acaban expulsados. Dos de esas lagunas, la 4:1 y la 2:1, ' +
+      'son las que definen los límites interior y exterior del cinturón principal. El cinturón no termina ' +
+      'donde se acaba el material: termina donde Júpiter deja de permitirlo.',
+    ],
     curiosidades: [
       'Toda la masa del cinturón junta no alcanza el 5 % de la masa de la Luna.',
       'Ceres, el mayor de sus cuerpos, concentra por sí solo cerca de un tercio de esa masa.',
@@ -101,13 +114,24 @@ const CINTURONES = [
       fuente: 'NASA Science — Kuiper Belt: región entre 30 y 50 UA del Sol.',
     },
     render: { color: '#6F7E93', instancias: 3000 },
-    narracion:
+    narraciones: [
       'Más allá de Neptuno se extiende un anillo de cuerpos helados mucho más ancho y masivo ' +
       'que el cinturón de asteroides. Ahí están Plutón, Eris, Makemake y Haumea, y de ahí ' +
       'vienen los cometas de periodo corto. Es el material que sobró de la formación del ' +
       'Sistema Solar, demasiado disperso y demasiado lejos como para haberse unido en un ' +
       'planeta. Se conocen ya miles de objetos y se estima que hay cientos de miles de más ' +
       'de cien kilómetros.',
+      'De aquí vienen los cometas de periodo corto, como el Halley, y de aquí vino también Tritón antes ' +
+      'de que Neptuno lo capturara. El cinturón de Kuiper no es solo un depósito de material sobrante: es ' +
+      'el sitio del que el Sistema Solar exterior sigue recibiendo visitas. Alberga a Plutón, Eris, ' +
+      'Makemake y Haumea, los cuatro planetas enanos reconocidos más allá de Neptuno, y se extiende entre ' +
+      'las treinta y las cincuenta unidades astronómicas del Sol.',
+      'En 2019 la sonda New Horizons sobrevoló Arrokoth, el objeto más lejano visitado hasta ahora por ' +
+      'una nave humana. Lo que encontró fueron dos cuerpos redondeados unidos por un cuello estrecho, ' +
+      'como un muñeco de nieve: dos objetos que se acercaron tan despacio que se quedaron pegados en ' +
+      'lugar de destruirse. Es una imagen de cómo se formaron los planetas, conservada intacta cuatro mil ' +
+      'quinientos millones de años porque ahí fuera no ha pasado nada capaz de borrarla.',
+    ],
     curiosidades: [
       'Plutón, Eris, Makemake y Haumea son objetos del cinturón de Kuiper.',
       'Los cometas de periodo corto, como el Halley, proceden de esta región.',
@@ -177,7 +201,7 @@ async function principal() {
       render: { ...texto.render },
       anotaciones: texto.anotaciones,
       satelites: texto.satelites,
-      narracion: texto.narracion,
+      narraciones: texto.narraciones,
       curiosidades: texto.curiosidades,
       procedencia,
       revisadoPorJpl: jpl.revisado,
