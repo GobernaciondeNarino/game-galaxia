@@ -58,4 +58,4 @@ para cualquier decisión de diseño de la HUD.
 
 ## Estado
 
-Fases 0 a 4 completadas. Ver el plan de fases en `README.md`.
+Fases 0 a 5 completadas. Ver el plan de fases en `README.md`.

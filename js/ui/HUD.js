@@ -27,6 +27,7 @@ import { PanelGalactico } from './panels/PanelGalactico.js';
 import { Anotaciones } from './Anotaciones.js';
 import { ArcoDatos } from './ArcoDatos.js';
 import { Reticula } from './Reticula.js';
+import { Subtitles } from './Subtitles.js';
 import { log } from '../utils/debug.js';
 
 export class HUD {
@@ -82,6 +83,7 @@ export class HUD {
       this.anotaciones = new Anotaciones(capaEtiquetas, gestor);
     }
     this.arco = new ArcoDatos(document.body);
+    this.subtitulos = new Subtitles($('#hud-subtitulos'));
 
     this._montarControlesEscena();
     this._suscribir();
@@ -133,9 +135,62 @@ export class HUD {
         }),
         crear('span', { text: 'Órbitas' }),
       ]),
+      this._crearControlesNarracion(),
     ]);
 
     $('#hud-barra-superior').append(this.controles);
+  }
+
+  /**
+   * Controles de narración: silencio, volumen, repetir y subtítulos.
+   * El de subtítulos existe porque son obligatorios pero no imponibles: quien
+   * los tenga tapando el planeta debe poder quitarlos.
+   */
+  _crearControlesNarracion() {
+    this.botonSilencio = crear('button', {
+      class: 'controles__boton controles__boton--icono',
+      type: 'button',
+      'aria-pressed': String(App.preferencias.get('narracionSilenciada')),
+      'aria-label': 'Silenciar la narración (M)',
+      title: 'Silenciar la narración (M)',
+      onclick: () => this.acciones.alternarSilencio(),
+      text: '🔊',
+    });
+
+    this.deslizadorVolumen = crear('input', {
+      type: 'range', min: 0, max: 1, step: 0.05,
+      value: App.preferencias.get('volumenNarracion'),
+      class: 'controles__volumen',
+      'aria-label': 'Volumen de la narración',
+      oninput: (e) => this.acciones.establecerVolumen(Number(e.target.value)),
+    });
+
+    return crear('div', { class: 'controles__grupo controles__grupo--audio' }, [
+      this.botonSilencio,
+      this.deslizadorVolumen,
+      crear('button', {
+        class: 'controles__boton controles__boton--icono',
+        type: 'button',
+        'aria-label': 'Repetir la narración',
+        title: 'Repetir la narración',
+        onclick: () => this.acciones.repetirNarracion(),
+        text: '↻',
+      }),
+      crear('label', { class: 'controles__interruptor' }, [
+        crear('input', {
+          type: 'checkbox',
+          checked: App.preferencias.get('subtitulos'),
+          onchange: (e) => App.preferencias.set('subtitulos', e.target.checked),
+        }),
+        crear('span', { text: 'Subtítulos' }),
+      ]),
+    ]);
+  }
+
+  /** Refleja el estado del silencio en el botón. */
+  actualizarSilencio(silenciada) {
+    this.botonSilencio.textContent = silenciada ? '🔇' : '🔊';
+    this.botonSilencio.setAttribute('aria-pressed', String(silenciada));
   }
 
   _cambiarModulo(id) {
@@ -160,6 +215,17 @@ export class HUD {
         this.navegacion.panel.dataset.resaltado = id ?? '';
       }),
       App.al('voz:comando', ({ texto }) => this.entradas.mostrarComando(texto)),
+      App.al('narracion:motor', ({ motor }) => {
+        // Un cambio de motor es información, no un fallo silencioso.
+        this.barra.establecerSubtitulo(
+          motor === 'navegador'
+            ? 'Narración con la voz del navegador'
+            : 'Narración con voz sintetizada',
+        );
+      }),
+      App.al('narracion:bloqueada', () => {
+        this.barra.establecerSubtitulo('Toca la pantalla para permitir el audio');
+      }),
     ];
   }
 
@@ -242,6 +308,7 @@ export class HUD {
       this.barra, this.perfil, this.mapaOrbital, this.composicion, this.geologia,
       this.magnetosfera, this.adicionales, this.navegacion, this.proyeccion,
       this.entradas, this.panelGalactico, this.reticula, this.anotaciones, this.arco,
+      this.subtitulos,
     ]) {
       parte?.destruir?.();
     }

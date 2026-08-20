@@ -188,6 +188,12 @@ En este orden:
 2. **`https://tu-dominio/api/health.php?red=1`**
    Añade la prueba de conectividad y de validez de la clave con ElevenLabs.
 
+2 bis. **`https://tu-dominio/api/tts.php?bodyId=tierra`**
+   Debe devolver `audio/mpeg`. La primera vez tarda unos segundos —la está
+   generando—; la segunda es instantánea y trae la cabecera
+   `X-Orbis-Cache: hit`. Con `&soloCache=1` no genera nada: devuelve el audio
+   si ya existe y `204` si no, y es lo que usa la precarga.
+
 3. **`http://tu-dominio/`** (sin la ese)
    Debe redirigir a `https://` con un 301.
 
@@ -243,3 +249,30 @@ caché de un año: si cambias una textura, cambia también su nombre de archivo.
 narración: el nombre de cada MP3 es el hash del texto, la voz y el modelo, de
 modo que un texto nuevo genera un archivo nuevo y el antiguo queda huérfano.
 Un borrado periódico de huérfanos es opcional.
+
+### Coste de la narración
+
+Las 33 narraciones suman unos 33.000 caracteres. Se generan **una sola vez**,
+la primera vez que alguien visita cada cuerpo, y a partir de ahí se sirven de
+`cache/audio/`. El gasto en ElevenLabs no crece con las visitas, solo con los
+textos: si editas una narración, esa —y solo esa— se vuelve a generar.
+
+El límite por IP (`LIMITE_GENERACIONES_HORA`, 30 por omisión) solo cuenta las
+generaciones nuevas. Servir un audio cacheado no consume cupo, y la precarga de
+los cuerpos vecinos usa `soloCache=1`, que tampoco.
+
+### Precalentar la caché antes de abrir al público
+
+Recomendable si esperas visitas simultáneas el primer día: así nadie espera a
+que se sintetice.
+
+```bash
+for id in $(php -r 'require "api/lib/Catalogo.php"; echo implode(" ", Catalogo::identificadores());'); do
+  curl -s -o /dev/null -w "%{http_code} $id\n" "https://tu-dominio/api/tts.php?bodyId=$id"
+  sleep 2
+done
+```
+
+Ejecútalo desde el propio servidor o sube temporalmente
+`LIMITE_GENERACIONES_HORA`; con el límite por omisión se detendría en el
+trigésimo cuerpo.

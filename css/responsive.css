@@ -153,3 +153,11 @@
   }
   .anotaciones__aviso { bottom: 148px; font-size: 9px; }
 }
+
+/* Los subtítulos deben caber y leerse también en vertical. */
+@media (max-width: 720px) {
+  #hud-subtitulos { width: 94vw; bottom: 126px; }
+  .subtitulo { padding: var(--e-2); }
+  .subtitulo__texto { font-size: 0.875rem; }
+  .controles__volumen { width: 48px; }
+}

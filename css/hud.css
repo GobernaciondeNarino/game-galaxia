@@ -819,3 +819,28 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
   color: var(--ambar-seleccion);
   pointer-events: none;
 }
+
+/* ==========================================================================
+   Subtítulos de la narración
+   ========================================================================== */
+.subtitulo {
+  display: inline-block;
+  padding: var(--e-2) var(--e-4);
+  background: rgba(5, 11, 24, 0.86);
+  border: 1px solid var(--panel-borde);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+.subtitulo__texto {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--texto);
+  text-wrap: balance;
+}
+
+/* Controles de audio en la barra */
+.controles__grupo--audio { gap: var(--e-2); }
+.controles__volumen {
+  width: 64px;
+  accent-color: var(--cian-brillante);
+}

@@ -4,10 +4,9 @@
  * Arranca la aplicación: diagnostica el entorno, carga el catálogo, construye
  * la escena tridimensional y pone en marcha el bucle de render.
  *
- * Fases 1 a 4 implementadas: escena tridimensional con órbitas keplerianas
- * reales, HUD en DOM con paneles persistentes, y las dos vistas —VISTA DE
- * SISTEMA y VISTA DE CUERPO— con transición interrumpible, anotaciones
- * ancladas a la superficie y arco de datos.
+ * Fases 1 a 5 implementadas: escena tridimensional con órbitas keplerianas
+ * reales, HUD en DOM con paneles persistentes, las dos vistas con transición
+ * interrumpible, y narración por audio con subtítulos.
  */
 
 import { App } from './core/App.js';
@@ -19,6 +18,8 @@ import { Loop, VELOCIDADES } from './core/Loop.js';
 import { SolarSystem } from './system/SolarSystem.js';
 import { FallbackControls } from './input/FallbackControls.js';
 import { HUD } from './ui/HUD.js';
+import { Narrator } from './audio/Narrator.js';
+import { SFX } from './audio/SFX.js';
 import { $, crear, anunciar } from './utils/dom.js';
 import { RAIZ, rutaApp } from './utils/rutas.js';
 import { depuracion, log, error } from './utils/debug.js';
@@ -149,6 +150,10 @@ async function arrancar() {
     App.definir('cuerpoActivo', id);
     App.definir('vista', 'cuerpo');
     rig.viajarA(cuerpo);
+    sfx.reproducir('seleccion');
+    // La narración arranca al seleccionar, no al llegar: el viaje dura más de
+    // un segundo y el silencio mientras tanto se hace largo.
+    narrador?.narrar(id);
     anunciar(`${cuerpo.datos.nombre} seleccionado.`);
     App.emitir('cuerpo:seleccionado', { id, origen, cuerpo });
   }
@@ -157,6 +162,8 @@ async function arrancar() {
     App.definir('cuerpoActivo', null);
     App.definir('vista', 'sistema');
     rig.volverAVistaGeneral();
+    narrador?.detener();
+    sfx.reproducir('transicion');
     anunciar('Vista general del Sistema Solar.');
     App.emitir('vista:general', {});
   }
@@ -194,9 +201,21 @@ async function arrancar() {
     alPedirVecino: vecino,
     alAlternarPausa: alternarPausa,
     alAlternarOrbitas: () => mostrarOrbitas(!App.preferencias.get('mostrarOrbitas')),
+    alAlternarSilencio: () => {
+      const silenciada = !App.preferencias.get('narracionSilenciada');
+      narrador?.silenciar(silenciada);
+      hud.actualizarSilencio(silenciada);
+      anunciar(silenciada ? 'Narración silenciada.' : 'Narración activada.');
+    },
   });
 
   // ------------------------------------------------------------------- HUD --
+  const sfx = new SFX();
+
+  // El narrador se crea antes que la HUD para poder pasarle sus acciones, pero
+  // necesita los subtítulos, que viven en la HUD. Se conecta justo después.
+  let narrador = null;
+
   const hud = new HUD(catalogo, {
     seleccionar,
     vistaGeneral,
@@ -207,7 +226,21 @@ async function arrancar() {
     // La HUD necesita la malla del cuerpo para anclar las anotaciones a su
     // superficie; se la pide al sistema en lugar de guardar una referencia.
     obtenerCuerpo3D: (id) => sistema.obtener(id),
+    alternarSilencio: () => {
+      const silenciada = !App.preferencias.get('narracionSilenciada');
+      narrador?.silenciar(silenciada);
+      hud.actualizarSilencio(silenciada);
+      anunciar(silenciada ? 'Narración silenciada.' : 'Narración activada.');
+    },
+    establecerVolumen: (v) => narrador?.establecerVolumen(v),
+    repetirNarracion: () => narrador?.repetir(),
   }, { capaEtiquetas: $('#capa-etiquetas'), gestor });
+
+  narrador = new Narrator(
+    catalogo.cuerpos.filter((c) => c.tipo !== 'cinturon'),
+    hud.subtitulos,
+    resultados.backend?.extra ?? null,
+  );
 
   // ------------------------------------------------------------------ bucle --
   let usuarioInteractuando = false;
@@ -270,9 +303,11 @@ async function arrancar() {
   }
 
   // -------------------------------------------------------------- exposición --
-  Object.assign(App.subsistemas, { escena: gestor, sistema, efectos, rig, bucle, controles, hud });
+  Object.assign(App.subsistemas, {
+    escena: gestor, sistema, efectos, rig, bucle, controles, hud, narrador, sfx,
+  });
   App.acciones = { seleccionar, vistaGeneral, vecino };
-  App.faseImplementada = 4;
+  App.faseImplementada = 5;
 
   sistema.establecerVisibilidadOrbitas(App.preferencias.get('mostrarOrbitas'));
   bucle.iniciar();
@@ -294,6 +329,8 @@ async function arrancar() {
   // colgado si el navegador conserva la página en la caché de retroceso.
   window.addEventListener('pagehide', () => {
     bucle.detener();
+    narrador.destruir();
+    sfx.destruir();
     hud.destruir();
     controles.destruir();
     sistema.destruir();

@@ -15,7 +15,10 @@ import { log } from '../utils/debug.js';
 const TOLERANCIA_CLIC = 5;
 
 export class FallbackControls {
-  constructor(gestor, sistema, { alSeleccionar, alPedirVistaGeneral, alPedirVecino, alAlternarPausa, alAlternarOrbitas } = {}) {
+  constructor(gestor, sistema, {
+    alSeleccionar, alPedirVistaGeneral, alPedirVecino,
+    alAlternarPausa, alAlternarOrbitas, alAlternarSilencio,
+  } = {}) {
     this.gestor = gestor;
     this.sistema = sistema;
     this.alSeleccionar = alSeleccionar;
@@ -23,6 +26,7 @@ export class FallbackControls {
     this.alPedirVecino = alPedirVecino;
     this.alAlternarPausa = alAlternarPausa;
     this.alAlternarOrbitas = alAlternarOrbitas;
+    this.alAlternarSilencio = alAlternarSilencio;
 
     this.rayo = new THREE.Raycaster();
     // Sin esto, apuntar a Fobos (0,06 unidades) es prácticamente imposible.
@@ -150,6 +154,10 @@ export class FallbackControls {
       case 'o':
       case 'O':
         this.alAlternarOrbitas?.();
+        break;
+      case 'm':
+      case 'M':
+        this.alAlternarSilencio?.();
         break;
       default:
         manejado = false;

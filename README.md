@@ -8,9 +8,9 @@ paso de compilación, sin Node.js en producción y sin procesos en segundo plano
 > **Estado: fases 0 a 4 completadas.** Escena tridimensional navegable con el
 > Sol, los ocho planetas, cinco planetas enanos, diecinueve satélites, anillos,
 > cinturones y entorno galáctico; catálogo cuyas cifras proceden de JPL
-> Horizons; y HUD completa en DOM con sus dos vistas, transición interrumpible,
-> anotaciones ancladas a la superficie y arco de datos. Quedan la narración con
-> ElevenLabs (fase 5), los gestos (fase 6) y la voz (fase 7).
+> Horizons; HUD completa en DOM con sus dos vistas, transición interrumpible,
+> anotaciones ancladas a la superficie y arco de datos; y narración por audio
+> con subtítulos sincronizados. Quedan los gestos (fase 6) y la voz (fase 7).
 > Consulta el [plan de fases](#plan-de-fases).
 
 ---
@@ -177,8 +177,14 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 - **Ninguna credencial llega al navegador.** La clave de ElevenLabs se lee de la
   variable de entorno `ELEVENLABS_API_KEY` de Plesk o, en su defecto, de
   `config/secrets.php`, que está en `.gitignore` y bloqueado por `.htaccess`.
-- `api/tts.php` (fase 5) solo sintetiza textos asociados a un `bodyId` existente
-  en `data/sistema-solar.json`: no es un proxy genérico hacia una API de pago.
+- **`api/tts.php` no acepta texto del cliente.** Recibe un `bodyId`, y el texto
+  que sintetiza lo toma de su propia copia de `data/sistema-solar.json`. Un
+  endpoint que sintetizara el texto recibido sería una pasarela gratuita hacia
+  una API de pago a costa del titular de la cuenta; así, el conjunto de textos
+  posibles es finito, conocido y cacheable, y el gasto está acotado.
+- Límite de generaciones **nuevas** por IP; servir de caché y precargar no
+  consumen cupo. Verificación TLS obligatoria en las llamadas salientes. La
+  respuesta cruda de ElevenLabs va al registro, nunca al cliente.
 - **CSP sin `unsafe-inline` en los scripts.** El único bloque en línea es el
   `importmap` —los navegadores no admiten import maps externos—, autorizado por
   su hash SHA-256. Si lo modificas, ejecuta `node tools/csp-hash.mjs`.
@@ -196,7 +202,7 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 | 2 | `sistema-solar.json` con datos verificados, satélites, anillos y cinturón de asteroides | ✅ Completada |
 | 3 | HUD en DOM: elementos persistentes, `VISTA DE SISTEMA`, gráficos y tira de navegación | ✅ Completada |
 | 4 | `VISTA DE CUERPO`, transición interrumpible, `CameraRig`, anotaciones y arco de datos | ✅ Completada |
-| 5 | `api/tts.php` con caché y límite de peticiones; `Narrator.js` con subtítulos | Pendiente |
+| 5 | `api/tts.php` con caché y límite de peticiones; `Narrator.js` con subtítulos | ✅ Completada |
 | 6 | Control por manos con MediaPipe y todos los gestos | Pendiente |
 | 7 | Control por voz con parser de intenciones y alternativa vía `stt.php` | Pendiente |
 | 8 | Optimización, pruebas cruzadas de navegador y guía de despliegue | Pendiente |

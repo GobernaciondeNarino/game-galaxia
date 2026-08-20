@@ -2,6 +2,9 @@
 cache/audio/*
 !cache/audio/.gitkeep
 
+# Contadores del limitador de peticiones
+cache/limites/
+
 # Registros del backend
 api/logs/*
 !api/logs/.gitkeep
