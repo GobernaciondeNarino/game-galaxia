@@ -99,6 +99,18 @@ exactamente el mismo camino.
 de pantalla y navegable con Tab. Una HUD dibujada en una textura 3D se ve mejor
 en capturas y es inutilizable para quien no ve la pantalla.
 
+**Funciona en cualquier ruta.** Todas las rutas internas —incluidas las del
+`importmap`— son relativas al directorio de la aplicación, y `js/utils/rutas.js`
+deduce la raíz de la URL de su propio módulo. ORBIS se puede servir tanto en
+`https://ejemplo.gov.co/` como en `https://ejemplo.gov.co/juegos/orbis/` sin
+cambiar una línea. Ver `docs/DESPLIEGUE-PLESK.md` §3 bis.
+
+**Los errores dicen de quién es el problema.** El diagnóstico de arranque
+distingue un fallo del navegador (WebGL desactivado) de un fallo del despliegue
+(falta `vendor/`, MIME mal configurado, PHP apagado) y, en el segundo caso,
+muestra la ruta exacta que falta y el comando para arreglarlo. Nunca anuncia
+«tu navegador no puede» cuando lo que falla es el servidor.
+
 **Estado en memoria, nunca en `localStorage`.** Las preferencias
 (`js/utils/storage.js`) duran lo que dure la pestaña. No se deja rastro en el
 equipo del visitante.

@@ -77,6 +77,50 @@ CSP y con `config/` accesible.** Es el error de despliegue más frecuente.
 
 ---
 
+## 3 bis. Desplegar en un subdirectorio
+
+ORBIS funciona igual en la raíz de un dominio
+(`https://ejemplo.gov.co/`) que en un subdirectorio
+(`https://ejemplo.gov.co/juegos/orbis/`). No hay que tocar ni una línea de
+código: **todas las rutas internas son relativas al directorio de la
+aplicación**, incluidas las del `importmap`.
+
+Para que eso se cumpla hay tres condiciones, y las tres están ya resueltas en
+el repositorio. Si alguna vez editas estos archivos, respétalas:
+
+1. **`index.html` lleva `<base href="./">`** y el `importmap` apunta a
+   `./vendor/…`, nunca a `/vendor/…`. Una ruta que empiece por `/` se resuelve
+   contra la raíz del dominio y devolverá 404 en cuanto la aplicación no esté
+   en la raíz.
+2. **`js/utils/rutas.js` deduce la raíz** a partir de la URL de su propio
+   módulo. Todo `fetch()` interno pasa por `rutaApp()`; ningún módulo escribe
+   una ruta absoluta a mano.
+3. **`.htaccess` fuerza `DirectorySlash On`.** Sin la barra final, el navegador
+   resuelve `css/`, `js/` y `vendor/` contra el directorio *padre*. Apache
+   redirige `…/orbis` a `…/orbis/` por omisión, pero conviene comprobarlo:
+
+   ```
+   curl -I https://tu-dominio/juegos/orbis
+   → 301 Location: https://tu-dominio/juegos/orbis/
+   ```
+
+Sube el árbol completo dentro del subdirectorio, incluido su propio
+`.htaccess`. La configuración de Apache es local a esa carpeta: no interfiere
+con el resto del sitio.
+
+**Comprobación rápida** una vez subido:
+
+```
+https://tu-dominio/juegos/orbis/vendor/three/build/three.module.min.js  → 200
+https://tu-dominio/juegos/orbis/api/health.php                          → JSON
+https://tu-dominio/juegos/orbis/config/secrets.php                      → 403
+```
+
+Si el primero devuelve 404, la carpeta `vendor/` no se subió: la pantalla de
+arranque lo dirá con esas mismas palabras y con la ruta exacta que falta.
+
+---
+
 ## 4. Permisos
 
 ```bash
@@ -167,7 +211,9 @@ En este orden:
 | Síntoma | Causa habitual | Solución |
 |---|---|---|
 | `Failed to load module script … MIME type of "text/plain"` | Apache no reconoce `.js` o `.mjs` | Falta `.htaccess`, o `AllowOverride None`. Pide a soporte `AllowOverride All` en el vhost |
-| `Failed to resolve module specifier "three"` | `/vendor/three/` no llegó al servidor | Vuelve a subir la carpeta completa |
+| `Failed to resolve module specifier "three"` | `vendor/three/` no llegó al servidor | Vuelve a subir la carpeta completa |
+| Todo devuelve 404 y las rutas apuntan al directorio *padre* | Se visitó la URL sin barra final y Apache no redirigió | Comprueba `DirectorySlash On` y que `.htaccess` llegó; entra con la barra final |
+| El `importmap` busca en `/vendor/` en vez de en el subdirectorio | Alguien cambió las rutas del `importmap` a absolutas | Vuelve a `./vendor/…` y ejecuta `node tools/csp-hash.mjs` |
 | La pantalla de arranque se queda en «Comprobando datos del sistema» | `data/sistema-solar.json` no legible o con JSON inválido | Revisa permisos (644) y valida el JSON |
 | `cache_audio: escritura denegada` | Propietario o permisos incorrectos | `chmod 775 cache/audio` con el propietario correcto |
 | El navegador bloquea el importmap (`Refused to execute inline script`) | El hash de la CSP no coincide con `index.html` | `node tools/csp-hash.mjs` y vuelve a subir `.htaccess` |

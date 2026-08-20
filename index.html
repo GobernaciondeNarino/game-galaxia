@@ -7,6 +7,11 @@
 <meta name="description" content="ORBIS — interfaz holográfica interactiva del Sistema Solar con control por gestos y voz.">
 <title>ORBIS · Interfaz Galáctica</title>
 
+<!-- Ancla todas las rutas relativas al directorio de la aplicación. Sin esto,
+     visitar «…/orbis» (sin barra final) resolvería css/, js/ y vendor/ contra
+     el directorio padre. -->
+<base href="./">
+
 <link rel="icon" href="assets/orbis.svg" type="image/svg+xml">
 
 <!-- Precarga de lo que bloquea el primer render: fuentes y datos maestros.
@@ -25,16 +30,22 @@
 <link rel="stylesheet" href="css/responsive.css">
 
 <!-- Mapa de importaciones: resuelve los especificadores desnudos de los módulos
-     ES sin ningún empaquetador. Todo apunta a copias locales en /vendor, de
+     ES sin ningún empaquetador. Todo apunta a copias locales en vendor/, de
      modo que la aplicación no depende de ningún CDN de terceros en producción.
+
+     Las rutas son RELATIVAS (./) a propósito: así ORBIS funciona igual en la
+     raíz de un dominio que en un subdirectorio (…/juegos/orbis/). Con rutas
+     absolutas (/vendor/…) el navegador las buscaría en la raíz del dominio y
+     devolvería 404.
+
      Si se edita este bloque hay que regenerar el hash CSP:
         node tools/csp-hash.mjs                                                -->
 <script type="importmap">
 {
   "imports": {
-    "three": "/vendor/three/build/three.module.min.js",
-    "three/addons/": "/vendor/three/addons/",
-    "@mediapipe/tasks-vision": "/vendor/mediapipe/vision_bundle.mjs"
+    "three": "./vendor/three/build/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/",
+    "@mediapipe/tasks-vision": "./vendor/mediapipe/vision_bundle.mjs"
   }
 }
 </script>

@@ -7,6 +7,14 @@
 Options -Indexes
 DirectoryIndex index.html
 
+# Redirige «…/orbis» a «…/orbis/». Sin la barra final, el navegador resolvería
+# css/, js/ y vendor/ contra el directorio padre y todo devolvería 404.
+# Es el comportamiento por omisión de Apache, pero se deja explícito porque de
+# él depende que la aplicación funcione en un subdirectorio.
+<IfModule mod_dir.c>
+  DirectorySlash On
+</IfModule>
+
 # ---------------------------------------------------------------------------
 # 1. HTTPS obligatorio
 #    getUserMedia() (cámara y micrófono) solo funciona en contextos seguros.
@@ -77,8 +85,10 @@ DirectoryIndex index.html
 </IfModule>
 
 # vendor/ contiene copias con versión fijada: nunca cambian sin cambiar de ruta.
+# El patrón no lleva ancla inicial para que funcione también cuando ORBIS se
+# despliega en un subdirectorio (…/juegos/orbis/vendor/…).
 <IfModule mod_headers.c>
-  <If "%{REQUEST_URI} =~ m#^/vendor/#">
+  <If "%{REQUEST_URI} =~ m#/vendor/#">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </If>
 </IfModule>
@@ -100,7 +110,7 @@ DirectoryIndex index.html
   # imprescindibles para el WASM y el worker de MediaPipe.
   # El hash corresponde al <script type="importmap"> de index.html; si se
   # modifica ese bloque hay que regenerarlo con:  node tools/csp-hash.mjs
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob: 'sha256-7sChTtfQM0EJJH7b+QMUx61TGGkHcbRJOI5VP8FIPnY='; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob: 'sha256-YCCu03F1ixcvn8W0yQCzeR4w+4P+xDXzUcZ7u6ZtnnM='; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 </IfModule>
 
 # ---------------------------------------------------------------------------

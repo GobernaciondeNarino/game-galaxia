@@ -7,8 +7,9 @@
  */
 
 import { App } from './core/App.js';
-import { ejecutarDiagnostico } from './core/Diagnostico.js';
-import { $, anunciar } from './utils/dom.js';
+import { ejecutarDiagnostico, titularDeFallo } from './core/Diagnostico.js';
+import { $, crear, anunciar } from './utils/dom.js';
+import { RAIZ } from './utils/rutas.js';
 import { depuracion, log, error } from './utils/debug.js';
 
 const relleno = $('#arranque-relleno');
@@ -23,26 +24,46 @@ function progresar(fraccion, texto) {
   if (detalle && texto) detalle.textContent = texto;
 }
 
-/** Deja la pantalla de arranque en estado de fallo irrecuperable. */
-function fallar(mensaje) {
+/**
+ * Deja la pantalla de arranque en estado de fallo irrecuperable.
+ * El mensaje debe decir qué pasa y qué hacer, nunca un genérico que culpe al
+ * navegador de quien visita la página cuando el problema es del despliegue.
+ */
+function fallar(titular, detalles = []) {
   const marco = $('.arranque__marco');
   marco?.setAttribute('data-fallo', '');
-  progresar(1, mensaje);
-  anunciar(`Error de arranque: ${mensaje}`);
-  error(mensaje);
+  progresar(1, titular);
+
+  // Las instrucciones concretas ya aparecen bajo cada punto en rojo; aquí solo
+  // se sustituye el aviso de cámara y micrófono, que en este estado sobra.
+  const aviso = $('.arranque__aviso');
+  if (aviso) {
+    aviso.innerHTML = '';
+    aviso.append(
+      crear('strong', { text: 'Cada punto en rojo indica qué falta. ' }),
+      'La guía completa está en docs/DESPLIEGUE-PLESK.md, apartado «Resolución de problemas».',
+    );
+  }
+
+  anunciar(`Error de arranque: ${titular}`);
+  error(titular, ...detalles);
 }
 
 async function arrancar() {
   log(`ORBIS v${App.version} — fase implementada: ${App.faseImplementada}`);
+  log(`Raíz de la aplicación: ${RAIZ}`);
   progresar(0.02, 'Verificando el entorno…');
 
-  const { ok, resultados } = await ejecutarDiagnostico(progresar);
+  const { ok, resultados, fallos } = await ejecutarDiagnostico(progresar);
 
   // Los datos maestros quedan disponibles para el resto de subsistemas.
   App.definir('datos', resultados.datos?.extra ?? null);
 
   if (!ok) {
-    fallar('Este navegador no puede ejecutar ORBIS. Revisa los puntos marcados.');
+    fallar(
+      titularDeFallo(fallos),
+      fallos.map((f) => f.remedio).filter(Boolean),
+    );
     return;
   }
 

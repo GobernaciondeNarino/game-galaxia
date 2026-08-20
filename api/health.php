@@ -31,13 +31,23 @@ $comprobaciones = [];
 /**
  * Registra una comprobación.
  *
+ * La etiqueta es lo que ve la persona en la pantalla de arranque; la clave es
+ * el identificador estable para el código. Nunca se muestran claves internas
+ * en la interfaz.
+ *
  * @param string $clave      identificador estable, usado por el frontend
+ * @param string $etiqueta   nombre legible, en español
  * @param string $resultado  'ok' | 'aviso' | 'error'
  */
-function comprobar(string $clave, string $resultado, string $nota): void
+function comprobar(string $clave, string $etiqueta, string $resultado, string $nota): void
 {
     global $comprobaciones;
-    $comprobaciones[] = ['clave' => $clave, 'resultado' => $resultado, 'nota' => $nota];
+    $comprobaciones[] = [
+        'clave'     => $clave,
+        'etiqueta'  => $etiqueta,
+        'resultado' => $resultado,
+        'nota'      => $nota,
+    ];
 }
 
 // --------------------------------------------------------------------------
@@ -45,7 +55,7 @@ function comprobar(string $clave, string $resultado, string $nota): void
 // --------------------------------------------------------------------------
 $versionOk = version_compare(PHP_VERSION, PHP_MINIMO, '>=');
 comprobar(
-    'php',
+    'php', 'versión de PHP',
     $versionOk ? 'ok' : 'aviso',
     $versionOk
         ? 'versión soportada'
@@ -61,6 +71,7 @@ foreach (['curl' => true, 'json' => true, 'openssl' => true, 'mbstring' => false
     $presente = extension_loaded($ext);
     comprobar(
         'ext_' . $ext,
+        'extensión ' . $ext,
         $presente ? 'ok' : ($critica ? 'error' : 'aviso'),
         $presente ? 'disponible' : 'no cargada'
     );
@@ -76,15 +87,16 @@ if (!is_dir($dirCache)) {
     @mkdir($dirCache, 0755, true);
 }
 if (!is_dir($dirCache)) {
-    comprobar('cache_audio', 'error', 'cache/audio no existe y no se pudo crear');
+    comprobar('cache_audio', 'escritura en cache/audio', 'error', 'cache/audio no existe y no se pudo crear');
 } elseif (!is_writable($dirCache)) {
-    comprobar('cache_audio', 'error', 'cache/audio no es escribible (revisa permisos y propietario)');
+    comprobar('cache_audio', 'escritura en cache/audio', 'error', 'cache/audio no es escribible (revisa permisos y propietario)');
 } else {
     $prueba = $dirCache . '/.escritura-' . bin2hex(random_bytes(4));
     $escrito = @file_put_contents($prueba, 'ok') !== false;
     @unlink($prueba);
     comprobar(
         'cache_audio',
+        'escritura en cache/audio',
         $escrito ? 'ok' : 'error',
         $escrito ? 'escribible' : 'escritura denegada'
     );
@@ -108,7 +120,7 @@ if ($origenClave === null && is_file(RAIZ . '/config/secrets.php')) {
 }
 
 comprobar(
-    'clave_elevenlabs',
+    'clave_elevenlabs', 'clave de ElevenLabs',
     $origenClave !== null ? 'ok' : 'aviso',
     $origenClave !== null
         ? 'configurada (origen: ' . $origenClave . ')'
@@ -119,7 +131,7 @@ comprobar(
 // 5. config/secrets.php no debe ser accesible por HTTP
 // --------------------------------------------------------------------------
 comprobar(
-    'config_protegido',
+    'config_protegido', 'protección de config/',
     is_file(RAIZ . '/config/.htaccess') ? 'ok' : 'error',
     is_file(RAIZ . '/config/.htaccess')
         ? 'config/.htaccess presente'
@@ -131,15 +143,16 @@ comprobar(
 // --------------------------------------------------------------------------
 $rutaDatos = RAIZ . '/data/sistema-solar.json';
 if (!is_readable($rutaDatos)) {
-    comprobar('datos', 'error', 'data/sistema-solar.json no legible');
+    comprobar('datos', 'catálogo de datos', 'error', 'data/sistema-solar.json no legible');
 } else {
     $datos = json_decode((string) file_get_contents($rutaDatos), true);
     if (!is_array($datos) || !isset($datos['cuerpos'])) {
-        comprobar('datos', 'error', 'JSON inválido o sin la clave "cuerpos"');
+        comprobar('datos', 'catálogo de datos', 'error', 'JSON inválido o sin la clave "cuerpos"');
     } else {
         $total = count($datos['cuerpos']);
         comprobar(
             'datos',
+            'catálogo de datos',
             $total > 0 ? 'ok' : 'aviso',
             $total > 0 ? $total . ' cuerpos catalogados' : 'catálogo vacío (se completa en la fase 2)'
         );
@@ -151,14 +164,14 @@ if (!is_readable($rutaDatos)) {
 // --------------------------------------------------------------------------
 $vendorThree = RAIZ . '/vendor/three/build/three.module.min.js';
 comprobar(
-    'vendor_three',
+    'vendor_three', 'Three.js en el servidor',
     is_readable($vendorThree) ? 'ok' : 'error',
     is_readable($vendorThree) ? 'Three.js vendorizado' : 'falta vendor/three — ¿subiste la carpeta completa?'
 );
 
 $modeloManos = RAIZ . '/assets/models/hand_landmarker.task';
 comprobar(
-    'modelo_manos',
+    'modelo_manos', 'modelo de detección de manos',
     is_readable($modeloManos) ? 'ok' : 'aviso',
     is_readable($modeloManos)
         ? 'hand_landmarker.task presente'
@@ -171,7 +184,7 @@ comprobar(
 // --------------------------------------------------------------------------
 if (isset($_GET['red']) && $_GET['red'] === '1') {
     if (!extension_loaded('curl')) {
-        comprobar('red_elevenlabs', 'error', 'curl no está disponible');
+        comprobar('red_elevenlabs', 'conexión con ElevenLabs', 'error', 'curl no está disponible');
     } else {
         $ch = curl_init('https://api.elevenlabs.io/v1/models');
         curl_setopt_array($ch, [
@@ -187,15 +200,16 @@ if (isset($_GET['red']) && $_GET['red'] === '1') {
         curl_close($ch);
 
         if ($codigo === 200) {
-            comprobar('red_elevenlabs', 'ok', 'API alcanzable y clave válida');
+            comprobar('red_elevenlabs', 'conexión con ElevenLabs', 'ok', 'API alcanzable y clave válida');
         } elseif ($codigo === 401) {
-            comprobar('red_elevenlabs', 'error', 'API alcanzable pero la clave es inválida');
+            comprobar('red_elevenlabs', 'conexión con ElevenLabs', 'error', 'API alcanzable pero la clave es inválida');
         } elseif ($codigo > 0) {
-            comprobar('red_elevenlabs', 'aviso', 'API alcanzable, respuesta HTTP ' . $codigo);
+            comprobar('red_elevenlabs', 'conexión con ElevenLabs', 'aviso', 'API alcanzable, respuesta HTTP ' . $codigo);
         } else {
             // No se expone el mensaje crudo de curl para no filtrar rutas internas.
             comprobar(
                 'red_elevenlabs',
+                'conexión con ElevenLabs',
                 'error',
                 'sin salida a Internet' . ($errorCurl !== '' ? ' (fallo de conexión)' : '')
             );

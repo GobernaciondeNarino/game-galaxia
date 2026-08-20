@@ -237,7 +237,26 @@ body[data-estado="listo"] #arranque {
 }
 
 .chequeo__marca { text-align: center; }
-.chequeo__nota  { color: var(--texto-apagado); }
+.chequeo__nota  { color: var(--texto-apagado); text-align: right; }
+
+/* Instrucción concreta de reparación. Ocupa toda la fila bajo el chequeo y
+   solo aparece cuando hay algo que hacer. */
+.chequeo__remedio {
+  grid-column: 2 / -1;
+  margin-top: var(--e-1);
+  padding-left: var(--e-2);
+  border-left: 1px solid rgba(232, 160, 32, 0.5);
+  font-family: var(--fuente-datos);
+  font-size: var(--t-menor);
+  letter-spacing: 0;
+  line-height: 1.5;
+  color: var(--texto-tenue);
+  text-align: left;
+}
+.chequeo[data-resultado="error"] .chequeo__remedio {
+  border-left-color: var(--rojo-alerta);
+  color: var(--texto);
+}
 
 .chequeo[data-resultado="ok"]       { color: var(--texto-tenue); }
 .chequeo[data-resultado="ok"] .chequeo__marca { color: var(--verde-estado); }
@@ -259,6 +278,12 @@ body[data-estado="listo"] #arranque {
 /* Fallo irrecuperable de arranque (sin WebGL, módulos bloqueados…) */
 .arranque__marco[data-fallo] { border-color: rgba(255, 82, 82, 0.7); }
 .arranque__marco[data-fallo] .arranque__marca { color: var(--rojo-alerta); text-shadow: none; }
+.arranque__marco[data-fallo] .arranque__detalle { color: var(--texto); }
+.arranque__marco[data-fallo] .arranque__relleno {
+  background: var(--rojo-alerta);
+  box-shadow: none;
+}
+
 
 /* --------------------------------------------------------------------------
    5. Sin JavaScript
