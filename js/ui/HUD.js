@@ -105,7 +105,7 @@ export class HUD {
     this.etiquetaVelocidad = crear('span', { class: 'controles__valor panel__cifra', text: '×100' });
 
     this.botonGalaxia = crear('button', {
-      class: 'controles__boton', type: 'button',
+      class: 'controles__boton controles__boton--galaxia', type: 'button',
       'aria-pressed': 'false',
       title: 'Mostrar u ocultar la interfaz galáctica',
       onclick: () => {

@@ -150,10 +150,15 @@ Plesk → *Dominios* → **Configuración de PHP** → *Variables de entorno*:
 | Nombre | Valor |
 |---|---|
 | `ELEVENLABS_API_KEY` | tu clave |
-| `ELEVENLABS_VOICE_ID` | id de la voz en español elegida |
+| `ELEVENLABS_VOICE_ID` | *(opcional)* otra voz distinta de la de ORBIS |
 
 Así la clave no toca el disco del sitio y no puede filtrarse por una regla de
 Apache mal escrita.
+
+**La única variable obligatoria es `ELEVENLABS_API_KEY`.** La voz de ORBIS
+(`lE5ZJB6jGeeuvSNxOvs2`) va fijada en `api/tts.php`; un id de voz es un
+identificador público, no una credencial, y sin la clave de API no sirve para
+nada. Define `ELEVENLABS_VOICE_ID` solo si quieres cambiarla.
 
 > Con PHP-FPM puede hacer falta reiniciar el *pool* del dominio para que las
 > variables se apliquen (Plesk lo ofrece en la misma pantalla).

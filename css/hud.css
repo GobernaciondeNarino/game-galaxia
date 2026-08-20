@@ -517,7 +517,11 @@
 /* Aspa para cerrarlo antes de que se retire solo. */
 .galaxia__cerrar {
   flex: none;
-  padding: 0 var(--e-1);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   font-family: var(--fuente-titulos);
   font-size: var(--t-base);
   line-height: 1;

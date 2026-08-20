@@ -157,3 +157,65 @@ la escala real es inutilizable.
 Los cinturones se ocultan en modo real: reconstruir sus 8.000 instancias en cada
 cambio de escala provocaría un tirón, y la interfaz lo declara en lugar de
 dejarlos mal colocados.
+
+## 7. Tamaños de pantalla
+
+Comprobado con Chromium en 320x568, 375x667, 414x896, 768x1024, 1024x768,
+1280x800, 1440x900 y 1920x1080, midiendo en cada uno: desborde horizontal,
+contenido que cae fuera de la ventana sin forma de llegar a él, y tamaño de
+cada objetivo pulsable. Los tamaños de 1024 para abajo se midieron además con
+puntero táctil emulado, que es lo que decide si se aplican los 44 px.
+
+| Ancho | Qué se ve |
+|---|---|
+| ≥1600 px | La HUD completa, tal como está diseñada |
+| 1280–1600 | Paneles laterales más estrechos |
+| 1024–1280 | Los cinco paneles de la derecha pasan a una fila que se desplaza |
+| 720–1024 | Una sola columna; se retira el arco de datos y el panel de entradas |
+| ≤720 | Escena, controles, perfil del cuerpo y navegación |
+| ≤380 | El perfil pasa a una columna y los controles a una fila desplazable |
+
+### Fallos encontrados y corregidos
+
+**La barra superior ocupaba 640 px de alto en el móvil.** `.barra` lleva
+`flex: 1 1 640px`, pensado para una barra en fila: 640 px de ancho base. Por
+debajo de 720 px el contenedor pasa a `flex-direction: column`, el eje principal
+se vuelve el vertical y esos 640 px pasaron a ser una **altura**: la barra sola
+se comía 640 de los 667 px de un teléfono. Los controles caían fuera de la
+pantalla —no había forma de pausar, cambiar de velocidad, silenciar ni abrir la
+ayuda—, el perfil del cuerpo se quedaba en 0 px de alto y de toda la interfaz
+solo se veía el rótulo ORBIS.
+
+**En un teléfono no se veía el Sistema Solar.** El perfil ocupaba toda la fila
+central y los paneles son opacos, así que la escena quedaba tapada de arriba
+abajo. El perfil se limita ahora a 38 vh y se ancla abajo; lo que queda encima
+es hueco transparente por el que se ve el lienzo.
+
+**El panel galáctico se cortaba por abajo.** Entre 768 y 1280 px las tres cifras
+citadas y su fuente quedaban bajo el borde inferior sin ningún contenedor con
+desplazamiento por el que alcanzarlas. Ahora se limita al alto disponible y lo
+que se encoge es la espiral, que es lo decorativo. Por debajo de 1280 px la fila
+central de la rejilla se queda casi sin altura, así que ahí el panel pasa a ser
+una capa centrada en lugar de un elemento de la rejilla.
+
+**Objetivos táctiles por debajo del mínimo.** Los botones medían 32x24 px y las
+pestañas de módulo 55x22. Con puntero táctil ahora son de 44x44 (WCAG 2.1
+§2.5.5) y con ratón de 24x24 (WCAG 2.2 §2.5.8, nivel AA). Se consulta
+`(pointer: coarse)` y no el ancho de la ventana: son cosas distintas —hay
+tabletas de 1280 px que solo se tocan y portátiles de 1024 con ratón— y ampliar
+por ancho habría estropeado la densidad de la HUD justo donde no hacía falta.
+
+**Detalles menores.** A 320 px las cuatro pastillas de estado pedían 321 px en
+una sola fila y la barra se salía por la derecha (ahora envuelven); las dos
+columnas del perfil se pisaban entre sí por debajo de 380 px (ahora es una); y
+el perfil usaba `align-content: end`, que en un contenedor con desplazamiento
+empuja lo que sobra por el borde superior, donde no se llega desplazando: el
+nombre del cuerpo quedaba cortado.
+
+### Qué se sacrifica y en qué orden
+
+Cuando deja de haber sitio, lo primero que se retira es lo decorativo
+(proyección orbital, arco de datos), después lo que tiene otra vía de acceso
+(panel de entradas, paneles de la derecha) y en último lugar nunca se toca lo
+esencial: la escena, el perfil del cuerpo, la navegación y los controles. Ningún
+control desaparece en ningún tamaño; en el más estrecho se recorre con el dedo.

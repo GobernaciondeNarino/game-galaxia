@@ -24,8 +24,9 @@ return [
     // Clave de la API de ElevenLabs (https://elevenlabs.io → Profile → API Key).
     'ELEVENLABS_API_KEY' => '',
 
-    // Voz por defecto de la narración en español.
-    // Consulta los ids disponibles en https://api.elevenlabs.io/v1/voices
+    // Voz de la narración. Déjalo vacío para usar la voz de ORBIS, que ya está
+    // fijada en api/tts.php (lE5ZJB6jGeeuvSNxOvs2). Rellénalo solo si quieres
+    // otra: consulta los ids en https://api.elevenlabs.io/v1/voices
     'ELEVENLABS_VOICE_ID' => '',
 
     // Modelo de síntesis. eleven_multilingual_v2 da la mejor prosodia en español.

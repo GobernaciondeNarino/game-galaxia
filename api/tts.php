@@ -105,8 +105,15 @@ if (mb_strlen($texto) > $LIMITE_CARACTERES) {
 // 3. Voz y modelo
 //    El cliente puede pedir una voz concreta, pero solo de una lista blanca:
 //    un voiceId libre permitiría usar voces de pago ajenas al proyecto.
+//
+//    VOZ_ORBIS es un identificador público de ElevenLabs, no una credencial:
+//    sin la clave de API no sirve para nada, así que puede ir en el repositorio.
+//    Se puede sustituir sin tocar el código con la variable de entorno
+//    ELEVENLABS_VOICE_ID o con config/secrets.php.
 // ---------------------------------------------------------------------------
-$vozPredeterminada = Config::obtener('ELEVENLABS_VOICE_ID', '');
+const VOZ_ORBIS = 'lE5ZJB6jGeeuvSNxOvs2';
+
+$vozPredeterminada = Config::obtener('ELEVENLABS_VOICE_ID', VOZ_ORBIS);
 $modelo = Config::obtener('ELEVENLABS_MODEL_ID', 'eleven_multilingual_v2');
 
 $vocesPermitidas = array_filter(array_map(

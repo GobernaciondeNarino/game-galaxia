@@ -70,6 +70,9 @@
     padding: var(--e-2);
     gap: var(--e-2);
     grid-template-columns: 1fr;
+    /* El perfil se queda con lo que sobre y se desplaza por dentro. Un mínimo
+       fijo aquí empujaba la tira de navegación fuera de la pantalla en un
+       teléfono de 320x568 con los objetivos táctiles ya ampliados. */
     grid-template-rows: auto minmax(0, 1fr) auto;
     grid-template-areas:
       "superior"
@@ -82,13 +85,54 @@
   #hud-proyeccion-orbital,
   #hud-estado-entradas { display: none; }
 
-  #hud-panel-izquierdo { overflow-y: auto; align-content: start; }
+  /* El panel galáctico vive dentro de #hud-viewport, que aquí no se dibuja:
+     un botón que no puede mostrar nada es peor que ningún botón. */
+  .controles__boton--galaxia { display: none; }
+
+  /* La escena tiene que verse. Con el perfil ocupando toda la fila central,
+     los paneles opacos tapaban el Sistema Solar de arriba abajo y en un
+     teléfono no se veía ni un planeta: la aplicación entera quedaba reducida a
+     una ficha de datos. El perfil se limita a poco más de un tercio de la
+     altura y se ancla abajo; lo que queda encima es hueco transparente por el
+     que se ve el lienzo. */
+  #hud-panel-izquierdo {
+    overflow-y: auto;
+    /* `align-content: start`, no `end`: en un contenedor con desplazamiento,
+       alinear el contenido al final empuja lo que sobra por el borde SUPERIOR,
+       y ahí no se llega desplazando —el nombre del cuerpo quedaba cortado y era
+       imposible verlo—. Quien baja la caja es `align-self`, que coloca el panel
+       dentro de su celda sin tocar su contenido. */
+    align-content: start;
+    align-self: end;
+    /* `min(…, 100%)` y no `38vh` a secas: anclado al final de su fila, un alto
+       mayor que la fila desborda HACIA ARRIBA y el perfil se dibujaba encima de
+       los controles. El 100% es el alto real de la fila, así que en una pantalla
+       muy justa el perfil se encoge en vez de invadir. */
+    max-height: min(38vh, 100%);
+  }
   #hud-subtitulos      { width: 92vw; bottom: 118px; }
 
   /* Barra superior compacta: marca, estado y controles. El reloj de misión y
-     las pestañas de módulo no caben y no son imprescindibles. */
-  #hud-barra-superior { flex-direction: column; gap: var(--e-2); }
+     las pestañas de módulo no caben y no son imprescindibles.
+
+     `align-items: stretch` es obligatorio al girar el eje: la barra base usa
+     `flex-start`, que en columna alinea en horizontal y dejaba los hijos
+     encogidos al ancho de su contenido. */
+  #hud-barra-superior {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--e-2);
+  }
+
+  /* ESTE ERA EL FALLO QUE VACIABA LA PANTALLA EN EL MÓVIL.
+     `.barra` lleva `flex: 1 1 640px`, pensado para una barra en fila: 640 px de
+     ANCHO base. Al pasar el contenedor a columna, el eje principal es el
+     vertical y esos 640 px pasaron a ser una ALTURA: la barra sola ocupaba 640
+     de los 667 px de un teléfono. El resultado era que los controles caían
+     fuera de la pantalla, el perfil del cuerpo se quedaba en 0 px de alto y de
+     la interfaz solo se veía el rótulo ORBIS. */
   .barra {
+    flex: 0 0 auto;
     grid-template-columns: 1fr;
     grid-template-areas: "identidad" "derecha";
     padding: var(--e-2);
@@ -98,6 +142,11 @@
   .barra__centro { display: none; }
   .barra__derecha { justify-items: start; }
   .barra__marca { font-size: 1.05rem; letter-spacing: 0.22em; }
+
+  /* Las cuatro pastillas de estado (cámara, micrófono, red, FPS) en una sola
+     fila piden 321 px: más que los 304 disponibles en una pantalla de 320. Sin
+     esto la barra se sale por la derecha y la de FPS queda cortada. */
+  .barra__indicadores { flex-wrap: wrap; }
 
   .controles { width: 100%; justify-content: space-between; padding: var(--e-2); }
   .controles__valor { min-width: 4em; }
@@ -109,6 +158,27 @@
     gap: 1px var(--e-3);
   }
   .perfil__nombre { font-size: 1.25rem; }
+
+  /* Por debajo de 380 px no hay sitio para dos columnas: la etiqueta y la cifra
+     de cada ficha se pisaban («MASA» encima de «1.391.400»). Una columna. */
+  @media (max-width: 380px) {
+    .perfil__lista { grid-template-columns: 1fr; }
+
+    /* Y los nueve controles, en cuatro filas de 44 px, se comían media pantalla
+       y dejaban el perfil en nada. Pasan a una sola fila que se recorre con el
+       dedo, como la tira de navegación: se pierde un gesto, no una función.
+       Quitar controles habría sido peor —el interruptor de escala real y el de
+       subtítulos no están en ningún otro sitio—. */
+    .controles {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    .controles::-webkit-scrollbar { display: none; }
+    .controles > *, .controles__grupo > * { flex: none; }
+  }
 
   .navegacion__flecha { display: none; }   /* Se desplaza con el dedo. */
   .miniatura { width: 54px; }
@@ -125,10 +195,93 @@
   }
 }
 
+/* ==========================================================================
+   Objetivos táctiles
+   La HUD es densa a propósito y con ratón esa densidad es una virtud: el
+   puntero tiene precisión de píxel. El dedo no. Se consulta el tipo de puntero,
+   no el ancho de la ventana, porque son cosas distintas —hay tabletas de 1280
+   px que solo se tocan y portátiles de 1024 con ratón— y ampliar por ancho
+   estropearía la densidad justo donde no hace falta.
+
+   44x44 px es el mínimo de la WCAG 2.1 (2.5.5). Se consigue con `min-height` y
+   relleno, sin tocar el tamaño de letra: la interfaz sigue igual de compacta a
+   la vista, solo se agranda la zona sensible.
+   ========================================================================== */
+/* Mínimo con ratón: 24x24 px, el umbral AA de la WCAG 2.2 (2.5.8). Son
+   aumentos de dos o tres píxeles que no alteran la densidad de la HUD, pero
+   sacan de debajo del umbral a las pestañas de módulo, los botones de icono y
+   las dos aspas de cerrar. */
+.barra__modulo { min-height: 24px; }
+.controles__boton { min-height: 24px; min-width: 24px; }
+.controles__interruptor { min-height: 24px; }
+.controles__interruptor input { width: 16px; height: 16px; }
+.controles__volumen { height: 24px; }
+.navegacion__cerrar { width: 24px; height: 24px; }
+
+@media (pointer: coarse) {
+  .controles__boton,
+  .barra__modulo,
+  .entradas__boton {
+    min-height: 44px;
+    padding-inline: var(--e-3);
+  }
+  .controles__boton--icono { min-width: 44px; padding-inline: var(--e-2); }
+
+  /* La casilla y su texto forman un solo objetivo: tocar la palabra «Órbitas»
+     debe funcionar igual que tocar el cuadrito. */
+  .controles__interruptor { min-height: 44px; }
+  .controles__interruptor input { width: 20px; height: 20px; }
+
+  .miniatura { min-height: 44px; }
+  .navegacion__flecha, .navegacion__cerrar { min-width: 44px; min-height: 44px; }
+  .galaxia__cerrar { width: 44px; height: 44px; }
+
+  /* El deslizador de volumen es el objetivo más difícil de todos: hay que
+     acertar en el pulgar, no solo en el control. */
+  .controles__volumen { height: 44px; }
+}
+
 /* Nada de la HUD puede empujar la rejilla más allá de la ventana. Es la red de
    seguridad que evita que un panel con una cifra larga desborde la pantalla. */
 #hud, #hud > * { min-width: 0; }
 .panel { max-width: 100%; }
+
+/* ==========================================================================
+   El panel galáctico nunca debe salirse por abajo
+   Mide 420 px de lado más cabecera y cifras; en cuanto el viewport central
+   baja de unos 800 px de alto, las tres cifras citadas y su fuente quedaban
+   por debajo del borde inferior, sin ningún contenedor con desplazamiento por
+   el que llegar a ellas. Se limita al alto disponible y lo que se encoge es la
+   espiral, que es lo decorativo, no los datos.
+   ========================================================================== */
+.galaxia { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.galaxia__svg { max-height: min(46vh, 420px); }
+
+/* Por debajo de 1280 px la fila central de la rejilla se queda casi sin altura
+   —el perfil y la fila de paneles se llevan el espacio—, y el panel galáctico
+   quedaba reducido a una franja de 26 px con todo su contenido dentro. Ahí deja
+   de ser un elemento de la rejilla y pasa a ser una capa centrada: como se abre
+   a propósito con el botón «Galaxia» y se cierra con su aspa, taparlo todo un
+   momento es lo correcto. Se queda por debajo de la ayuda (30) y del comparador
+   (31), que sí deben poder abrirse encima.
+
+   Por debajo de 720 px no hace falta ninguna excepción: #hud-viewport es
+   `display: none` y eso oculta al panel aunque esté posicionado, que es
+   justo lo que se quiere. */
+@media (max-width: 1280px) {
+  .galaxia {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: min(92vw, 560px);
+    max-height: 82vh;
+    transform: translate(-50%, -50%);
+    z-index: 25;
+  }
+  .galaxia[data-oculto="si"] {
+    transform: translate(-50%, -50%) translateX(14%) scale(0.96);
+  }
+}
 
 /* Pantallas muy bajas (portátiles 768 px de alto en horizontal). */
 @media (max-height: 720px) {
