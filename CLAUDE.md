@@ -43,6 +43,8 @@ API de Three.js (`SceneManager.js`, `CameraRig.js`); el resto, en español.
 ```bash
 bash tools/comprobar-secretos.sh           # credenciales en el cliente
 node tools/contraste.mjs                   # contraste WCAG 2.1 AA
+node tools/pruebas-gestos.mjs              # reconocedor de gestos
+node tools/pruebas-voz.mjs                 # parser de intenciones de voz
 node tools/csp-hash.mjs --verificar        # hash CSP del importmap al día
 find api config -name '*.php' -exec php -l {} \;
 php -S localhost:8080                      # y abrir http://localhost:8080
@@ -58,4 +60,4 @@ para cualquier decisión de diseño de la HUD.
 
 ## Estado
 
-Fases 0 a 5 completadas. Ver el plan de fases en `README.md`.
+Fases 0 a 7 completadas. Ver el plan de fases en `README.md`.

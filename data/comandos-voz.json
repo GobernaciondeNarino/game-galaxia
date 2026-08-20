@@ -1,0 +1,534 @@
+{
+  "$esquema": "orbis/comandos-voz/1",
+  "nota": "Vocabulario del control por voz. Los alias están normalizados —minúsculas, sin tildes y sin signos— porque así llega la transcripción tras pasar por el normalizador del parser. Incluyen apodos reales ('el planeta rojo') y errores de transcripción frecuentes: el reconocedor confunde a menudo 'Ío' con 'yo' y 'Encélado' con 'enselado'. Ampliar esta lista con lo que la gente diga de verdad es la forma barata de mejorar el reconocimiento, y no requiere tocar código.",
+  "idiomas": [
+    "es-CO",
+    "es-ES",
+    "es-419"
+  ],
+  "intenciones": {
+    "ir_a": {
+      "descripcion": "Viajar a un cuerpo y abrir su ficha",
+      "necesitaCuerpo": true,
+      "patrones": [
+        "ir a",
+        "vamos a",
+        "llevame a",
+        "llevar a",
+        "muestrame",
+        "muestra",
+        "ensename",
+        "ver",
+        "visitar",
+        "viajar a",
+        "acercate a",
+        "enfoca",
+        "enfocar",
+        "selecciona"
+      ],
+      "ejemplo": "llévame a Júpiter"
+    },
+    "vista_general": {
+      "descripcion": "Volver a la vista del sistema completo",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "vista general",
+        "vista de sistema",
+        "vista del sistema",
+        "aleja",
+        "alejate",
+        "sistema completo",
+        "todo el sistema",
+        "salir",
+        "atras",
+        "volver"
+      ],
+      "ejemplo": "vista general"
+    },
+    "siguiente": {
+      "descripcion": "Pasar al cuerpo siguiente de la tira",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "siguiente",
+        "el siguiente",
+        "adelante",
+        "pasa al siguiente"
+      ],
+      "ejemplo": "siguiente"
+    },
+    "anterior": {
+      "descripcion": "Volver al cuerpo anterior de la tira",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "anterior",
+        "el anterior",
+        "atras uno",
+        "vuelve atras"
+      ],
+      "ejemplo": "anterior"
+    },
+    "hablame_de": {
+      "descripcion": "Reproducir la narración de un cuerpo",
+      "necesitaCuerpo": true,
+      "patrones": [
+        "hablame de",
+        "habla de",
+        "cuentame de",
+        "cuentame sobre",
+        "que sabes de",
+        "informacion de",
+        "datos de",
+        "explicame"
+      ],
+      "ejemplo": "háblame de Saturno"
+    },
+    "satelites_de": {
+      "descripcion": "Enumerar los satélites de un cuerpo",
+      "necesitaCuerpo": true,
+      "patrones": [
+        "satelites de",
+        "lunas de",
+        "cuantas lunas tiene",
+        "cuantos satelites tiene"
+      ],
+      "ejemplo": "satélites de Júpiter"
+    },
+    "comparar": {
+      "descripcion": "Comparar dos cuerpos",
+      "necesitaCuerpo": true,
+      "necesitaDosCuerpos": true,
+      "patrones": [
+        "comparar",
+        "compara",
+        "compara a",
+        "diferencia entre",
+        "cual es mayor"
+      ],
+      "ejemplo": "comparar Marte con Venus"
+    },
+    "pausar": {
+      "descripcion": "Detener el reloj",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "pausar",
+        "pausa",
+        "detener el tiempo",
+        "para el tiempo",
+        "congela"
+      ],
+      "ejemplo": "pausar"
+    },
+    "reanudar": {
+      "descripcion": "Reanudar el reloj",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "reanudar",
+        "reanuda",
+        "continuar",
+        "continua",
+        "sigue"
+      ],
+      "ejemplo": "reanudar"
+    },
+    "acelerar": {
+      "descripcion": "Acelerar el tiempo",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "acelerar tiempo",
+        "acelera",
+        "mas rapido",
+        "aumenta la velocidad"
+      ],
+      "ejemplo": "acelerar tiempo"
+    },
+    "frenar": {
+      "descripcion": "Ralentizar el tiempo",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "frenar tiempo",
+        "frena",
+        "mas lento",
+        "reduce la velocidad",
+        "ralentiza"
+      ],
+      "ejemplo": "frenar tiempo"
+    },
+    "mostrar_orbitas": {
+      "descripcion": "Mostrar las líneas de órbita",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "mostrar orbitas",
+        "muestra las orbitas",
+        "ver orbitas",
+        "orbitas si"
+      ],
+      "ejemplo": "mostrar órbitas"
+    },
+    "ocultar_orbitas": {
+      "descripcion": "Ocultar las líneas de órbita",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "ocultar orbitas",
+        "oculta las orbitas",
+        "quitar orbitas",
+        "sin orbitas"
+      ],
+      "ejemplo": "ocultar órbitas"
+    },
+    "modo_real": {
+      "descripcion": "Proporciones astronómicas reales",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "modo real",
+        "escala real",
+        "proporciones reales",
+        "tamano real"
+      ],
+      "ejemplo": "modo real"
+    },
+    "modo_didactico": {
+      "descripcion": "Escala comprimida y navegable",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "modo didactico",
+        "escala didactica",
+        "modo normal",
+        "escala normal"
+      ],
+      "ejemplo": "modo didáctico"
+    },
+    "repetir": {
+      "descripcion": "Repetir la narración",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "repetir",
+        "repite",
+        "otra vez",
+        "de nuevo",
+        "vuelve a contarlo"
+      ],
+      "ejemplo": "repetir"
+    },
+    "silencio": {
+      "descripcion": "Silenciar la narración",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "silencio",
+        "silencia",
+        "callate",
+        "sin voz",
+        "quita el sonido",
+        "mutear"
+      ],
+      "ejemplo": "silencio"
+    },
+    "detener_narracion": {
+      "descripcion": "Detener la narración en curso",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "detener narracion",
+        "para de hablar",
+        "deja de hablar",
+        "basta"
+      ],
+      "ejemplo": "detener narración"
+    },
+    "ayuda": {
+      "descripcion": "Mostrar la lista de comandos",
+      "necesitaCuerpo": false,
+      "patrones": [
+        "ayuda",
+        "que puedo decir",
+        "que puedo hacer",
+        "comandos",
+        "opciones"
+      ],
+      "ejemplo": "¿qué puedo decir?"
+    }
+  },
+  "conectores": [
+    "con",
+    "y",
+    "contra",
+    "frente a",
+    "versus",
+    "vs"
+  ],
+  "ruido": [
+    "por favor",
+    "orbis",
+    "oye orbis",
+    "hola",
+    "gracias",
+    "eh",
+    "este",
+    "pues"
+  ],
+  "cuerpos": {
+    "sol": {
+      "nombre": "Sol",
+      "alias": [
+        "el sol",
+        "estrella",
+        "nuestra estrella",
+        "sol"
+      ]
+    },
+    "mercurio": {
+      "nombre": "Mercurio",
+      "alias": [
+        "el mensajero",
+        "mercurio"
+      ]
+    },
+    "venus": {
+      "nombre": "Venus",
+      "alias": [
+        "el lucero",
+        "estrella de la manana",
+        "lucero del alba",
+        "venus"
+      ]
+    },
+    "tierra": {
+      "nombre": "Tierra",
+      "alias": [
+        "el planeta azul",
+        "la tierra",
+        "nuestro planeta",
+        "planeta tierra",
+        "tierra"
+      ]
+    },
+    "marte": {
+      "nombre": "Marte",
+      "alias": [
+        "el planeta rojo",
+        "marte",
+        "planeta rojo"
+      ]
+    },
+    "jupiter": {
+      "nombre": "Júpiter",
+      "alias": [
+        "el gigante",
+        "gigante gaseoso",
+        "jupiter"
+      ]
+    },
+    "saturno": {
+      "nombre": "Saturno",
+      "alias": [
+        "el de los anillos",
+        "planeta de los anillos",
+        "saturno"
+      ]
+    },
+    "urano": {
+      "nombre": "Urano",
+      "alias": [
+        "uranio",
+        "urano"
+      ]
+    },
+    "neptuno": {
+      "nombre": "Neptuno",
+      "alias": [
+        "neptuno"
+      ]
+    },
+    "pluton": {
+      "nombre": "Plutón",
+      "alias": [
+        "pluton"
+      ]
+    },
+    "ceres": {
+      "nombre": "Ceres",
+      "alias": [
+        "ceres",
+        "seres"
+      ]
+    },
+    "eris": {
+      "nombre": "Eris",
+      "alias": [
+        "eris",
+        "heris"
+      ]
+    },
+    "makemake": {
+      "nombre": "Makemake",
+      "alias": [
+        "make make",
+        "makemake",
+        "maquemaque"
+      ]
+    },
+    "haumea": {
+      "nombre": "Haumea",
+      "alias": [
+        "aumea",
+        "haumea",
+        "jaumea"
+      ]
+    },
+    "luna": {
+      "nombre": "Luna",
+      "alias": [
+        "el satelite",
+        "la luna",
+        "luna",
+        "nuestro satelite"
+      ]
+    },
+    "fobos": {
+      "nombre": "Fobos",
+      "alias": [
+        "fobos",
+        "focos",
+        "phobos"
+      ]
+    },
+    "deimos": {
+      "nombre": "Deimos",
+      "alias": [
+        "deimo",
+        "deimos"
+      ]
+    },
+    "io": {
+      "nombre": "Ío",
+      "alias": [
+        "hio",
+        "io",
+        "yo"
+      ]
+    },
+    "europa": {
+      "nombre": "Europa",
+      "alias": [
+        "europa"
+      ]
+    },
+    "ganimedes": {
+      "nombre": "Ganímedes",
+      "alias": [
+        "ganimede",
+        "ganimedes",
+        "ganimedez"
+      ]
+    },
+    "calisto": {
+      "nombre": "Calisto",
+      "alias": [
+        "cali sto",
+        "calisto",
+        "callisto"
+      ]
+    },
+    "mimas": {
+      "nombre": "Mimas",
+      "alias": [
+        "mimad",
+        "mimas"
+      ]
+    },
+    "encelado": {
+      "nombre": "Encélado",
+      "alias": [
+        "encelada",
+        "encelado",
+        "enceladus",
+        "enselado"
+      ]
+    },
+    "rea": {
+      "nombre": "Rea",
+      "alias": [
+        "re a",
+        "rea",
+        "reia"
+      ]
+    },
+    "titan": {
+      "nombre": "Titán",
+      "alias": [
+        "titan"
+      ]
+    },
+    "japeto": {
+      "nombre": "Jápeto",
+      "alias": [
+        "iapetus",
+        "japeto",
+        "japetus",
+        "yapeto"
+      ]
+    },
+    "ariel": {
+      "nombre": "Ariel",
+      "alias": [
+        "ariel"
+      ]
+    },
+    "umbriel": {
+      "nombre": "Umbriel",
+      "alias": [
+        "umbriel",
+        "umbriell",
+        "un briel"
+      ]
+    },
+    "titania": {
+      "nombre": "Titania",
+      "alias": [
+        "titania"
+      ]
+    },
+    "oberon": {
+      "nombre": "Oberón",
+      "alias": [
+        "oberon"
+      ]
+    },
+    "miranda": {
+      "nombre": "Miranda",
+      "alias": [
+        "miranda"
+      ]
+    },
+    "triton": {
+      "nombre": "Tritón",
+      "alias": [
+        "triton"
+      ]
+    },
+    "caronte": {
+      "nombre": "Caronte",
+      "alias": [
+        "caronde",
+        "caronte",
+        "charon"
+      ]
+    },
+    "cinturon-asteroides": {
+      "nombre": "Cinturón de asteroides",
+      "alias": [
+        "asteroides",
+        "cinturon de asteroides",
+        "cinturon principal",
+        "el cinturon"
+      ]
+    },
+    "cinturon-kuiper": {
+      "nombre": "Cinturón de Kuiper",
+      "alias": [
+        "cinturon de cuiper",
+        "cinturon de kuiper",
+        "cuiper",
+        "kuiper"
+      ]
+    }
+  }
+}

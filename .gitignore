@@ -22,8 +22,10 @@ assets/skybox/*
 # Respuestas crudas de JPL Horizons: caché local de tools/datos-jpl.mjs
 .cache-horizons/
 
-# Modelo de MediaPipe (7,5 MB; lo descarga tools/vendor.mjs mediapipe)
-assets/models/*.task
+# El modelo de MediaPipe SÍ se versiona (7,6 MB): así el despliegue en Plesk
+# es un único «git pull» y no hay que acordarse de subirlo por FTP aparte, que
+# es exactamente el fallo que dejó la primera versión sin funcionar.
+# Se descarga y actualiza con: node tools/vendor.mjs mediapipe
 
 # Sistema operativo / editores
 .DS_Store

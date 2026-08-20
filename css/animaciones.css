@@ -48,3 +48,9 @@
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+/* Latido del testigo de cámara encendida */
+@keyframes orbis-testigo {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}

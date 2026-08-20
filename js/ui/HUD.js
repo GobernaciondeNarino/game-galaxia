@@ -136,6 +136,14 @@ export class HUD {
         crear('span', { text: 'Órbitas' }),
       ]),
       this._crearControlesNarracion(),
+      crear('button', {
+        class: 'controles__boton controles__boton--icono',
+        type: 'button',
+        'aria-label': 'Ayuda: qué puedes decir y pulsar (F1)',
+        title: 'Ayuda (F1)',
+        onclick: () => this.mostrarAyuda(),
+        text: '?',
+      }),
     ]);
 
     $('#hud-barra-superior').append(this.controles);
@@ -295,6 +303,72 @@ export class HUD {
     this.anotaciones?.actualizar(delta, enCuerpo && Boolean(cuerpo3D));
   }
 
+  /**
+   * Panel de ayuda con los comandos disponibles. Se construye a partir del
+   * mismo vocabulario que usa el parser, así que nunca puede quedar desfasado
+   * respecto a lo que la aplicación entiende de verdad.
+   */
+  mostrarAyuda(vocabulario = this._vocabulario) {
+    this._vocabulario = vocabulario ?? this._vocabulario;
+    if (this.panelAyuda) {
+      this.panelAyuda.hidden = false;
+      this.panelAyuda.querySelector('button')?.focus();
+      return;
+    }
+    if (!this._vocabulario) return;
+
+    const filas = Object.entries(this._vocabulario.intenciones ?? {}).map(([, datos]) =>
+      crear('li', { class: 'ayuda__fila' }, [
+        crear('span', { class: 'ayuda__ejemplo', text: `«${datos.ejemplo}»` }),
+        crear('span', { class: 'ayuda__descripcion', text: datos.descripcion }),
+      ]));
+
+    const cerrar = crear('button', {
+      class: 'controles__boton', type: 'button', text: 'Cerrar',
+      onclick: () => { this.panelAyuda.hidden = true; },
+    });
+
+    this.panelAyuda = crear('div', {
+      class: 'panel ayuda', role: 'dialog', 'aria-modal': 'false',
+      'aria-label': 'Comandos disponibles',
+      onkeydown: (e) => { if (e.key === 'Escape') this.panelAyuda.hidden = true; },
+    }, [
+      crear('header', { class: 'panel__cabecera' }, [
+        crear('h2', { class: 'panel__titulo', text: 'Qué puedes decir y pulsar' }),
+        cerrar,
+      ]),
+      crear('ul', { class: 'ayuda__lista' }, filas),
+      crear('p', { class: 'panel__nota', text: 'Con teclado: flechas para orbitar, + y − para acercar, Re Pág y Av Pág para cambiar de cuerpo, Espacio para pausar, O para las órbitas, M para silenciar y Esc para la vista general.' }),
+    ]);
+
+    document.body.append(this.panelAyuda);
+    cerrar.focus();
+  }
+
+  /** Propuesta de alternativas cuando no se entiende un comando de voz. */
+  mostrarSugerencias(texto, sugerencias) {
+    if (!this.avisoSugerencias) {
+      this.avisoSugerencias = crear('div', { class: 'panel sugerencias', role: 'status' });
+      document.body.append(this.avisoSugerencias);
+    }
+
+    this.avisoSugerencias.replaceChildren(
+      crear('p', { class: 'sugerencias__oido' }, [
+        crear('span', { class: 'panel__titulo', text: 'No he entendido' }),
+        crear('span', { class: 'sugerencias__texto', text: `«${texto}»` }),
+      ]),
+      crear('p', { class: 'panel__nota', text: 'Puedes probar con:' }),
+      crear('ul', { class: 'sugerencias__lista' },
+        sugerencias.map((s) => crear('li', { text: `«${s}»` }))),
+    );
+
+    this.avisoSugerencias.hidden = false;
+    clearTimeout(this._temporizadorSugerencias);
+    this._temporizadorSugerencias = setTimeout(() => {
+      this.avisoSugerencias.hidden = true;
+    }, 6000);
+  }
+
   /** Canal lento del bucle: 10 veces por segundo. */
   actualizarLento(fps, fechaSimulada) {
     this.barra.actualizarFps(fps);
@@ -312,7 +386,10 @@ export class HUD {
     ]) {
       parte?.destruir?.();
     }
+    clearTimeout(this._temporizadorSugerencias);
     this.controles?.remove();
+    this.panelAyuda?.remove();
+    this.avisoSugerencias?.remove();
     $('#hud').hidden = true;
   }
 }

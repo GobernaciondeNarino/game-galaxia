@@ -17,7 +17,7 @@ const TOLERANCIA_CLIC = 5;
 export class FallbackControls {
   constructor(gestor, sistema, {
     alSeleccionar, alPedirVistaGeneral, alPedirVecino,
-    alAlternarPausa, alAlternarOrbitas, alAlternarSilencio,
+    alAlternarPausa, alAlternarOrbitas, alAlternarSilencio, alPedirAyuda,
   } = {}) {
     this.gestor = gestor;
     this.sistema = sistema;
@@ -27,6 +27,7 @@ export class FallbackControls {
     this.alAlternarPausa = alAlternarPausa;
     this.alAlternarOrbitas = alAlternarOrbitas;
     this.alAlternarSilencio = alAlternarSilencio;
+    this.alPedirAyuda = alPedirAyuda;
 
     this.rayo = new THREE.Raycaster();
     // Sin esto, apuntar a Fobos (0,06 unidades) es prácticamente imposible.
@@ -114,22 +115,21 @@ export class FallbackControls {
     if (activo && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activo.tagName)) return;
     if (evento.metaKey || evento.ctrlKey || evento.altKey) return;
 
-    const controles = this.gestor.controles;
     const PASO_ANGULO = 0.09;
     let manejado = true;
 
     switch (evento.key) {
       case 'ArrowLeft':
-        evento.shiftKey ? controles.pan?.(30, 0) : this._orbitar(-PASO_ANGULO, 0);
+        evento.shiftKey ? this.desplazarPor(-0.05, 0) : this._orbitar(-PASO_ANGULO, 0);
         break;
       case 'ArrowRight':
-        evento.shiftKey ? controles.pan?.(-30, 0) : this._orbitar(PASO_ANGULO, 0);
+        evento.shiftKey ? this.desplazarPor(0.05, 0) : this._orbitar(PASO_ANGULO, 0);
         break;
       case 'ArrowUp':
-        evento.shiftKey ? controles.pan?.(0, 30) : this._orbitar(0, -PASO_ANGULO);
+        evento.shiftKey ? this.desplazarPor(0, 0.05) : this._orbitar(0, -PASO_ANGULO);
         break;
       case 'ArrowDown':
-        evento.shiftKey ? controles.pan?.(0, -30) : this._orbitar(0, PASO_ANGULO);
+        evento.shiftKey ? this.desplazarPor(0, -0.05) : this._orbitar(0, PASO_ANGULO);
         break;
       case '+':
       case '=':
@@ -159,11 +159,58 @@ export class FallbackControls {
       case 'M':
         this.alAlternarSilencio?.();
         break;
+      case 'F1':
+      case '?':
+        this.alPedirAyuda?.();
+        break;
       default:
         manejado = false;
     }
 
     if (manejado) evento.preventDefault();
+  }
+
+  /**
+   * Devuelve el cuerpo que hay en un punto de la pantalla, en coordenadas
+   * normalizadas de 0 a 1. Lo usa el control por gestos, que no tiene un evento
+   * de ratón del que sacar las coordenadas.
+   */
+  cuerpoEnPunto(xNormalizado, yNormalizado) {
+    this.puntero.x = xNormalizado * 2 - 1;
+    this.puntero.y = -(yNormalizado * 2 - 1);
+    return this._cuerpoBajoPuntero();
+  }
+
+  /** Orbita la cámara. Público: lo usan el teclado y los gestos. */
+  orbitarPor(deltaAzimut, deltaPolar) {
+    this._orbitar(deltaAzimut, deltaPolar);
+  }
+
+  /** Acerca o aleja la cámara por un factor. */
+  acercarPor(factor) {
+    this._acercar(factor);
+  }
+
+  /**
+   * Desplaza el punto de mira paralelamente al plano de la cámara.
+   * OrbitControls.pan() no forma parte de su API pública en todas las
+   * versiones, así que se calcula aquí con los ejes de la propia cámara.
+   */
+  desplazarPor(dx, dy) {
+    const camara = this.gestor.camara;
+    const controles = this.gestor.controles;
+    const distancia = camara.position.distanceTo(controles.target);
+
+    const derecha = new THREE.Vector3().setFromMatrixColumn(camara.matrix, 0);
+    const arriba = new THREE.Vector3().setFromMatrixColumn(camara.matrix, 1);
+
+    const desplazamiento = new THREE.Vector3()
+      .addScaledVector(derecha, -dx * distancia)
+      .addScaledVector(arriba, dy * distancia);
+
+    camara.position.add(desplazamiento);
+    controles.target.add(desplazamiento);
+    controles.update();
   }
 
   /** Orbita la cámara alrededor del objetivo actual de OrbitControls. */

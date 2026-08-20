@@ -4,9 +4,9 @@
  * Arranca la aplicación: diagnostica el entorno, carga el catálogo, construye
  * la escena tridimensional y pone en marcha el bucle de render.
  *
- * Fases 1 a 5 implementadas: escena tridimensional con órbitas keplerianas
+ * Fases 1 a 7 implementadas: escena tridimensional con órbitas keplerianas
  * reales, HUD en DOM con paneles persistentes, las dos vistas con transición
- * interrumpible, y narración por audio con subtítulos.
+ * interrumpible, narración con subtítulos, control por gestos y por voz.
  */
 
 import { App } from './core/App.js';
@@ -20,6 +20,10 @@ import { FallbackControls } from './input/FallbackControls.js';
 import { HUD } from './ui/HUD.js';
 import { Narrator } from './audio/Narrator.js';
 import { SFX } from './audio/SFX.js';
+import { HandTracking } from './input/HandTracking.js';
+import { GestureRecognizer } from './input/GestureRecognizer.js';
+import { CursorGestual } from './ui/CursorGestual.js';
+import { VoiceCommands } from './input/VoiceCommands.js';
 import { $, crear, anunciar } from './utils/dom.js';
 import { RAIZ, rutaApp } from './utils/rutas.js';
 import { depuracion, log, error } from './utils/debug.js';
@@ -201,6 +205,7 @@ async function arrancar() {
     alPedirVecino: vecino,
     alAlternarPausa: alternarPausa,
     alAlternarOrbitas: () => mostrarOrbitas(!App.preferencias.get('mostrarOrbitas')),
+    alPedirAyuda: () => hud.mostrarAyuda(),
     alAlternarSilencio: () => {
       const silenciada = !App.preferencias.get('narracionSilenciada');
       narrador?.silenciar(silenciada);
@@ -241,6 +246,224 @@ async function arrancar() {
     hud.subtitulos,
     resultados.backend?.extra ?? null,
   );
+
+  // ------------------------------------------------------- control por manos --
+  // Se construye siempre, pero no toca la cámara hasta que el usuario la
+  // enciende explícitamente. Es una capa que se suma a ratón y teclado, nunca
+  // un requisito.
+  const cursorGestual = new CursorGestual(document.body);
+  const reconocedor = new GestureRecognizer();
+
+  const manos = new HandTracking({
+    video: hud.entradas.video,
+    lienzoEsqueleto: hud.entradas.esqueleto,
+    alDetectar: (landmarks) => {
+      const estado = reconocedor.procesar(landmarks);
+      cursorGestual.actualizar(estado);
+      for (const accion of estado.acciones) ejecutarGesto(accion);
+    },
+  });
+
+  /** Traduce una acción del reconocedor en una operación sobre la escena. */
+  function ejecutarGesto(accion) {
+    switch (accion.tipo) {
+      case 'orbitar':
+        // El factor convierte fracción de imagen en radianes. La x va invertida
+        // porque la cámara refleja: mover la mano a la derecha debe girar la
+        // escena hacia la derecha.
+        controles.orbitarPor(-accion.dx * 6, accion.dy * 4);
+        break;
+
+      case 'zoom':
+        controles.acercarPor(1 + accion.delta * 2.5);
+        break;
+
+      case 'desplazar':
+        controles.desplazarPor(-accion.dx * 1.4, accion.dy * 1.4);
+        break;
+
+      case 'anclar':
+        // El puño detiene el viaje de cámara en curso y deja la vista quieta.
+        rig.enTransito = false;
+        break;
+
+      case 'seleccionar': {
+        // La x se invierte igual que en el cursor: el punto de la pantalla no
+        // es el de la imagen de la cámara.
+        const cuerpo = controles.cuerpoEnPunto(1 - accion.x, accion.y);
+        if (cuerpo) {
+          seleccionar(cuerpo.id, 'gesto');
+        } else {
+          sfx.reproducir('error');
+          anunciar('No hay ningún cuerpo bajo el cursor.');
+        }
+        break;
+      }
+
+      case 'vista-general':
+        vistaGeneral();
+        break;
+
+      case 'vecino':
+        vecino(accion.direccion);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  App.al('entrada:solicitar-camara', async () => {
+    if (manos.activa) {
+      manos.desactivar();
+      return;
+    }
+    hud.entradas.mostrarEstado('Pidiendo permiso de cámara…');
+    await manos.activar();
+  });
+
+  App.al('manos:cargando', ({ paso }) => {
+    hud.entradas.mostrarEstado(
+      paso === 'modelo'
+        ? 'Cargando el modelo de manos (7,6 MB)…'
+        : 'Esperando el permiso de la cámara…',
+    );
+  });
+
+  App.al('manos:activa', () => {
+    hud.entradas.mostrarEstado('');
+    hud.entradas.establecerCamara(true);
+    hud.barra.establecerIndicador('camara', 'activo', 'on');
+    anunciar('Cámara activada. El vídeo se procesa en tu navegador y no se envía a ningún servidor.');
+  });
+
+  App.al('manos:inactiva', () => {
+    hud.entradas.establecerCamara(false);
+    hud.barra.establecerIndicador('camara', 'inactivo', 'off');
+    cursorGestual.ocultar();
+    reconocedor.reiniciar();
+    anunciar('Cámara apagada.');
+  });
+
+  App.al('manos:error', ({ mensaje }) => {
+    hud.entradas.mostrarEstado(mensaje, 'error');
+    hud.entradas.establecerCamara(false);
+    hud.barra.establecerIndicador('camara', 'alerta', 'error');
+    anunciar(mensaje);
+  });
+
+  // -------------------------------------------------------- control por voz --
+  let voz = null;
+  try {
+    const vocabulario = await (await fetch(rutaApp('data/comandos-voz.json'))).json();
+    voz = new VoiceCommands(vocabulario, ejecutarIntencion);
+    // La ayuda se construye con el mismo vocabulario que entiende el parser,
+    // así que la lista de comandos nunca puede quedar desfasada.
+    hud.mostrarAyuda(vocabulario);
+    hud.panelAyuda.hidden = true;
+  } catch (err) {
+    error('No se pudo cargar el vocabulario de voz:', err);
+  }
+
+  /** Ejecuta una intención reconocida por voz. */
+  function ejecutarIntencion(intencion) {
+    const { intencion: tipo, cuerpo, cuerpoB } = intencion;
+
+    switch (tipo) {
+      case 'ir_a':
+      case 'hablame_de':
+        if (cuerpo) seleccionar(cuerpo, 'voz');
+        break;
+
+      case 'vista_general': vistaGeneral(); break;
+      case 'siguiente': vecino(1); break;
+      case 'anterior': vecino(-1); break;
+
+      case 'satelites_de': {
+        const datos = catalogo.cuerpos.find((c) => c.id === cuerpo);
+        const lunas = (datos?.satelites ?? [])
+          .map((id) => catalogo.cuerpos.find((c) => c.id === id)?.nombre)
+          .filter(Boolean);
+        anunciar(
+          lunas.length
+            ? `${datos.nombre} tiene ${lunas.length} satélites en ORBIS: ${lunas.join(', ')}.`
+            : `${datos?.nombre ?? 'Ese cuerpo'} no tiene satélites catalogados en ORBIS.`,
+        );
+        if (cuerpo) seleccionar(cuerpo, 'voz');
+        break;
+      }
+
+      case 'comparar':
+        // La comparación abre el primero y anuncia el segundo: el panel
+        // comparativo llega en la fase 8; hasta entonces, no se finge tenerlo.
+        if (cuerpo) seleccionar(cuerpo, 'voz');
+        anunciar(
+          cuerpoB
+            ? `Comparación con ${catalogo.cuerpos.find((c) => c.id === cuerpoB)?.nombre}: disponible próximamente.`
+            : 'No he entendido con qué comparar.',
+        );
+        break;
+
+      case 'pausar': if (!bucle.pausado) alternarPausa(); break;
+      case 'reanudar': if (bucle.pausado) alternarPausa(); break;
+      case 'acelerar': cambiarVelocidad(1); break;
+      case 'frenar': cambiarVelocidad(-1); break;
+      case 'mostrar_orbitas': mostrarOrbitas(true); break;
+      case 'ocultar_orbitas': mostrarOrbitas(false); break;
+
+      case 'modo_real':
+      case 'modo_didactico':
+        anunciar('El cambio de escala llega en la fase 8.');
+        break;
+
+      case 'repetir': narrador?.repetir(); break;
+      case 'silencio':
+        narrador?.silenciar(true);
+        hud.actualizarSilencio(true);
+        break;
+      case 'detener_narracion': narrador?.detener(); break;
+      case 'ayuda': hud.mostrarAyuda(); break;
+
+      default:
+        break;
+    }
+
+    sfx.reproducir('seleccion');
+  }
+
+  App.al('entrada:solicitar-microfono', async () => {
+    if (!voz) return;
+    if (voz.activo) {
+      voz.desactivar();
+      return;
+    }
+    // El aviso de privacidad se muestra ANTES de pedir el permiso, no después.
+    hud.entradas.mostrarEstado(voz.avisoPrivacidad);
+    await voz.activar();
+  });
+
+  App.al('voz:activa', ({ motor }) => {
+    hud.entradas.establecerMicrofono(true);
+    hud.barra.establecerIndicador('microfono', 'activo', motor === 'navegador' ? 'on' : 'servidor');
+    anunciar('Micrófono activado. Di «ayuda» para saber qué puedes pedir.');
+  });
+
+  App.al('voz:inactiva', () => {
+    hud.entradas.establecerMicrofono(false);
+    hud.barra.establecerIndicador('microfono', 'inactivo', 'off');
+    hud.entradas.mostrarEstado('');
+  });
+
+  App.al('voz:error', ({ mensaje }) => {
+    hud.entradas.mostrarEstado(mensaje, 'error');
+    hud.barra.establecerIndicador('microfono', 'alerta', 'error');
+    anunciar(mensaje);
+  });
+
+  App.al('voz:no-entendido', ({ texto, sugerencias }) => {
+    sfx.reproducir('error');
+    hud.mostrarSugerencias(texto, sugerencias);
+  });
 
   // ------------------------------------------------------------------ bucle --
   let usuarioInteractuando = false;
@@ -305,9 +528,10 @@ async function arrancar() {
   // -------------------------------------------------------------- exposición --
   Object.assign(App.subsistemas, {
     escena: gestor, sistema, efectos, rig, bucle, controles, hud, narrador, sfx,
+    manos, reconocedor, voz,
   });
   App.acciones = { seleccionar, vistaGeneral, vecino };
-  App.faseImplementada = 5;
+  App.faseImplementada = 7;
 
   sistema.establecerVisibilidadOrbitas(App.preferencias.get('mostrarOrbitas'));
   bucle.iniciar();
@@ -329,6 +553,9 @@ async function arrancar() {
   // colgado si el navegador conserva la página en la caché de retroceso.
   window.addEventListener('pagehide', () => {
     bucle.detener();
+    manos.destruir();
+    voz?.destruir();
+    cursorGestual.destruir();
     narrador.destruir();
     sfx.destruir();
     hud.destruir();

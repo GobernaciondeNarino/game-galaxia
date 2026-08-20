@@ -5,9 +5,6 @@ Referencia para quien usa la interfaz.
 > **Nada de esto es obligatorio.** ORBIS se maneja por completo con ratón y
 > teclado. Los gestos y la voz son una capa adicional que se activa
 > explícitamente y se puede apagar en cualquier momento.
->
-> **Estado:** los gestos llegan en la fase 6 y la voz en la fase 7. Este
-> documento fija ya el comportamiento acordado.
 
 ---
 
@@ -20,10 +17,15 @@ Referencia para quien usa la interfaz.
   transmite.
 - Mientras la cámara está activa se muestra un indicador visible y un botón de
   apagado siempre accesible.
-- El reconocimiento de voz usa por omisión el motor del propio navegador. Si no
-  está disponible (Firefox, Safari), ORBIS lo dice y ofrece la alternativa por
-  servidor, que **sí** envía fragmentos cortos de audio a transcribir. Nunca se
-  cambia de motor sin avisar.
+- El reconocimiento de voz usa el motor del propio navegador cuando existe
+  (Chrome, Edge). Conviene saber que **Chrome envía el audio a servidores de
+  Google** para transcribirlo: no es un procesamiento local.
+- Si el navegador no reconoce voz (Firefox, Safari), ORBIS lo dice y ofrece la
+  alternativa por servidor, que envía fragmentos cortos de audio a este
+  servidor y de ahí a ElevenLabs. **El audio no se guarda**: se transcribe y se
+  descarta.
+- En ambos casos, el aviso aparece **antes** de pedir el permiso del micrófono,
+  no después.
 
 ---
 
@@ -42,7 +44,7 @@ Siempre disponibles.
 | Pausar o reanudar el tiempo | Control de la barra superior | `Espacio` |
 | Mostrar u ocultar órbitas | Control de la barra superior | `O` |
 | Silenciar la narración | Control de volumen | `M` |
-| Ayuda | Botón `?` | `F1` o `?` |
+| Ayuda | Botón `?` de la barra | `F1` o `?` |
 
 ---
 
@@ -99,14 +101,30 @@ Idioma: español (`es-ES` y `es-CO`). Se activan con el botón del micrófono.
 
 ### Si no te entiende
 
-El reconocimiento falla a menudo con nombres como *Ganímedes*, *Encélado* o
-*Umbriel*. ORBIS normaliza la transcripción (minúsculas, sin tildes, sin signos)
-y compara por proximidad, de modo que «ganimedes», «ganímedez» o «ganimede»
-llegan al mismo sitio.
+El reconocimiento falla a menudo con nombres poco frecuentes. ORBIS normaliza la
+transcripción —minúsculas, sin tildes, sin signos, sin muletillas— y compara por
+distancia de Levenshtein con un umbral proporcional a la longitud de la palabra:
+en «Ío» un error de una letra lo cambia todo, en «Makemake» no.
+
+El vocabulario de `data/comandos-voz.json` incluye además los errores de
+transcripción que se dan de verdad. Todos estos funcionan:
+
+| Lo que se transcribe | Lo que entiende ORBIS |
+|---|---|
+| «ir a ganimedez» | Ganímedes |
+| «llévame a enselado» | Encélado |
+| «muéstrame yo» | Ío |
+| «llévame a make make» | Makemake |
+| «ir a caronde» | Caronte |
+| «llévame al planeta rojo» | Marte |
+| «Neptuno» (a secas) | ir a Neptuno |
+
+Ampliar esa lista con lo que la gente diga de verdad es la forma barata de
+mejorar el reconocimiento, y **no requiere tocar código**: basta con añadir
+alias al JSON.
 
 Cuando aun así no reconoce el comando, **no falla en silencio**: propone las
-tres alternativas más cercanas para que elijas con la voz, con un clic o con el
-teclado.
+tres alternativas más cercanas.
 
 ---
 

@@ -844,3 +844,141 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
   width: 64px;
   accent-color: var(--cian-brillante);
 }
+
+/* ==========================================================================
+   Cursor holográfico de los gestos
+   ========================================================================== */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  width: 44px;
+  height: 44px;
+  pointer-events: none;
+  will-change: transform;
+}
+.cursor__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cursor__pista { fill: none; stroke: rgba(79, 195, 247, 0.22); stroke-width: 2.5; }
+.cursor__aro {
+  fill: none;
+  stroke: var(--ambar-seleccion);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 90ms linear;
+}
+.cursor__punto {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--cian-brillante);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.9);
+}
+.cursor[data-gesto="puno"] .cursor__punto { background: var(--rojo-alerta); box-shadow: 0 0 10px rgba(255, 82, 82, 0.9); }
+.cursor[data-gesto="pellizco"] .cursor__punto,
+.cursor[data-gesto="pellizco-doble"] .cursor__punto { background: var(--ambar-seleccion); }
+.cursor__accion {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ambar-seleccion);
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(5, 11, 24, 0.95);
+}
+.cursor__gesto {
+  position: fixed;
+  left: 50%;
+  top: 96px;
+  transform: translateX(-50%);
+  z-index: 6;
+  padding: 3px 12px;
+  background: rgba(5, 11, 24, 0.72);
+  border: 1px solid var(--panel-borde);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cian-acento);
+  pointer-events: none;
+}
+
+/* Estado de la carga del detector de manos y testigo de cámara encendida */
+.entradas__estado {
+  font-size: 9px;
+  line-height: 1.45;
+  color: var(--cian-acento);
+}
+.entradas__estado[data-tipo="error"] { color: var(--rojo-alerta); }
+
+/* Testigo rojo mientras la cámara está encendida: nunca puede estar grabando
+   sin que se vea. */
+.entradas__testigo {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rojo-alerta);
+  box-shadow: 0 0 8px rgba(255, 82, 82, 0.9);
+  animation: orbis-testigo 1.6s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Ayuda y sugerencias de voz
+   ========================================================================== */
+.ayuda {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  width: min(560px, 92vw);
+  max-height: 76vh;
+  overflow-y: auto;
+  padding: var(--e-4);
+}
+.ayuda__lista { display: grid; gap: 3px; margin-top: var(--e-2); }
+.ayuda__fila {
+  display: grid;
+  grid-template-columns: minmax(0, 15em) 1fr;
+  gap: var(--e-3);
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.12);
+}
+.ayuda__ejemplo {
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-menor);
+  color: var(--cian-brillante);
+}
+.ayuda__descripcion { font-size: var(--t-menor); color: var(--texto-tenue); }
+
+.sugerencias {
+  position: fixed;
+  left: 50%;
+  bottom: 200px;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: min(420px, 88vw);
+  padding: var(--e-3);
+}
+.sugerencias__oido { display: grid; gap: 2px; }
+.sugerencias__texto { font-family: var(--fuente-cifras); font-size: var(--t-base); color: var(--texto); }
+.sugerencias__lista { display: grid; gap: 2px; margin-top: var(--e-1); }
+.sugerencias__lista li {
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-menor);
+  color: var(--cian-acento);
+}

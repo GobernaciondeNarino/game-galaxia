@@ -38,14 +38,24 @@ export class EstadoEntradas {
       crear('span', { text: 'Activar micrófono' }),
     ]);
 
+    // Se guardan las referencias: HandTracking necesita el <video> para
+    // alimentar al detector y el <canvas> para dibujar el esqueleto.
+    this.video = crear('video', {
+      class: 'entradas__video', muted: true, playsinline: true, 'aria-hidden': 'true',
+    });
+    this.esqueleto = crear('canvas', { class: 'entradas__esqueleto', 'aria-hidden': 'true' });
+
+    this.estadoCarga = crear('p', { class: 'entradas__estado', hidden: true, role: 'status' });
+
     this.vista = crear('div', { class: 'entradas__vista', hidden: true }, [
-      crear('video', { class: 'entradas__video', muted: true, playsinline: true, 'aria-hidden': 'true' }),
-      crear('canvas', { class: 'entradas__esqueleto', 'aria-hidden': 'true' }),
+      this.video, this.esqueleto,
+      crear('span', { class: 'entradas__testigo', 'aria-hidden': 'true' }),
     ]);
 
     this.panel = crear('section', { class: 'panel panel--entradas' }, [
       crear('h2', { class: 'panel__titulo', text: 'Entradas' }),
       this.vista,
+      this.estadoCarga,
       this.botonCamara,
       this.botonMicrofono,
       crear('p', { class: 'entradas__aviso' }, [
@@ -72,6 +82,13 @@ export class EstadoEntradas {
 
   mostrarComando(texto) {
     this.ultimoComando.textContent = texto || '—';
+  }
+
+  /** Mensaje de estado: carga del modelo, permiso denegado, error… */
+  mostrarEstado(texto, tipo = 'info') {
+    this.estadoCarga.hidden = !texto;
+    this.estadoCarga.textContent = texto ?? '';
+    this.estadoCarga.dataset.tipo = tipo;
   }
 
   destruir() {

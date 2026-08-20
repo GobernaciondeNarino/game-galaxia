@@ -9,8 +9,10 @@ paso de compilación, sin Node.js en producción y sin procesos en segundo plano
 > Sol, los ocho planetas, cinco planetas enanos, diecinueve satélites, anillos,
 > cinturones y entorno galáctico; catálogo cuyas cifras proceden de JPL
 > Horizons; HUD completa en DOM con sus dos vistas, transición interrumpible,
-> anotaciones ancladas a la superficie y arco de datos; y narración por audio
-> con subtítulos sincronizados. Quedan los gestos (fase 6) y la voz (fase 7).
+> anotaciones ancladas a la superficie y arco de datos; narración por audio con
+> subtítulos sincronizados; control por gestos con MediaPipe; y control por voz
+> con parser de intenciones tolerante a errores de transcripción. Queda la
+> fase 8: optimización y pruebas cruzadas de navegador.
 > Consulta el [plan de fases](#plan-de-fases).
 
 ---
@@ -85,7 +87,8 @@ cache/audio/        MP3 generados, con nombre por hash
 vendor/             Three.js y MediaPipe, versión fijada
 tools/              vendor.mjs · texturas.mjs · datos-jpl.mjs
                     construir-datos.mjs · contraste.mjs · csp-hash.mjs
-                    comprobar-secretos.sh
+                    comprobar-secretos.sh · pruebas-gestos.mjs
+                    pruebas-voz.mjs
 docs/               Despliegue, gestos y comandos, notas técnicas
 ```
 
@@ -130,6 +133,11 @@ interfaz lo muestra como `SIN DATOS`. Ver `docs/DATOS.md`.
 Kepler con sus seis elementos orbitales referidos a J2000. Si el reloj de la
 escena marca una fecha, los planetas están donde estaban ese día — no en una
 fase decorativa.
+
+**Lo que se puede probar sin navegador, se prueba.** El reconocedor de gestos y
+el parser de voz son módulos de lógica pura, sin DOM ni dispositivos, y tienen
+su banco de pruebas en `tools/`. Corren en cada *push* y ya han encontrado tres
+errores reales que en una prueba manual con webcam habrían pasado por buenos.
 
 **Accesibilidad comprobada, no supuesta.** `tools/contraste.mjs` calcula la
 relación de contraste WCAG de cada pareja texto/fondo de las fichas de diseño y
