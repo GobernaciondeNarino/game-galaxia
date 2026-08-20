@@ -44,6 +44,7 @@ API de Three.js (`SceneManager.js`, `CameraRig.js`); el resto, en español.
 bash tools/comprobar-secretos.sh           # credenciales en el cliente
 node tools/contraste.mjs                   # contraste WCAG 2.1 AA
 node tools/pruebas-gestos.mjs              # reconocedor de gestos
+node tools/pruebas-guino.mjs               # guiño frente a parpadeo
 node tools/pruebas-voz.mjs                 # parser de intenciones de voz
 node tools/csp-hash.mjs --verificar        # hash CSP del importmap al día
 find api config -name '*.php' -exec php -l {} \;

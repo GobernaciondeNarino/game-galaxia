@@ -22,6 +22,7 @@ import { Narrator } from './audio/Narrator.js';
 import { SFX } from './audio/SFX.js';
 import { HandTracking } from './input/HandTracking.js';
 import { GestureRecognizer } from './input/GestureRecognizer.js';
+import { ReconocedorGuino, ojosDesdeResultado } from './input/ReconocedorGuino.js';
 import { CursorGestual } from './ui/CursorGestual.js';
 import { VoiceCommands } from './input/VoiceCommands.js';
 import { $, crear, anunciar } from './utils/dom.js';
@@ -280,6 +281,7 @@ async function arrancar() {
   // un requisito.
   const cursorGestual = new CursorGestual(document.body);
   const reconocedor = new GestureRecognizer();
+  const guino = new ReconocedorGuino();
 
   const manos = new HandTracking({
     video: hud.entradas.video,
@@ -288,6 +290,12 @@ async function arrancar() {
       const estado = reconocedor.procesar(landmarks);
       cursorGestual.actualizar(estado);
       for (const accion of estado.acciones) ejecutarGesto(accion);
+    },
+    // Un guiño sostenido calla la narración, igual que el puño. Es la misma
+    // acción por otra vía: quien tiene las manos ocupadas cierra un ojo.
+    alMirar: (resultado) => {
+      const { disparo } = guino.procesar(ojosDesdeResultado(resultado), performance.now());
+      if (disparo) ejecutarGesto({ tipo: 'callar' });
     },
   });
 
@@ -316,6 +324,14 @@ async function arrancar() {
         vecino(accion.direccion);
         break;
 
+      case 'callar':
+        // Callar no es silenciar: corta lo que se está diciendo, pero la
+        // siguiente narración vuelve a sonar. Silenciar del todo es la M o
+        // decir «silencio».
+        narrador?.detener();
+        anunciar('Narración detenida.');
+        break;
+
       default:
         break;
     }
@@ -330,11 +346,17 @@ async function arrancar() {
     await manos.activar();
   });
 
+  App.al('rostro:no-disponible', ({ mensaje }) => {
+    hud.entradas.mostrarEstado(mensaje, 'aviso', 'camara');
+  });
+
   App.al('manos:cargando', ({ paso }) => {
     hud.entradas.mostrarEstado(
       paso === 'modelo'
         ? 'Cargando el modelo de manos (7,6 MB)…'
-        : 'Esperando el permiso de la cámara…',
+        : paso === 'rostro'
+          ? 'Cargando el modelo de rostro (3,8 MB)…'
+          : 'Esperando el permiso de la cámara…',
       'info', 'camara',
     );
   });

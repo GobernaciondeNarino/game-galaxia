@@ -23,13 +23,21 @@
  *   · pellizco con una mano, arrastrando  → rotar el elemento
  *   · pellizco con las dos manos          → acercar (separar) y alejar (juntar)
  *   · mano abierta de un extremo a otro   → pasar al elemento siguiente
+ *   · puño cerrado, sostenido             → callar la narración
  *
- * Hubo más gestos —apuntar para seleccionar, puño para anclar, palma sostenida
- * para volver a la vista general— y estorbaban: al abrir la mano, que es el
- * gesto de reposo natural, se disparaban acciones que nadie había pedido. Un
- * vocabulario corto que nunca se equivoca vale más que uno amplio que sí. Todo
- * lo que ya no se puede hacer con la mano se sigue pudiendo hacer con el ratón,
- * el teclado y la voz, que es donde vive el control fino.
+ * Hubo más gestos —apuntar para seleccionar, palma sostenida para volver a la
+ * vista general— y estorbaban: al abrir la mano, que es el gesto de reposo
+ * natural, se disparaban acciones que nadie había pedido. Un vocabulario corto
+ * que nunca se equivoca vale más que uno amplio que sí. Lo que ya no se puede
+ * hacer con la mano se sigue pudiendo hacer con el ratón, el teclado y la voz.
+ *
+ * EL PUÑO ES LA EXCEPCIÓN, y merece explicación porque contradice lo anterior.
+ * Se pidió expresamente para callar la voz, y se puede permitir donde no se
+ * podía la palma por tres razones: cerrar el puño es una postura deliberada y
+ * nadie la adopta sin querer, mientras que la mano abierta es la postura de
+ * reposo; callar una narración es inofensivo y se deshace repitiendo; y aun así
+ * exige mantenerlo, y solo dispara UNA vez —hay que abrir la mano antes de que
+ * vuelva a contar—, así que sostenerlo no repite la orden.
  */
 
 /** Índices de los puntos de referencia que usa ORBIS. */
@@ -69,6 +77,7 @@ export const AJUSTES = {
   umbralExtendido: 1.5,
   umbralDeslizamiento: 0.22, // fracción del ancho recorrida para contar un deslizamiento
   ventanaDeslizamiento: 450, // ms en los que debe completarse
+  sostenidoPuno: 700,        // ms de puño cerrado para callar la narración
 };
 
 const distancia = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, (a.z ?? 0) - (b.z ?? 0));
@@ -117,6 +126,8 @@ export class GestureRecognizer {
 
     this._separacionAnterior = null;
     this._historialDeslizamiento = [];
+    this._inicioPuno = 0;
+    this._punoYaDisparado = false;
   }
 
   /** Suaviza los puntos de una mano contra su estado anterior. */
@@ -173,6 +184,7 @@ export class GestureRecognizer {
     const acciones = [];
 
     if (!manos?.length) {
+      this._reiniciarPuno();
       this._separacionAnterior = null;
       this._historialDeslizamiento.length = 0;
       this.manosSuavizadas.length = 0;
@@ -197,6 +209,7 @@ export class GestureRecognizer {
       }
       this._separacionAnterior = separacion;
       this._historialDeslizamiento.length = 0;
+      this._reiniciarPuno();
 
       this.estado = {
         ...this.estado,
@@ -244,8 +257,28 @@ export class GestureRecognizer {
       this._historialDeslizamiento.length = 0;
     }
 
-    // El puño y el índice apuntando se siguen reconociendo —la interfaz los
-    // nombra para que se vea que la mano se está leyendo— pero no hacen nada.
+    // Puño sostenido: callar la narración. El aro de progreso avisa de lo que
+    // va a pasar y da tiempo a abrir la mano para abortarlo.
+    if (gesto === GESTO.PUNO) {
+      if (!this._inicioPuno) this._inicioPuno = ahora;
+
+      if (this._punoYaDisparado) {
+        // Ya se disparó con este puño: no se repite hasta abrir la mano.
+        progreso = 0;
+      } else if (ahora - this._inicioPuno >= this.ajustes.sostenidoPuno) {
+        acciones.push({ tipo: 'callar' });
+        this._punoYaDisparado = true;
+        progreso = 0;
+      } else {
+        progreso = (ahora - this._inicioPuno) / this.ajustes.sostenidoPuno;
+        accionSostenida = 'callar';
+      }
+    } else {
+      this._reiniciarPuno();
+    }
+
+    // El índice apuntando se sigue reconociendo —la interfaz lo nombra para que
+    // se vea que la mano se está leyendo— pero no hace nada.
 
     this.estado = {
       gesto, manos: suavizadas.length, cursor, arrastre,
@@ -291,7 +324,13 @@ export class GestureRecognizer {
     return { progreso, accion: direccion > 0 ? 'siguiente' : 'anterior' };
   }
 
+  _reiniciarPuno() {
+    this._inicioPuno = 0;
+    this._punoYaDisparado = false;
+  }
+
   reiniciar() {
+    this._reiniciarPuno();
     this.manosSuavizadas.length = 0;
     this._cursorAnterior = null;
     this._gestoAnterior = null;

@@ -53,6 +53,7 @@ export class HUD {
     this.perfil = new PerfilCuerpo($('#hud-panel-izquierdo'));
 
     const derecha = $('#hud-panel-derecho');
+    this.viewportDerecha = derecha;
     this.mapaOrbital = new MapaOrbital(derecha, {
       alElegirSatelite: (id) => acciones.seleccionar(id, 'mapa-orbital'),
     });
@@ -93,7 +94,9 @@ export class HUD {
     this._montarControlesEscena();
     this._suscribir();
 
-    // Arranque en VISTA DE SISTEMA con el Sol en el perfil.
+    // Arranque en VISTA DE SISTEMA con el Sol en el perfil y el módulo Sistema,
+    // que no esconde ningún panel.
+    document.body.dataset.modulo = 'sistema';
     this.mostrarCuerpo(this.porId.get('sol'));
     this.establecerVista('sistema');
 
@@ -226,10 +229,32 @@ export class HUD {
     this.botonSilencio.setAttribute('aria-pressed', String(silenciada));
   }
 
+  /**
+   * Cambia de módulo. Los tres que existen filtran la columna derecha:
+   *
+   *   · SISTEMA   — todos los paneles. Es el estado inicial.
+   *   · SENSORES  — lo que se mide del cuerpo: atmósfera, geología, magnetosfera.
+   *   · ANALÍTICA — lo que se deduce: mapa orbital y datos relativos a la Tierra.
+   *
+   * Quien esconde y muestra es el CSS, a partir de `body[data-modulo]` y del
+   * `data-modulos` que cada panel declara. Aquí no se destruye ni se reconstruye
+   * nada, así que volver a SISTEMA no cuesta un repintado.
+   *
+   * Antes estas tres pestañas se marcaban como activas y al pulsarlas solo
+   * emitían un evento que no escuchaba nadie: no ocurría absolutamente nada.
+   */
   _cambiarModulo(id) {
-    // Los módulos no implementados están desactivados en la propia barra, así
-    // que aquí solo llegan los que existen.
-    anunciar(`Módulo ${id} seleccionado.`);
+    document.body.dataset.modulo = id;
+
+    const visibles = this.viewportDerecha.querySelectorAll(
+      '.panel--derecha:not([hidden])',
+    ).length;
+    anunciar(
+      id === 'sistema'
+        ? 'Módulo Sistema: se muestran todos los paneles.'
+        : `Módulo ${id}: ${visibles} panel${visibles === 1 ? '' : 'es'} a la vista.`,
+    );
+
     App.emitir('hud:modulo', { id });
   }
 

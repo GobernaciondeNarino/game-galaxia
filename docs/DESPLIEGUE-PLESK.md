@@ -59,8 +59,13 @@ Plesk → *Dominios* → **Git** → *Añadir repositorio*:
 - Ruta de despliegue: `httpdocs`
 - Modo: *Despliegue automático*
 
-`vendor/` y `assets/fonts/` están versionados, así que llegan con el repositorio.
-`assets/models/hand_landmarker.task` **no** lo está (7,5 MB): súbelo por FTP.
+`vendor/`, `assets/fonts/` y `assets/models/` están versionados, así que llegan
+con el repositorio: los dos modelos de MediaPipe —`hand_landmarker.task` (7,8 MB)
+y `face_landmarker.task` (3,8 MB)— incluidos. No hay que subir nada por FTP.
+
+> Este apartado decía lo contrario —que el modelo de manos no estaba en git y
+> había que subirlo aparte— y era falso: sí lo está, y lo estaba ya. Seguir esa
+> instrucción no rompía nada, pero hacía perder el tiempo.
 
 ### Opción B — FTP / Administrador de archivos
 
@@ -229,7 +234,8 @@ En este orden:
 | `cache_audio: escritura denegada` | Propietario o permisos incorrectos | `chmod 775 cache/audio` con el propietario correcto |
 | El navegador bloquea el importmap (`Refused to execute inline script`) | El hash de la CSP no coincide con `index.html` | `node tools/csp-hash.mjs` y vuelve a subir `.htaccess` |
 | La cámara no arranca | Sin HTTPS, o falta `Permissions-Policy` | Activa el certificado; comprueba que `.htaccess` llegó |
-| El modelo de manos da 404 | `hand_landmarker.task` no subido (no está en git) | `node tools/vendor.mjs mediapipe` y súbelo por FTP |
+| Un modelo da 404 | `hand_landmarker.task` o `face_landmarker.task` no llegaron al servidor | `node tools/vendor.mjs mediapipe` y comprueba que `assets/models/` se desplegó entero |
+| El guiño no funciona pero las manos sí | falta `face_landmarker.task`; se avisa en el panel de entradas | mismo remedio; entretanto, el puño y la voz siguen deteniendo la narración |
 | Error 500 en `api/*.php` | Versión de PHP o extensión ausente | Mira el registro de errores del dominio en Plesk |
 
 ### Registros

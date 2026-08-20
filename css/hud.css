@@ -498,6 +498,17 @@
 .mapa__satelite:hover, .mapa__satelite:focus-visible { fill: var(--ambar-seleccion); r: 5; }
 
 /* ==========================================================================
+   Pestañas de módulo: filtran la columna derecha
+   SISTEMA no esconde nada —es el estado inicial y el que lo devuelve todo—.
+   Los otros dos ocultan los paneles que no declaran pertenecer al módulo
+   elegido. `data-modulos` lo pone cada panel al construirse, en PanelesDerecha.
+   ========================================================================== */
+body[data-modulo="sensores"]  .panel--derecha:not([data-modulos~="sensores"]),
+body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]) {
+  display: none;
+}
+
+/* ==========================================================================
    Panel galáctico (viewport central de la VISTA DE SISTEMA)
    ========================================================================== */
 .galaxia {
@@ -954,6 +965,9 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
   color: var(--cian-acento);
 }
 .entradas__estado[data-tipo="error"] { color: var(--rojo-alerta); }
+/* Aviso: algo opcional no ha salido —el modelo de rostro, por ejemplo— pero lo
+   principal sigue funcionando. No es un error y no debe leerse como tal. */
+.entradas__estado[data-tipo="aviso"] { color: var(--ambar-seleccion); }
 
 /* Testigo rojo mientras la cámara está encendida: nunca puede estar grabando
    sin que se vea. */

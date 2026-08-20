@@ -5,6 +5,13 @@
  * Los cinco comparten una regla: si el catálogo no trae el dato, el panel se
  * atenúa y muestra SIN DATOS. Si lo que se dibuja es una forma ornamental y no
  * una medida, lleva la marca SIMULACIÓN a la vista, no escondida en un tooltip.
+ *
+ * Cada panel declara además a qué pestaña de módulo pertenece:
+ *
+ *   · SENSORES  — lo que se mide del cuerpo: atmósfera, geología, magnetosfera.
+ *   · ANALÍTICA — lo que se deduce o se compara: mapa orbital y datos relativos
+ *                 a la Tierra.
+ *   · SISTEMA   — todos. Es el estado inicial y no esconde nada.
  */
 
 import { crear } from '../../utils/dom.js';
@@ -13,10 +20,19 @@ import {
   barrasComposicion, trazaSismica, ondaMagnetica, dial, barrasAsignacion, sinDatos, svg,
 } from '../graficos.js';
 
-/** Crea la carcasa común de un panel de la columna. */
-function carcasa(titulo, { simulacion = false, cuerpo = [] } = {}) {
+/**
+ * Crea la carcasa común de un panel de la columna.
+ *
+ * `modulos` declara a qué pestañas de la barra superior pertenece el panel. Es
+ * un atributo del DOM y no una clase porque quien filtra es el CSS, a partir de
+ * `body[data-modulo]`: cambiar de módulo no toca JavaScript ni reconstruye nada.
+ */
+function carcasa(titulo, { simulacion = false, cuerpo = [], modulos = [] } = {}) {
   const contenido = crear('div', { class: 'panel__contenido' }, cuerpo);
-  const panel = crear('section', { class: 'panel panel--derecha' }, [
+  const panel = crear('section', {
+    class: 'panel panel--derecha',
+    dataset: modulos.length ? { modulos: modulos.join(' ') } : {},
+  }, [
     crear('header', { class: 'panel__cabecera' }, [
       crear('h2', { class: 'panel__titulo', text: titulo }),
       simulacion ? crear('span', { class: 'marca-simulacion', text: 'SIMULACIÓN' }) : null,
@@ -43,7 +59,7 @@ function reemplazar(contenedor, ...nodos) {
 export class MapaOrbital {
   constructor(contenedor, { alElegirSatelite } = {}) {
     this.alElegirSatelite = alElegirSatelite;
-    const { panel, contenido } = carcasa('Mapa orbital y sistema lunar');
+    const { panel, contenido } = carcasa('Mapa orbital y sistema lunar', { modulos: ['analitica'] });
     this.panel = panel;
     this.contenido = contenido;
     contenedor.append(panel);
@@ -135,7 +151,7 @@ export class MapaOrbital {
 /** COMPOSICIÓN ATMOSFÉRICA. Datos reales; escala logarítmica para los trazas. */
 export class ComposicionAtmosferica {
   constructor(contenedor) {
-    const { panel, contenido } = carcasa('Composición atmosférica');
+    const { panel, contenido } = carcasa('Composición atmosférica', { modulos: ['sensores'] });
     this.panel = panel;
     this.contenido = contenido;
     contenedor.append(panel);
@@ -175,7 +191,7 @@ export class ComposicionAtmosferica {
  */
 export class ActividadGeologica {
   constructor(contenedor) {
-    const { panel, contenido } = carcasa('Actividad geológica', { simulacion: true });
+    const { panel, contenido } = carcasa('Actividad geológica', { simulacion: true, modulos: ['sensores'] });
     this.panel = panel;
     this.contenido = contenido;
     contenedor.append(panel);
@@ -222,7 +238,7 @@ export class ActividadGeologica {
  */
 export class DensidadMagnetosferica {
   constructor(contenedor) {
-    const { panel, contenido } = carcasa('Densidad magnetosférica', { simulacion: true });
+    const { panel, contenido } = carcasa('Densidad magnetosférica', { simulacion: true, modulos: ['sensores'] });
     this.panel = panel;
     this.contenido = contenido;
     contenedor.append(panel);
@@ -267,7 +283,7 @@ export class DensidadMagnetosferica {
  */
 export class DatosAdicionales {
   constructor(contenedor) {
-    const { panel, contenido } = carcasa('Datos adicionales');
+    const { panel, contenido } = carcasa('Datos adicionales', { modulos: ['analitica'] });
     this.panel = panel;
     this.contenido = contenido;
     contenedor.append(panel);

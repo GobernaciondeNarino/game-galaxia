@@ -1,5 +1,12 @@
 /**
- * HandTracking — detección de manos con MediaPipe.
+ * HandTracking — detección de manos y de guiños con MediaPipe.
+ *
+ * Del rostro solo interesa UNA cosa: distinguir un guiño de un parpadeo, para
+ * poder callar la narración cerrando un ojo. No se mide nada más, no se guarda
+ * nada y el detector comparte el temporizador y el vídeo de las manos en lugar
+ * de abrir los suyos: dos inferencias sobre la misma imagen valen menos que dos
+ * cadenas de captura en paralelo. Corre a la mitad de ritmo que las manos, que
+ * es de sobra para un gesto que hay que mantener casi medio segundo.
  *
  * TRES REGLAS QUE MARCAN EL DISEÑO DE ESTE MÓDULO:
  *
@@ -14,6 +21,9 @@
  *    entre 8 y 25 ms; meterlo en el bucle de dibujo tiraría los fotogramas a la
  *    mitad. Corre en su propio temporizador, a 30 Hz como máximo, y baja a 15
  *    si la escena no llega a 40 fps.
+ *
+ * El rostro es opcional en el sentido fuerte: si su modelo no llega o no carga,
+ * se avisa una vez y las manos siguen funcionando igual. Nunca al revés.
  */
 
 import { App } from '../core/App.js';
@@ -25,19 +35,22 @@ const HZ_DEGRADADO = 15;
 const FPS_PARA_DEGRADAR = 40;
 
 export class HandTracking {
-  constructor({ video, lienzoEsqueleto, alDetectar } = {}) {
+  constructor({ video, lienzoEsqueleto, alDetectar, alMirar } = {}) {
     this.video = video;
     this.lienzo = lienzoEsqueleto;
     this.alDetectar = alDetectar;
+    this.alMirar = alMirar;
 
     this.activa = false;
     this.cargando = false;
     this.detector = null;
+    this.detectorRostro = null;
     this.flujo = null;
     this.hz = HZ_MAXIMO;
 
     this._temporizador = null;
     this._ultimaMarca = -1;
+    this._turno = 0;
   }
 
   get soportado() {
@@ -119,6 +132,9 @@ export class HandTracking {
       return false;
     }
 
+    // El rostro va después y aparte: si falla, las manos siguen.
+    if (this.alMirar) await this._cargarRostro();
+
     this.cargando = false;
     this.activa = true;
     App.preferencias.set('camaraActiva', true);
@@ -129,13 +145,50 @@ export class HandTracking {
     return true;
   }
 
-  /** Apaga la cámara y libera el detector. */
+  /**
+   * Carga el detector de rostro. Es un extra, no un requisito: cualquier fallo
+   * se avisa y se sigue, porque perder el guiño es perder un atajo y perder las
+   * manos sería perder el control por gestos entero.
+   */
+  async _cargarRostro() {
+    App.emitir('manos:cargando', { paso: 'rostro' });
+    try {
+      const { FilesetResolver, FaceLandmarker } = await import('@mediapipe/tasks-vision');
+      const conjunto = await FilesetResolver.forVisionTasks(rutaApp('vendor/mediapipe/wasm'));
+
+      this.detectorRostro = await FaceLandmarker.createFromOptions(conjunto, {
+        baseOptions: {
+          modelAssetPath: rutaApp('assets/models/face_landmarker.task'),
+          delegate: 'GPU',
+        },
+        runningMode: 'VIDEO',
+        numFaces: 1,
+        // Lo único que se pide de verdad: sin las formas no hay forma de saber
+        // cuánto está cerrado cada ojo, y sin eso no se distingue un guiño de
+        // un parpadeo.
+        outputFaceBlendshapes: true,
+        outputFacialTransformationMatrixes: false,
+      });
+      log('Detección de guiños activa.');
+    } catch (err) {
+      aviso('No se pudo cargar el detector de rostro; el guiño queda desactivado.', err);
+      this.detectorRostro = null;
+      App.emitir('rostro:no-disponible', {
+        mensaje: 'El guiño no está disponible. El puño y la voz siguen deteniendo la narración.',
+      });
+    }
+  }
+
+  /** Apaga la cámara y libera los detectores. */
   desactivar() {
     if (this._temporizador) clearTimeout(this._temporizador);
     this._temporizador = null;
 
     this.detector?.close?.();
     this.detector = null;
+
+    this.detectorRostro?.close?.();
+    this.detectorRostro = null;
 
     this._soltarCamara();
     this._limpiarEsqueleto();
@@ -190,6 +243,19 @@ export class HandTracking {
     const manos = resultado?.landmarks ?? [];
     this._dibujarEsqueleto(manos);
     this.alDetectar?.(manos);
+
+    // El rostro, una de cada dos veces. A 30 Hz eso son 15 lecturas por segundo
+    // y el guiño hay que mantenerlo 450 ms: sobran de largo. Cada detector
+    // lleva su propia línea de tiempo, así que su marca sigue creciendo aunque
+    // se salte turnos, que es lo que MediaPipe exige.
+    this._turno = (this._turno + 1) % 2;
+    if (this.detectorRostro && this._turno === 0) {
+      try {
+        this.alMirar?.(this.detectorRostro.detectForVideo(this.video, performance.now()));
+      } catch (err) {
+        aviso('Fallo en una inferencia de rostro; se continúa.', err);
+      }
+    }
 
     this._programar();
   }

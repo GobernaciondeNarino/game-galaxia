@@ -11,13 +11,22 @@
 import { crear, $ } from '../../utils/dom.js';
 import { App } from '../../core/App.js';
 
-/** Pestañas de módulo del pliego. Las no implementadas se declaran como tales. */
+/**
+ * Pestañas de módulo del pliego. Las tres primeras filtran la columna derecha;
+ * las dos últimas no existen y se declaran como tales, desactivadas y con el
+ * motivo en el título. Una pestaña que se puede pulsar y no hace nada es peor
+ * que una pestaña apagada que explica por qué.
+ *
+ * La nota decía «llega en la fase 7» y «llega en la fase 8», y ambas fases ya
+ * están cerradas sin que estos dos módulos entraran en el alcance: la promesa
+ * había caducado y seguía en pantalla.
+ */
 const MODULOS = [
-  { id: 'sistema', etiqueta: 'Sistema', activo: true },
-  { id: 'sensores', etiqueta: 'Sensores', activo: true },
-  { id: 'analitica', etiqueta: 'Analítica', activo: true },
-  { id: 'asistente', etiqueta: 'Asistente', activo: false, nota: 'Llega en la fase 7' },
-  { id: 'tecnologia', etiqueta: 'Tecnología', activo: false, nota: 'Llega en la fase 8' },
+  { id: 'sistema', etiqueta: 'Sistema', activo: true, nota: 'todos los paneles' },
+  { id: 'sensores', etiqueta: 'Sensores', activo: true, nota: 'atmósfera, geología y magnetosfera' },
+  { id: 'analitica', etiqueta: 'Analítica', activo: true, nota: 'mapa orbital y datos comparados' },
+  { id: 'asistente', etiqueta: 'Asistente', activo: false, nota: 'no implementado' },
+  { id: 'tecnologia', etiqueta: 'Tecnología', activo: false, nota: 'no implementado' },
 ];
 
 const INDICADORES = [
@@ -44,7 +53,7 @@ export class BarraSuperior {
           dataset: { modulo: m.id },
           'aria-pressed': m.id === 'sistema' ? 'true' : 'false',
           disabled: !m.activo,
-          title: m.activo ? `Módulo ${m.etiqueta}` : `${m.etiqueta} — ${m.nota}`,
+          title: `${m.etiqueta} — ${m.nota}`,
           onclick: () => this._seleccionarModulo(m.id),
           text: m.etiqueta,
         })));

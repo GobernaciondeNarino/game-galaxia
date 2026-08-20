@@ -227,9 +227,25 @@
       "necesitaCuerpo": false,
       "patrones": [
         "detener narracion",
+        "detener la narracion",
+        "deten la narracion",
         "para de hablar",
         "deja de hablar",
-        "basta"
+        "no hables",
+        "no sigas hablando",
+        "detente",
+        "deten",
+        "detener",
+        "para ya",
+        "parate",
+        "alto",
+        "basta",
+        "ya basta",
+        "suficiente",
+        "ya esta bien",
+        "stop",
+        "no sigas",
+        "parar"
       ],
       "ejemplo": "detener narración"
     },

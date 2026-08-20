@@ -22,8 +22,10 @@ Medido con el inspector de red, con la caché vacía.
 **Lo que NO se descarga al abrir:**
 
 - las texturas de 2048 px (≈ 8 MB): solo la del cuerpo que se enfoca;
-- el modelo de manos (7,6 MB) y el WASM de MediaPipe (22 MB): solo si se
-  enciende la cámara;
+- los modelos de manos (7,8 MB) y de rostro (3,8 MB) y el WASM de MediaPipe
+  (22 MB): solo si se enciende la cámara. El de rostro se carga después del de
+  manos y solo sirve para distinguir un guiño de un parpadeo; si falla, se avisa
+  y el control por manos sigue funcionando igual;
 - el audio de las narraciones: solo el del cuerpo activo y sus dos vecinos.
 
 Sin el nivel de detalle de las texturas, el arranque descargaría **8 MB en

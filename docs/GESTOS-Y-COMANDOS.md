@@ -14,7 +14,13 @@ Referencia para quien usa la interfaz.
   un botón cada vez.
 - El vídeo de la cámara **se procesa íntegramente dentro del navegador** y
   **no se envía a ningún servidor**. Ni se graba, ni se almacena, ni se
-  transmite.
+  transmite. Se puede comprobar en la pestaña Red del navegador: con la cámara
+  encendida no sale ni una petición con imágenes.
+- Con la cámara encendida se miran **las manos y la cara**. De la cara se lee
+  una sola cosa: cuánto está cerrado cada ojo, para distinguir un guiño de un
+  parpadeo. No se identifica a nadie, no se estima edad, sexo ni estado de
+  ánimo, no se guarda ningún rasgo y nada de eso sale del navegador. Los dos
+  modelos —manos y rostro— se sirven desde este mismo servidor, no desde Google.
 - Mientras la cámara está activa se muestra un indicador visible y un botón de
   apagado siempre accesible.
 - El reconocimiento de voz usa el motor del propio navegador cuando existe
@@ -53,7 +59,7 @@ Siempre disponibles.
 
 Requieren cámara. Se activan con el botón de la esquina inferior derecha.
 
-Son tres gestos y cuatro acciones. No hay más, a propósito.
+Son cuatro gestos y cinco acciones. No hay más, a propósito.
 
 | Gesto | Acción |
 |---|---|
@@ -61,18 +67,55 @@ Son tres gestos y cuatro acciones. No hay más, a propósito.
 | Pellizco con las dos manos, separando | Acercar |
 | Pellizco con las dos manos, juntando | Alejar |
 | Mano abierta, barriendo de un extremo a otro | Cuerpo siguiente o anterior |
+| Puño cerrado, mantenido 0,7 s | Detener la narración |
+| Un ojo cerrado, mantenido 0,45 s | Detener la narración |
 
-**Por qué tan pocos.** Hubo más: apuntar sostenido para seleccionar, puño para
-anclar la vista y palma abierta para volver a la vista general. Se retiraron
-porque se disparaban solos. La mano abierta es la postura de reposo —es lo que
-hace cualquiera al bajar el brazo o al dudar—, así que la palma sostenida abría
-la interfaz galáctica una y otra vez en mitad de la interacción. Un vocabulario
-corto que nunca se equivoca vale más que uno amplio que sí.
+**Por qué tan pocos.** Hubo más: apuntar sostenido para seleccionar y palma
+abierta para volver a la vista general. Se retiraron porque se disparaban solos.
+La mano abierta es la postura de reposo —es lo que hace cualquiera al bajar el
+brazo o al dudar—, así que la palma sostenida abría la interfaz galáctica una y
+otra vez en mitad de la interacción. Un vocabulario corto que nunca se equivoca
+vale más que uno amplio que sí.
 
 Seleccionar un cuerpo concreto, volver a la vista general y todo lo demás siguen
 estando en el ratón, el teclado y la voz, que es donde vive el control fino. El
-puño y el índice apuntando se siguen reconociendo y se nombran en pantalla —para
-que se vea que la cámara sigue leyendo la mano— pero no hacen nada.
+índice apuntando se sigue reconociendo y se nombra en pantalla —para que se vea
+que la cámara sigue leyendo la mano— pero no hace nada.
+
+**Por qué el puño sí.** Contradice lo anterior y merece explicación. Cerrar el
+puño es una postura deliberada: nadie la adopta sin querer, al contrario que la
+mano abierta. Callar una voz es inofensivo y se deshace pidiendo que repita. Y
+aun así hay que mantenerlo, con el aro de progreso avisando, y dispara una sola
+vez: hay que abrir la mano antes de que vuelva a contar, así que sostener el
+puño no manda callar treinta veces por segundo.
+
+### El guiño
+
+Cerrar un ojo y mantenerlo detiene la narración, lo mismo que el puño. Está
+pensado para cuando se tienen las manos ocupadas.
+
+**El problema es que parpadeamos**, unas quince veces por minuto y sin querer.
+Si «un ojo cerrado» bastara, la voz se cortaría sola cada cuatro segundos y
+nadie entendería por qué. Por eso hacen falta tres condiciones a la vez:
+
+1. **Asimetría.** Un parpadeo cierra los dos ojos; se exige que uno esté
+   claramente cerrado y el otro claramente abierto. Esta es la condición que
+   separa el guiño del parpadeo.
+2. **Distancia.** La diferencia entre ambos ojos debe ser grande, para descartar
+   los parpadeos que el modelo captura a medias.
+3. **Duración.** Un parpadeo dura entre 100 y 150 ms; el umbral está en 450.
+
+Y la misma regla del puño: un guiño dispara una vez, y hay que abrir el ojo
+antes de que vuelva a contar.
+
+El guiño necesita un segundo modelo de MediaPipe (`face_landmarker.task`,
+3,8 MB), que se descarga al encender la cámara, después del de manos. Si no
+llega, se avisa en el panel de entradas y todo lo demás sigue funcionando: el
+guiño es un atajo, no un requisito. Del rostro no se mide ni se guarda nada
+más que cuánto está cerrado cada ojo.
+
+`node tools/pruebas-guino.mjs` comprueba, entre otras cosas, que veinte
+parpadeos seguidos no disparan nada.
 
 **Cómo colocarse:** a entre 50 cm y 1,5 m de la cámara, con la mano dentro del
 encuadre y luz suficiente sobre la palma. El recuadro de la esquina inferior
@@ -114,7 +157,19 @@ y navegar hasta él lleva su tiempo. Es incómodo a propósito: así es el Siste
 Solar de verdad. Los cinturones se ocultan en este modo.
 
 ### Audio
-- `repetir` · `silencio` · `detener narración`
+- `repetir` · `silencio` · `cállate`
+- Para callar la voz que está hablando: `detener narración`, `detén`, `detente`,
+  `detener`, `parar`, `para ya`, `alto`, `stop`, `basta`, `ya basta`,
+  `suficiente`, `no sigas`, `no hables`, `para de hablar`, `deja de hablar`.
+
+**`silencio` y `detente` no son lo mismo.** `silencio` apaga la narración hasta
+que se vuelva a activar; `detente` corta lo que se está diciendo ahora, pero la
+siguiente narración vuelve a sonar. El puño y el guiño hacen lo segundo.
+
+Las órdenes secas conviven con las de tiempo sin pisarse: el parser prueba los
+patrones de más largo a más corto, así que `detener el tiempo` sigue pausando la
+simulación aunque `detener` exista por su cuenta. `para` a secas **no** vale,
+justamente porque está dentro de «llévame **para** Marte».
 
 ### Ayuda
 - `ayuda` · `qué puedo decir`

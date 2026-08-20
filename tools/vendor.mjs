@@ -102,10 +102,17 @@ async function vendorMediapipe() {
   ]) {
     await bajar(`${base}/${f}`, join(RAIZ, 'vendor/mediapipe', f));
   }
-  // Modelo de detección de manos, alojado localmente (nunca desde el CDN de Google en producción).
+  // Modelos, alojados localmente (nunca desde el CDN de Google en producción).
   await bajar(
     'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
     join(RAIZ, 'assets/models/hand_landmarker.task'),
+  );
+  // El de rostro solo se usa para una cosa: distinguir un guiño de un parpadeo,
+  // y para eso hacen falta sus «blendshapes». Se descarga cuando se enciende la
+  // cámara, no al abrir la página.
+  await bajar(
+    'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+    join(RAIZ, 'assets/models/face_landmarker.task'),
   );
 }
 

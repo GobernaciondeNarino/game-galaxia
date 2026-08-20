@@ -109,7 +109,7 @@ console.log('\n▸ Los gestos retirados no disparan nada');
 {
   // Esta es la prueba del problema que motivó recortar el vocabulario: abrir la
   // mano o dejarla quieta apuntando abría paneles que nadie había pedido.
-  for (const [nombre, dedos] of [['apuntar', SOLO_INDICE], ['puño', NINGUNO], ['mano abierta quieta', TODOS]]) {
+  for (const [nombre, dedos] of [['apuntar', SOLO_INDICE], ['mano abierta quieta', TODOS]]) {
     const r = new GestureRecognizer();
     let t = 0;
     const acciones = [];
@@ -118,6 +118,52 @@ console.log('\n▸ Los gestos retirados no disparan nada');
     }
     comprobar(`${nombre} sostenido no produce acciones`, acciones.length, 0);
   }
+}
+
+console.log('\n▸ Puño sostenido: calla la narración');
+{
+  const r = new GestureRecognizer();
+  let t = 0;
+  const acciones = [];
+  const progresos = [];
+  for (let i = 0; i < 90; i++) {                       // ~3 s de puño cerrado
+    const res = r.procesar([mano({ dedos: NINGUNO })], (t += 33));
+    progresos.push(res.progreso);
+    acciones.push(...res.acciones);
+  }
+  // Lo importante no es que dispare, sino que dispare UNA vez: sin el cerrojo,
+  // mantener el puño mandaría callar treinta veces por segundo.
+  comprobar('dispara exactamente una vez', acciones.filter((a) => a.tipo === 'callar').length, 1);
+  comprobar('no produce ninguna otra acción', acciones.length, 1);
+  comprobar('el aro avisa antes de disparar', progresos.some((v) => v > 0.3 && v < 1), true);
+}
+
+console.log('\n▸ Un puño corto no basta');
+{
+  const r = new GestureRecognizer();
+  let t = 0;
+  const acciones = [];
+  for (let i = 0; i < 12; i++) {                       // ~0,4 s, por debajo del umbral
+    acciones.push(...r.procesar([mano({ dedos: NINGUNO })], (t += 33)).acciones);
+  }
+  comprobar('no calla', acciones.length, 0);
+}
+
+console.log('\n▸ Hay que abrir la mano para volver a callar');
+{
+  const r = new GestureRecognizer();
+  let t = 0;
+  const cerrar = (n) => {
+    const a = [];
+    for (let i = 0; i < n; i++) a.push(...r.procesar([mano({ dedos: NINGUNO })], (t += 33)).acciones);
+    return a.filter((x) => x.tipo === 'callar').length;
+  };
+  const abrir = (n) => { for (let i = 0; i < n; i++) r.procesar([mano({ dedos: TODOS })], (t += 33)); };
+
+  comprobar('primer puño calla', cerrar(60), 1);
+  comprobar('seguir cerrado no repite', cerrar(60), 0);
+  abrir(10);
+  comprobar('tras abrir, vuelve a contar', cerrar(60), 1);
 }
 
 console.log('\n▸ Zoom con dos manos en pellizco');

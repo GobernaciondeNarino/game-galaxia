@@ -25,12 +25,13 @@ const ETIQUETAS = {
   // Se reconocen, pero no hacen nada: nombrarlos evita que parezca que la
   // cámara ha dejado de ver la mano.
   apuntando: 'Apuntando',
-  puno: 'Puño',
+  puno: 'Puño · mantén para callar',
 };
 
 const ACCIONES = {
   siguiente: 'Siguiente',
   anterior: 'Anterior',
+  callar: 'Detener la narración',
 };
 
 export class CursorGestual {

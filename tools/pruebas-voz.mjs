@@ -120,5 +120,48 @@ comprobar('titan ≠ titania', parser.interpretar('ir a titan').cuerpo, 'titan')
 comprobar('ceres ≠ eris', parser.interpretar('ir a ceres').cuerpo, 'ceres');
 comprobar('eris ≠ ceres', parser.interpretar('ir a eris').cuerpo, 'eris');
 
+console.log('\n▸ Detener la narración: órdenes secas y sus variantes');
+{
+  // «Detente» a secas no se reconocía: solo funcionaban «detener narración»,
+  // «basta» y «deja de hablar». Es la orden más natural para callar a una voz
+  // que está hablando, y la que primero se le ocurre a cualquiera.
+  for (const frase of [
+    'detener narración', 'detener la narración', 'detén la narración', 'detén',
+    'detente', 'deténte', 'detente por favor', 'detener', 'parar', 'para ya',
+    'alto', 'stop', 'basta', 'ya basta', 'suficiente', 'no sigas', 'no hables',
+    'para de hablar', 'deja de hablar',
+  ]) {
+    comprobar(`«${frase}»`, parser.interpretar(frase).intencion, 'detener_narracion');
+  }
+}
+
+console.log('\n▸ …sin pisar a las órdenes que se le parecen');
+{
+  // El parser prueba los patrones de más largo a más corto, y de ahí que
+  // «detener el tiempo» siga yendo a pausar aunque «detener» exista por su
+  // cuenta. Estas comprobaciones son las que lo garantizan.
+  const pares = [
+    ['detener el tiempo', 'pausar'],
+    ['para el tiempo', 'pausar'],
+    ['congela', 'pausar'],
+    ['reanudar', 'reanudar'],
+    ['continúa', 'reanudar'],
+    ['sigue', 'reanudar'],
+    ['silencio', 'silencio'],
+    ['cállate', 'silencio'],
+    ['repetir', 'repetir'],
+    ['acelerar tiempo', 'acelerar'],
+    ['frenar tiempo', 'frenar'],
+    ['vista general', 'vista_general'],
+  ];
+  for (const [frase, esperado] of pares) {
+    comprobar(`«${frase}»`, parser.interpretar(frase).intencion, esperado);
+  }
+  // «para» está dentro de «llévame para Marte»: por eso NO se acepta «para» a
+  // secas como orden de callar, solo «para ya», «parar» y «para de hablar».
+  comprobar('«llévame para Marte» sigue siendo un viaje',
+    parser.interpretar('llévame para Marte').cuerpo, 'marte');
+}
+
 console.log(fallos ? `\n✘ ${fallos} comprobación(es) fallida(s)\n` : '\n✔ Todas las comprobaciones pasan\n');
 process.exit(fallos ? 1 : 0);
