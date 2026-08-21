@@ -260,6 +260,17 @@
         "opciones"
       ],
       "ejemplo": "¿qué puedo decir?"
+    },
+    "decir_nombre": {
+      "ejemplo": "me llamo Ana",
+      "descripcion": "Decirle al asistente cómo te llamas",
+      "patrones": [
+        "me llamo",
+        "mi nombre es",
+        "puedes llamarme",
+        "llamame",
+        "yo me llamo"
+      ]
     }
   },
   "conectores": [

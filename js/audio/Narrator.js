@@ -126,6 +126,136 @@ export class Narrator {
     return soloCache ? `${base}&soloCache=1` : base;
   }
 
+  /**
+   * URL de una frase del asistente.
+   *
+   * El texto lo pone el servidor: aquí solo viaja QUÉ frase, cuál de sus
+   * versiones, y el nombre, que allí se valida antes de encajarlo. Nunca sale
+   * de aquí una oración para sintetizar.
+   */
+  _urlFrase(frase, variante = 0) {
+    const partes = [
+      `frase=${encodeURIComponent(frase)}`,
+      `variante=${variante}`,
+    ];
+    const nombre = App.estado.nombre;
+    if (nombre) partes.push(`nombre=${encodeURIComponent(nombre)}`);
+    return `${rutaApp('api/tts.php')}?${partes.join('&')}`;
+  }
+
+  /**
+   * Dice una frase del asistente y devuelve una promesa que se resuelve al
+   * terminar. Usa un reproductor aparte a propósito: el principal lleva
+   * enganchada la sincronización de subtítulos con su tiempo de reproducción, y
+   * meter aquí una segunda pista descuadraría los subtítulos de la narración.
+   *
+   * Si algo falla —no hay clave, no hay red, el navegador bloquea el audio— se
+   * resuelve igualmente. Una frase de cortesía no puede impedir que se oiga la
+   * narración, que es lo que de verdad importa.
+   */
+  async decirFrase(frase, variante = 0) {
+    if (this.motor === 'ninguno') return false;
+    if (App.preferencias.get('narracionSilenciada')) return false;
+
+    // El texto se pide siempre, lo diga quien lo diga: hace falta para el
+    // subtítulo, que es obligatorio, y para la voz del navegador cuando no hay
+    // síntesis en el servidor. Es una consulta sin coste ni credenciales.
+    const texto = await this._textoFrase(frase, variante);
+    if (!texto) return false;
+
+    this.subtitulos.mostrarFrase(texto);
+
+    if (this.motor !== 'servidor') return this._decirFraseConNavegador(texto);
+
+    return new Promise((resolver) => {
+      const reproductor = new Audio();
+      reproductor.preload = 'auto';
+      reproductor.volume = this.volumenObjetivo;
+      if (reproductor.volume <= 0) { resolver(false); return; }
+
+      let terminado = false;
+      const acabar = (ok) => {
+        if (terminado) return;
+        terminado = true;
+        clearTimeout(temporizador);
+        reproductor.src = '';
+        // Solo se limpia si sigue siendo ESTA frase: entre medias puede haber
+        // empezado otra —cambiar de cuerpo mientras suena la entradilla— y
+        // borrarla aquí dejaría la nueva sin poder cortarse.
+        if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
+        resolver(ok);
+      };
+
+      // Red de seguridad: si el audio no llega en unos segundos, se sigue sin
+      // él en lugar de dejar al usuario mirando un planeta en silencio.
+      const temporizador = setTimeout(() => acabar(false), 6000);
+
+      reproductor.addEventListener('ended', () => acabar(true), { once: true });
+      reproductor.addEventListener('error', () => acabar(false), { once: true });
+
+      this._fraseEnCurso = reproductor;
+      reproductor.src = this._urlFrase(frase, variante);
+      reproductor.play().catch(() => acabar(false));
+    });
+  }
+
+  /** Pide el texto de una frase. Devuelve null si no hay versión aplicable. */
+  async _textoFrase(frase, variante) {
+    const partes = [`frase=${encodeURIComponent(frase)}`, `variante=${variante}`];
+    const nombre = App.estado.nombre;
+    if (nombre) partes.push(`nombre=${encodeURIComponent(nombre)}`);
+
+    try {
+      const respuesta = await fetch(`${rutaApp('api/frase.php')}?${partes.join('&')}`);
+      if (respuesta.status === 204 || !respuesta.ok) return null;
+      const datos = await respuesta.json();
+      return typeof datos?.texto === 'string' ? datos.texto : null;
+    } catch {
+      // Sin red no hay entradilla, y no pasa nada: es un adorno, no el mensaje.
+      return null;
+    }
+  }
+
+  /** La entradilla con la voz del navegador, para cuando no hay ElevenLabs. */
+  _decirFraseConNavegador(texto) {
+    if (!('speechSynthesis' in window)) return Promise.resolve(false);
+
+    return new Promise((resolver) => {
+      const locucion = new SpeechSynthesisUtterance(texto);
+      locucion.lang = 'es-ES';
+      locucion.rate = 1.02;         // Un pelo más viva que la narración.
+      locucion.volume = this.volumenObjetivo;
+
+      let terminado = false;
+      const acabar = (ok) => {
+        if (terminado) return;
+        terminado = true;
+        clearTimeout(temporizador);
+        if (this._locucionFrase === locucion) this._locucionFrase = null;
+        resolver(ok);
+      };
+      const temporizador = setTimeout(() => acabar(false), 6000);
+
+      locucion.onend = () => acabar(true);
+      locucion.onerror = () => acabar(false);
+
+      this._locucionFrase = locucion;
+      window.speechSynthesis.speak(locucion);
+    });
+  }
+
+  /** Corta la frase del asistente si hubiera una sonando. */
+  _cortarFrase() {
+    if (this._locucionFrase) {
+      window.speechSynthesis?.cancel();
+      this._locucionFrase = null;
+    }
+    if (!this._fraseEnCurso) return;
+    this._fraseEnCurso.pause();
+    this._fraseEnCurso.src = '';
+    this._fraseEnCurso = null;
+  }
+
   /** Las narraciones escritas para un cuerpo, o lista vacía si no tiene. */
   _narraciones(id) {
     const lista = this.porId.get(id)?.narraciones;
@@ -172,6 +302,19 @@ export class Narrator {
     this.detener();
     this.idActual = id;
     this.subtitulos.preparar(texto, cuerpo.nombre);
+
+    // Entradilla del asistente: «Mira esto, Ana» la primera vez, «otra vez por
+    // aquí» al volver. Es corta y se sintetiza aparte, así que no obliga a
+    // regenerar las 105 narraciones una vez por cada nombre; las narraciones
+    // siguen siendo las mismas para todo el mundo y comparten caché.
+    if (varianteForzada === null) {
+      const primeraVez = this.varianteActual === 0 && (this.visitas.get(id) ?? 0) <= 1;
+      const frase = primeraVez ? 'presentacion' : 'regreso';
+      // No se espera a que termine si el usuario cambia de cuerpo mientras
+      // tanto: `idActual` habrá cambiado y la narración de este ya no toca.
+      await this.decirFrase(frase, this.varianteActual);
+      if (this.idActual !== id) return;
+    }
 
     if (this.motor === 'navegador') {
       this._narrarConNavegador(cuerpo, texto);
@@ -306,6 +449,7 @@ export class Narrator {
 
   /** Interrupción inmediata, con un fundido muy corto para que no chasquee. */
   detener() {
+    this._cortarFrase();
     if (this._locucion) {
       window.speechSynthesis?.cancel();
       this._locucion = null;

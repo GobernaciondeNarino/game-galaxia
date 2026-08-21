@@ -131,6 +131,36 @@ completa. Mientras el aro no se cierre, se puede abortar cerrando la mano.
 
 ---
 
+## El asistente y tu nombre
+
+Al terminar de cargar, ORBIS se presenta y pregunta cómo llamarte. **No hace
+falta responder**: el botón de seguir sin decirlo está a la vista desde el
+principio, y sin nombre el asistente habla en general. También se puede decir
+más tarde por voz: «me llamo Ana».
+
+**El nombre no se guarda en ningún sitio.** Vive en memoria mientras dure la
+pestaña y se olvida al recargar. No hay `localStorage`, ni cookies, ni una
+petición al servidor para conservarlo. Solo viaja al servidor en el momento de
+sintetizar una frase que lo lleva dentro, y allí se valida antes de usarse.
+
+Con nombre, el asistente introduce cada cuerpo antes de narrarlo —«mira esto,
+Ana»— y cambia la fórmula al volver a uno ya visitado. Las narraciones en sí son
+las mismas para todo el mundo: personalizar las 105 por cada nombre habría
+multiplicado la síntesis sin añadir nada.
+
+### Una nota sobre la regla del texto
+
+`api/tts.php` nunca sintetiza texto que venga del navegador; el catálogo y las
+frases los pone el servidor. El nombre es la única excepción, acotada a
+propósito: como mucho 24 caracteres, solo letras, espacios, apóstrofos y
+guiones, como mucho tres palabras, y siempre encajado dentro de una frase que
+escribe el servidor. Lo peor que se puede sintetizar así son veinticuatro letras
+dentro de una oración ajena, con el limitador por IP aplicándose igual. La
+validación está en `api/lib/Asistente.php` y `php tools/pruebas-asistente.php`
+comprueba todo lo que no debe colarse.
+
+---
+
 ## Comandos de voz
 
 Idioma: español (`es-ES` y `es-CO`). Se activan con el botón del micrófono.
@@ -180,6 +210,9 @@ Las órdenes secas conviven con las de tiempo sin pisarse: el parser prueba los
 patrones de más largo a más corto, así que `detener el tiempo` sigue pausando la
 simulación aunque `detener` exista por su cuenta. `para` a secas **no** vale,
 justamente porque está dentro de «llévame **para** Marte».
+
+### Tu nombre
+- `me llamo Ana` · `mi nombre es Juan Carlos` · `llámame Marta`
 
 ### Ayuda
 - `ayuda` · `qué puedo decir`

@@ -1,0 +1,58 @@
+{
+  "$esquema": "orbis/asistente/1",
+  "nota": "Frases del asistente. Viven en el SERVIDOR y no en el navegador por la misma razón que las narraciones: api/tts.php nunca sintetiza texto que venga del cliente. Lo único que el cliente elige es QUÉ frase, con un identificador, y a lo sumo aporta un nombre propio que se valida y se encaja en el hueco {nombre}. Cada entrada tiene varias versiones que se van alternando, para que el asistente no repita la misma fórmula cada vez.",
+  "validacionNombre": {
+    "patron": "letras, espacios, apóstrofos y guiones; entre 1 y 24 caracteres; como mucho tres palabras",
+    "nota": "El hueco {nombre} es la única parte de estas frases que llega del cliente. La validación está en api/lib/Asistente.php y se prueba en tools/pruebas-asistente.mjs."
+  },
+  "frases": {
+    "bienvenida": {
+      "descripcion": "Al terminar de cargar, cuando la persona ha dado su nombre.",
+      "conNombre": [
+        "Hola, {nombre}. Soy ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
+        "Encantado, {nombre}. Soy ORBIS. Esto que ves está construido con medidas reales: pulsa cualquier cuerpo y te cuento lo que sabemos de él.",
+        "Bienvenido, {nombre}. Soy ORBIS, y esto es el Sistema Solar a escala. Elige por dónde empezamos, o pregúntame y te llevo."
+      ],
+      "sinNombre": [
+        "Hola. Soy ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
+        "Bienvenido. Soy ORBIS, y esto es el Sistema Solar a escala, construido con medidas reales. Elige por dónde empezamos.",
+        "Hola. Soy ORBIS. Pulsa cualquier cuerpo y te cuento lo que sabemos de él, o pregúntame y te llevo hasta allí."
+      ]
+    },
+    "presentacion": {
+      "descripcion": "Antes de la narración de un cuerpo que se visita por primera vez.",
+      "conNombre": [
+        "Mira esto, {nombre}.",
+        "Aquí lo tienes, {nombre}.",
+        "Fíjate bien, {nombre}.",
+        "Atento, {nombre}.",
+        "Te va a gustar esto, {nombre}."
+      ],
+      "sinNombre": []
+    },
+    "regreso": {
+      "descripcion": "Antes de la narración de un cuerpo que ya se había visitado.",
+      "conNombre": [
+        "Otra vez por aquí, {nombre}. Te cuento algo distinto.",
+        "Volvemos, {nombre}. Esta vez por otro lado.",
+        "De nuevo aquí, {nombre}. Queda más que contar."
+      ],
+      "sinNombre": [
+        "Otra vez por aquí. Te cuento algo distinto.",
+        "Volvemos. Esta vez por otro lado.",
+        "De nuevo aquí. Queda más que contar."
+      ]
+    },
+    "sin-respuesta": {
+      "descripcion": "Cuando se pregunta algo que no está en los datos.",
+      "conNombre": [
+        "Eso no lo tengo, {nombre}. Solo cuento lo que está medido y citado, y de eso no hay dato.",
+        "No puedo responderte a eso, {nombre}: no está en los datos que manejo, y prefiero no inventarlo."
+      ],
+      "sinNombre": [
+        "Eso no lo tengo. Solo cuento lo que está medido y citado, y de eso no hay dato.",
+        "No puedo responder a eso: no está en los datos que manejo, y prefiero no inventarlo."
+      ]
+    }
+  }
+}

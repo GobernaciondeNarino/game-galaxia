@@ -22,6 +22,17 @@ export const App = {
     datos: null,             // contenido de data/sistema-solar.json
     fps: 0,
     tiempoSimulado: null,    // Date simulada del reloj de la escena
+    /**
+     * Cómo se llama quien está delante, si lo ha querido decir.
+     *
+     * Vive aquí y en ningún sitio más. El pliego prohíbe localStorage y
+     * sessionStorage, así que al recargar la página se olvida, y eso es lo
+     * correcto además de lo obligado: es para que el asistente pueda dirigirse
+     * a alguien durante un rato, no para reconocerlo mañana. Al servidor solo
+     * viaja cuando hay que sintetizar una frase que lo lleva dentro, y allí se
+     * valida antes de usarse.
+     */
+    nombre: null,
   },
 
   preferencias,

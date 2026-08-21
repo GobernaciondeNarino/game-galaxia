@@ -566,6 +566,91 @@ body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]) {
   font-size: 11px;
   letter-spacing: 0.16em;
 }
+/* ==========================================================================
+   Bienvenida: el saludo del asistente y la pregunta por el nombre
+   ========================================================================== */
+.bienvenida__velo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;                      /* Sobre la HUD, bajo la ayuda y el comparador. */
+  display: grid;
+  place-items: center;
+  padding: var(--e-4);
+  background: rgba(5, 11, 24, 0.72);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  transition: opacity var(--dur-media) var(--curva);
+}
+.bienvenida__velo[data-saliendo="si"] { opacity: 0; pointer-events: none; }
+
+.bienvenida {
+  width: min(100%, 480px);
+  max-height: 100%;
+  overflow-y: auto;
+  display: grid;
+  gap: var(--e-2);
+  padding: var(--e-5);
+}
+.bienvenida__marca {
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.42em;
+  color: var(--cian-acento);
+}
+.bienvenida__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--texto);
+}
+.bienvenida__texto { font-size: var(--t-base); line-height: 1.6; color: var(--texto-tenue); }
+.bienvenida__pregunta {
+  margin-top: var(--e-2);
+  font-size: var(--t-base);
+  color: var(--cian-brillante);
+}
+.bienvenida__etiqueta {
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+}
+.bienvenida__campo {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--e-3);
+  font-family: inherit;
+  font-size: var(--t-base);
+  color: var(--texto);
+  background: rgba(0, 229, 255, 0.05);
+  border: 1px solid var(--panel-borde);
+}
+.bienvenida__campo:focus-visible {
+  outline: none;
+  border-color: var(--cian-brillante);
+  background: rgba(0, 229, 255, 0.09);
+}
+.bienvenida__campo[aria-invalid="true"] { border-color: var(--rojo-alerta); }
+.bienvenida__error { font-size: var(--t-menor); color: var(--rojo-alerta); }
+.bienvenida__aviso { font-size: var(--t-menor); line-height: 1.5; color: var(--texto-apagado); }
+.bienvenida__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+  margin-top: var(--e-3);
+}
+.bienvenida__principal {
+  color: var(--cian-brillante);
+  border-color: var(--cian-brillante);
+}
+.bienvenida .controles__boton { min-height: 40px; padding-inline: var(--e-4); }
+
+@media (pointer: coarse) {
+  .bienvenida .controles__boton { min-height: 44px; }
+}
+
 /* Invitación a encender el micrófono y la cámara. */
 .invitacion {
   display: grid;

@@ -273,6 +273,11 @@ export class ParserIntenciones {
       cuerpo, cuerpoB,
       confianza: elegida.confianza,
       texto,
+      // Lo que quedó de la frase al quitarle el patrón. Casi ninguna intención
+      // lo necesita —los cuerpos se resuelven aparte, contra el catálogo—, pero
+      // «me llamo Ana» sí: ahí el dato es justamente lo que sobra, y no hay
+      // ninguna lista contra la que casarlo.
+      resto: resto || null,
       sugerencias: [],
     };
   }

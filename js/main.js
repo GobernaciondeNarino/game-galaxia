@@ -22,6 +22,7 @@ import { Narrator } from './audio/Narrator.js';
 import { SFX } from './audio/SFX.js';
 import { HandTracking } from './input/HandTracking.js';
 import { GestureRecognizer } from './input/GestureRecognizer.js';
+import { Bienvenida, pareceNombre } from './ui/Bienvenida.js';
 import { ReconocedorGuino, ojosDesdeResultado } from './input/ReconocedorGuino.js';
 import { CursorGestual } from './ui/CursorGestual.js';
 import { VoiceCommands } from './input/VoiceCommands.js';
@@ -452,6 +453,29 @@ async function arrancar() {
         hud.actualizarSilencio(true);
         break;
       case 'detener_narracion': narrador?.detener(); break;
+
+      case 'decir_nombre': {
+        // El parser normaliza a minúsculas y sin tildes, así que «josé» llega
+        // como «jose». Se recapitaliza para que al menos se escriba con mayúscula
+        // inicial; recuperar la tilde no es posible y no merece adivinar.
+        const crudo = (intencion.resto ?? '')
+          .split(' ')
+          .filter(Boolean)
+          .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+          .join(' ');
+        const nombre = pareceNombre(crudo);
+        if (!nombre) {
+          sfx.reproducir('error');
+          anunciar('No he entendido el nombre.');
+          hud.barra.establecerSubtitulo('No he entendido el nombre');
+          break;
+        }
+        App.definir('nombre', nombre);
+        hud.barra.establecerSubtitulo(`Sesión de ${nombre}`);
+        anunciar(`De acuerdo, ${nombre}.`);
+        narrador?.decirFrase('bienvenida', 1);
+        break;
+      }
       case 'ayuda': hud.mostrarAyuda(); break;
 
       default:
@@ -581,6 +605,22 @@ async function arrancar() {
   progresar(1, 'Listo.');
   document.body.dataset.estado = 'listo';
   anunciar('Sistema Solar cargado. Use Tab para navegar o haga clic sobre un cuerpo.');
+
+  // ------------------------------------------------------------ bienvenida --
+  // El asistente se presenta y pregunta el nombre. No bloquea: se puede seguir
+  // sin darlo, y entonces habla en general. El saludo en voz alta va DESPUÉS de
+  // cerrar el diálogo, no antes, porque hasta ese momento no se sabe a quién
+  // hay que saludar, y porque los navegadores no dejan sonar nada hasta que ha
+  // habido una interacción: pulsar el botón es justamente esa interacción.
+  new Bienvenida({
+    alTerminar: (nombre) => {
+      hud.barra.establecerSubtitulo(
+        nombre ? `Sesión de ${nombre}` : 'Estado del sistema: activo',
+      );
+      narrador.decirFrase('bienvenida', 0);
+      anunciar(nombre ? `Hola, ${nombre}.` : 'Hola.');
+    },
+  });
 
   if (depuracion.activo) {
     log('Diagnóstico:', resultados);

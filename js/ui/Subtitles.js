@@ -59,6 +59,7 @@ export class Subtitles {
    * doble de tiempo, que es una aproximación muy razonable al ritmo del habla.
    */
   preparar(texto, nombre) {
+    clearTimeout(this._temporizadorFrase);
     this.frases = partirEnFrases(texto);
     this.total = texto.length;
     this.indiceActual = -1;
@@ -71,6 +72,27 @@ export class Subtitles {
     }
 
     this.panel.setAttribute('aria-label', `Narración de ${nombre}`);
+  }
+
+  /**
+   * Muestra una frase suelta del asistente durante unos segundos.
+   *
+   * No entra en el reparto por fracciones de `preparar()`: una entradilla como
+   * «mira esto, Ana» dura lo que dura y no hay ninguna pista de reproducción a
+   * la que engancharla. Se muestra y se retira sola, y no pisa la narración que
+   * venga después porque `preparar()` limpia el temporizador.
+   */
+  mostrarFrase(texto, ms = 4000) {
+    if (!this.activos || !texto) return;
+    clearTimeout(this._temporizadorFrase);
+    this.linea.textContent = texto;
+    this.panel.hidden = false;
+    // -2 y no -1: -1 es «ninguna todavía», y con ese valor la primera frase de
+    // la narración siguiente se saltaría por parecer ya mostrada.
+    this.indiceActual = -2;
+    this._temporizadorFrase = setTimeout(() => {
+      if (this.indiceActual === -2) this.limpiar();
+    }, ms);
   }
 
   /** Muestra la frase que corresponde a una fracción de la duración total. */
@@ -95,6 +117,7 @@ export class Subtitles {
   }
 
   limpiar() {
+    clearTimeout(this._temporizadorFrase);
     this.panel.hidden = true;
     this.linea.textContent = '';
     this.indiceActual = -1;

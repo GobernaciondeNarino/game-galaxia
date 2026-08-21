@@ -41,6 +41,7 @@ require_once __DIR__ . '/lib/Respuesta.php';
 require_once __DIR__ . '/lib/Cache.php';
 require_once __DIR__ . '/lib/RateLimiter.php';
 require_once __DIR__ . '/lib/Catalogo.php';
+require_once __DIR__ . '/lib/Asistente.php';
 
 header('X-Content-Type-Options: nosniff');
 
@@ -52,6 +53,8 @@ $metodo = $_SERVER['REQUEST_METHOD'] ?? '';
 if ($metodo === 'GET') {
     $peticion = [
         'bodyId' => $_GET['bodyId'] ?? '',
+        'frase' => $_GET['frase'] ?? null,
+        'nombre' => $_GET['nombre'] ?? null,
         'voiceId' => $_GET['voiceId'] ?? null,
         'variante' => $_GET['variante'] ?? 0,
         'soloCache' => isset($_GET['soloCache']) && $_GET['soloCache'] === '1',
@@ -71,28 +74,52 @@ if ($metodo === 'GET') {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Validación del cuerpo celeste
+// 2. Qué hay que decir
+//    Dos vías, y en las dos el TEXTO lo pone el servidor: la narración de un
+//    cuerpo del catálogo, o una frase del asistente. El cliente solo elige cuál
+//    con un identificador y un número.
 // ---------------------------------------------------------------------------
+$variante = (int) ($peticion['variante'] ?? 0);
+$fraseId = isset($peticion['frase']) ? (string) $peticion['frase'] : '';
 $bodyId = isset($peticion['bodyId']) ? (string) $peticion['bodyId'] : '';
 
-// El identificador tiene un formato conocido: minúsculas, dígitos y guiones.
-if (preg_match('/^[a-z0-9-]{1,40}$/', $bodyId) !== 1) {
-    Respuesta::error(400, 'id_invalido', 'El identificador del cuerpo no tiene un formato válido.');
-}
+if ($fraseId !== '') {
+    if (preg_match('/^[a-z-]{1,32}$/', $fraseId) !== 1) {
+        Respuesta::error(400, 'frase_invalida', 'El identificador de frase no tiene un formato válido.');
+    }
 
-// Qué narración de las varias que tiene el cuerpo. Llega como número y se
-// envuelve al rango real en Catalogo: el cliente elige CUÁL, nunca QUÉ dice.
-// Aunque mandara un 9999 o un texto, saldría una de las narraciones escritas.
-$variante = (int) ($peticion['variante'] ?? 0);
-
-$texto = Catalogo::narracion($bodyId, $variante);
-if ($texto === null) {
-    Respuesta::error(
-        404,
-        'cuerpo_desconocido',
-        'No hay narración registrada para ese cuerpo.',
-        'bodyId solicitado: ' . $bodyId
+    // El nombre es lo ÚNICO que llega del cliente y acaba dicho en voz alta.
+    // Asistente::limpiarNombre lo acota a un puñado de letras; si no pasa, se
+    // usa la versión sin nombre en lugar de rechazar la petición.
+    $nombre = Asistente::limpiarNombre(
+        isset($peticion['nombre']) ? (string) $peticion['nombre'] : null
     );
+
+    $texto = Asistente::frase($fraseId, $nombre, $variante);
+    if ($texto === null) {
+        Respuesta::error(
+            404,
+            'frase_desconocida',
+            'No hay ninguna frase registrada con ese identificador.',
+            'frase solicitada: ' . $fraseId
+        );
+    }
+    $bodyId = 'asistente-' . $fraseId;
+} else {
+    // El identificador tiene un formato conocido: minúsculas, dígitos y guiones.
+    if (preg_match('/^[a-z0-9-]{1,40}$/', $bodyId) !== 1) {
+        Respuesta::error(400, 'id_invalido', 'El identificador del cuerpo no tiene un formato válido.');
+    }
+
+    $texto = Catalogo::narracion($bodyId, $variante);
+    if ($texto === null) {
+        Respuesta::error(
+            404,
+            'cuerpo_desconocido',
+            'No hay narración registrada para ese cuerpo.',
+            'bodyId solicitado: ' . $bodyId
+        );
+    }
 }
 
 // Tope de longitud: el catálogo lo cumple de sobra (150-220 palabras), pero si
