@@ -23,6 +23,7 @@ import { SFX } from './audio/SFX.js';
 import { HandTracking } from './input/HandTracking.js';
 import { GestureRecognizer } from './input/GestureRecognizer.js';
 import { Bienvenida, pareceNombre } from './ui/Bienvenida.js';
+import { Preguntas } from './input/Preguntas.js';
 import { ReconocedorGuino, ojosDesdeResultado } from './input/ReconocedorGuino.js';
 import { CursorGestual } from './ui/CursorGestual.js';
 import { VoiceCommands } from './input/VoiceCommands.js';
@@ -386,9 +387,16 @@ async function arrancar() {
 
   // -------------------------------------------------------- control por voz --
   let voz = null;
+  let preguntas = null;
   try {
-    const vocabulario = await (await fetch(rutaApp('data/comandos-voz.json'))).json();
+    const [vocabulario, vocabularioPreguntas] = await Promise.all([
+      (await fetch(rutaApp('data/comandos-voz.json'))).json(),
+      (await fetch(rutaApp('data/preguntas.json'))).json(),
+    ]);
     voz = new VoiceCommands(vocabulario, ejecutarIntencion);
+    // El parser de intenciones lo crea VoiceCommands; Preguntas lo reutiliza
+    // para reconocer los nombres de los cuerpos en lugar de duplicar esa lógica.
+    preguntas = new Preguntas(vocabularioPreguntas, catalogo.cuerpos, voz.parser ?? null);
     // La ayuda se construye con el mismo vocabulario que entiende el parser,
     // así que la lista de comandos nunca puede quedar desfasada.
     hud.mostrarAyuda(vocabulario);
@@ -398,6 +406,33 @@ async function arrancar() {
   }
 
   /** Ejecuta una intención reconocida por voz. */
+  /**
+   * ¿Era una pregunta sobre un cuerpo? Se prueba ANTES de rendirse.
+   *
+   * El parser de intenciones entiende órdenes; las preguntas son otra cosa y
+   * tienen su propio vocabulario. Se consulta cuando la intención no ha
+   * quedado clara, para no robarle «háblame de Marte» al comando de siempre.
+   *
+   * @returns {boolean} true si se ha respondido algo
+   */
+  async function intentarResponder(texto) {
+    if (!preguntas || !texto) return false;
+
+    const pregunta = preguntas.interpretar(texto, App.estado.cuerpoActivo);
+    if (!pregunta.atributo || !pregunta.cuerpo) return false;
+
+    const datos = await narrador?.responder(pregunta.cuerpo, pregunta.atributo);
+    if (!datos) return false;
+
+    hud.mostrarRespuesta({
+      ...datos,
+      cuerpo: catalogo.cuerpos.find((c) => c.id === pregunta.cuerpo)?.nombre ?? pregunta.cuerpo,
+      etiqueta: pregunta.etiqueta,
+    });
+    anunciar(datos.texto);
+    return true;
+  }
+
   function ejecutarIntencion(intencion) {
     const { intencion: tipo, cuerpo, cuerpoB } = intencion;
 
@@ -514,7 +549,13 @@ async function arrancar() {
     anunciar(mensaje);
   });
 
-  App.al('voz:no-entendido', ({ texto, sugerencias }) => {
+  App.al('voz:no-entendido', async ({ texto, sugerencias }) => {
+    // Antes de rendirse: puede que no fuera una orden sino una pregunta. El
+    // parser de intenciones solo entiende órdenes, así que aquí es donde tiene
+    // sentido probar el otro vocabulario, y no antes: «háblame de Marte» debe
+    // seguir siendo el comando de siempre, no una consulta sobre Marte.
+    if (await intentarResponder(texto)) return;
+
     sfx.reproducir('error');
     hud.mostrarSugerencias(texto, sugerencias);
   });

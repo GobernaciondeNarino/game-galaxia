@@ -199,6 +199,56 @@ export class Narrator {
     });
   }
 
+  /**
+   * Dice la respuesta a una pregunta y devuelve lo que compuso el servidor.
+   *
+   * El texto no se genera aquí: se pide con dos identificadores y llega hecho,
+   * con su fuente. Así la respuesta que se oye, la que se lee en el subtítulo y
+   * la que se muestra en el panel son literalmente la misma cadena, y no tres
+   * versiones que puedan desincronizarse.
+   *
+   * @returns {Promise<object|null>} { texto, fuente, valor, sinDato }
+   */
+  async responder(idCuerpo, atributo) {
+    let datos = null;
+    try {
+      const respuesta = await fetch(
+        `${rutaApp('api/respuesta.php')}?bodyId=${encodeURIComponent(idCuerpo)}` +
+        `&atributo=${encodeURIComponent(atributo)}`,
+      );
+      if (!respuesta.ok) return null;
+      datos = await respuesta.json();
+    } catch {
+      return null;
+    }
+    if (!datos?.texto) return null;
+
+    this.detener();
+    this.subtitulos.mostrarFrase(datos.texto, 9000);
+
+    if (this.motor === 'servidor') {
+      const reproductor = new Audio();
+      reproductor.volume = this.volumenObjetivo;
+      if (reproductor.volume > 0) {
+        this._fraseEnCurso = reproductor;
+        reproductor.addEventListener('error', () => {
+          // Sin síntesis en el servidor, lo dice el navegador: la respuesta no
+          // puede quedarse muda solo porque falte una clave de API.
+          if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
+          this._decirFraseConNavegador(datos.texto);
+        }, { once: true });
+        reproductor.src =
+          `${rutaApp('api/tts.php')}?bodyId=${encodeURIComponent(idCuerpo)}` +
+          `&atributo=${encodeURIComponent(atributo)}`;
+        reproductor.play().catch(() => this._decirFraseConNavegador(datos.texto));
+      }
+    } else if (this.motor === 'navegador') {
+      this._decirFraseConNavegador(datos.texto);
+    }
+
+    return datos;
+  }
+
   /** Pide el texto de una frase. Devuelve null si no hay versión aplicable. */
   async _textoFrase(frase, variante) {
     const partes = [`frase=${encodeURIComponent(frase)}`, `variante=${variante}`];

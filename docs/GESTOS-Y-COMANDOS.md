@@ -211,6 +211,30 @@ patrones de más largo a más corto, así que `detener el tiempo` sigue pausando
 simulación aunque `detener` exista por su cuenta. `para` a secas **no** vale,
 justamente porque está dentro de «llévame **para** Marte».
 
+### Preguntas sobre los cuerpos
+- `¿cuánto pesa Júpiter?` · `¿qué tamaño tiene Marte?` · `¿qué temperatura hace en Venus?`
+- `¿cuántas lunas tiene Saturno?` · `¿qué atmósfera tiene Titán?` · `¿tiene volcanes Ío?`
+- `¿cuánto dura su día?` · `¿cuánto dura su año?` · `¿a qué distancia está del Sol?`
+- `¿tiene campo magnético?` · `¿cuál es su velocidad de escape?` · `¿cuánta luz refleja?`
+- `dime algo curioso` · `¿de dónde sacas eso?`
+
+Si ya estás mirando un cuerpo, no hace falta nombrarlo: «¿y cuánta gravedad
+hay?» pregunta por el que tienes delante. Si nombras otro, gana el nombrado.
+
+**Qué es y qué no es esto.** No hay ningún modelo de lenguaje detrás. En
+producción ORBIS corre sobre Plesk con PHP y nada más, así que no puede
+improvisar respuestas ni mantener una conversación abierta. Lo que hace es
+buscar en el catálogo: si la pregunta encaja con un atributo, responde con la
+cifra **y su fuente**; si el catálogo no trae ese dato, dice `SIN DATOS` en vez
+de rellenar el hueco. A cambio funciona sin conexión, sin coste por pregunta y
+sin poder equivocarse, porque todo lo que responde está medido y citado.
+
+Las cifras se dicen de forma que se puedan escuchar —«1.898 cuatrillones de
+kilogramos», no «1,9 por diez elevado a veintisiete»— y se comparan con la
+Tierra cuando ayuda: «318 veces la masa de la Tierra» dice mucho más que
+cualquier número suelto. La comparación tampoco inventa: divide dos cifras que
+ya están en el catálogo.
+
 ### Tu nombre
 - `me llamo Ana` · `mi nombre es Juan Carlos` · `llámame Marta`
 

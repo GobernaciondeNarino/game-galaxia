@@ -47,6 +47,7 @@ node tools/pruebas-gestos.mjs              # reconocedor de gestos
 node tools/pruebas-guino.mjs               # guiño frente a parpadeo
 node tools/pruebas-narracion.mjs           # las tres narraciones de cada cuerpo
 php  tools/pruebas-asistente.php           # validación del nombre y frases
+node tools/pruebas-preguntas.mjs           # reconocedor de preguntas
 node tools/pruebas-voz.mjs                 # parser de intenciones de voz
 node tools/csp-hash.mjs --verificar        # hash CSP del importmap al día
 find api config -name '*.php' -exec php -l {} \;

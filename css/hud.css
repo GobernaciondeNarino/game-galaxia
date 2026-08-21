@@ -567,6 +567,35 @@ body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]) {
   letter-spacing: 0.16em;
 }
 /* ==========================================================================
+   Respuesta a una pregunta
+   ========================================================================== */
+.respuesta {
+  position: fixed;
+  left: 50%;
+  bottom: 190px;
+  transform: translateX(-50%);
+  z-index: 22;
+  width: min(92vw, 560px);
+  display: grid;
+  gap: var(--e-2);
+}
+.respuesta__valor {
+  font-size: 1.5rem;
+  color: var(--cian-brillante);
+}
+.respuesta__valor[data-sin-dato="si"] {
+  font-size: var(--t-base);
+  color: var(--ambar-seleccion);
+  letter-spacing: 0.18em;
+}
+.respuesta__texto { font-size: var(--t-base); line-height: 1.6; color: var(--texto); }
+
+@media (max-width: 720px) {
+  .respuesta { bottom: 150px; width: 94vw; }
+  .respuesta__valor { font-size: 1.15rem; }
+}
+
+/* ==========================================================================
    Bienvenida: el saludo del asistente y la pregunta por el nombre
    ========================================================================== */
 .bienvenida__velo {

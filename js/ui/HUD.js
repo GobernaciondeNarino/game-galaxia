@@ -420,8 +420,61 @@ export class HUD {
     return true;
   }
 
+  /**
+   * Muestra la respuesta a una pregunta, con su fuente.
+   *
+   * La fuente no es un adorno: es la diferencia entre un dato y una afirmación.
+   * Cuando el catálogo no trae el valor se muestra SIN DATOS en ámbar, igual
+   * que en los paneles, en lugar de disimular el hueco.
+   */
+  mostrarRespuesta({ texto, fuente, valor, sinDato, cuerpo, etiqueta }) {
+    if (!this.panelRespuesta) {
+      this.respuestaTitulo = crear('h2', { class: 'panel__titulo' });
+      this.respuestaValor = crear('p', { class: 'respuesta__valor panel__cifra' });
+      this.respuestaTexto = crear('p', { class: 'respuesta__texto' });
+      this.respuestaFuente = crear('p', { class: 'panel__fuente' });
+
+      this.panelRespuesta = crear('div', {
+        class: 'panel respuesta', role: 'status', hidden: true,
+      }, [
+        crear('header', { class: 'panel__cabecera' }, [
+          this.respuestaTitulo,
+          crear('button', {
+            class: 'galaxia__cerrar', type: 'button',
+            'aria-label': 'Cerrar la respuesta',
+            onclick: () => { this.panelRespuesta.hidden = true; },
+            text: '✕',
+          }),
+        ]),
+        this.respuestaValor,
+        this.respuestaTexto,
+        this.respuestaFuente,
+      ]);
+      document.body.append(this.panelRespuesta);
+    }
+
+    this.respuestaTitulo.textContent = `${cuerpo} · ${etiqueta ?? ''}`.trim();
+    this.respuestaValor.textContent = sinDato ? 'SIN DATOS' : (valor ?? '');
+    this.respuestaValor.hidden = !sinDato && !valor;
+    this.respuestaValor.dataset.sinDato = sinDato ? 'si' : 'no';
+    this.respuestaTexto.textContent = texto;
+    this.respuestaFuente.textContent = fuente ? `Fuente: ${fuente}` : '';
+    this.respuestaFuente.hidden = !fuente;
+    this.panelRespuesta.hidden = false;
+
+    clearTimeout(this._temporizadorRespuesta);
+    // Se retira sola, pero con margen de sobra para leer la fuente entera.
+    this._temporizadorRespuesta = setTimeout(() => {
+      this.panelRespuesta.hidden = true;
+    }, 18000);
+  }
+
   /** Propuesta de alternativas cuando no se entiende un comando de voz. */
   mostrarSugerencias(texto, sugerencias) {
+    // Se retira la respuesta anterior: dejarla ahí mientras se dice «no te he
+    // entendido» invita a leerla como si fuera la contestación a lo último.
+    if (this.panelRespuesta) this.panelRespuesta.hidden = true;
+
     if (!this.avisoSugerencias) {
       this.avisoSugerencias = crear('div', { class: 'panel sugerencias', role: 'status' });
       document.body.append(this.avisoSugerencias);
@@ -462,6 +515,8 @@ export class HUD {
       parte?.destruir?.();
     }
     clearTimeout(this._temporizadorSugerencias);
+    clearTimeout(this._temporizadorRespuesta);
+    this.panelRespuesta?.remove();
     this.controles?.remove();
     this.panelAyuda?.remove();
     this.avisoSugerencias?.remove();

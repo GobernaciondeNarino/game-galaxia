@@ -42,6 +42,7 @@ require_once __DIR__ . '/lib/Cache.php';
 require_once __DIR__ . '/lib/RateLimiter.php';
 require_once __DIR__ . '/lib/Catalogo.php';
 require_once __DIR__ . '/lib/Asistente.php';
+require_once __DIR__ . '/lib/Respuestas.php';
 
 header('X-Content-Type-Options: nosniff');
 
@@ -54,6 +55,7 @@ if ($metodo === 'GET') {
     $peticion = [
         'bodyId' => $_GET['bodyId'] ?? '',
         'frase' => $_GET['frase'] ?? null,
+        'atributo' => $_GET['atributo'] ?? null,
         'nombre' => $_GET['nombre'] ?? null,
         'voiceId' => $_GET['voiceId'] ?? null,
         'variante' => $_GET['variante'] ?? 0,
@@ -83,7 +85,31 @@ $variante = (int) ($peticion['variante'] ?? 0);
 $fraseId = isset($peticion['frase']) ? (string) $peticion['frase'] : '';
 $bodyId = isset($peticion['bodyId']) ? (string) $peticion['bodyId'] : '';
 
-if ($fraseId !== '') {
+$atributo = isset($peticion['atributo']) ? (string) $peticion['atributo'] : '';
+
+if ($atributo !== '') {
+    // Respuesta a una pregunta: dos identificadores, y el texto lo compone
+    // Respuestas a partir del catálogo. Igual que en las otras dos vías, el
+    // navegador elige QUÉ se dice, nunca CÓMO se dice.
+    if (preg_match('/^[a-z]{1,24}$/', $atributo) !== 1) {
+        Respuesta::error(400, 'atributo_invalido', 'El atributo no tiene un formato válido.');
+    }
+    if (preg_match('/^[a-z0-9-]{1,40}$/', $bodyId) !== 1) {
+        Respuesta::error(400, 'id_invalido', 'El identificador del cuerpo no tiene un formato válido.');
+    }
+
+    $resultado = Respuestas::responder($bodyId, $atributo);
+    if ($resultado === null) {
+        Respuesta::error(
+            404,
+            'sin_respuesta',
+            'No hay respuesta para esa combinación de cuerpo y atributo.',
+            $bodyId . ' / ' . $atributo
+        );
+    }
+    $texto = $resultado['texto'];
+    $bodyId = 'respuesta-' . $bodyId . '-' . $atributo;
+} elseif ($fraseId !== '') {
     if (preg_match('/^[a-z-]{1,32}$/', $fraseId) !== 1) {
         Respuesta::error(400, 'frase_invalida', 'El identificador de frase no tiene un formato válido.');
     }
