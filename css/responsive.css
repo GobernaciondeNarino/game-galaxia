@@ -75,6 +75,31 @@
   #hud-proyeccion-orbital,
   #hud-estado-entradas { display: none; }
 
+  /* Aquí no hay celda «viewport». Los avisos se mudan a la del perfil, que
+     está anclado abajo y deja libre la franja de arriba.
+
+     Pero esa franja no siempre da de sí: medido a 320x568, la fila mide 233 px
+     y el perfil se queda 216, así que sobran 17 px y un aviso necesita 75. Por
+     eso, CUANDO HAY UN AVISO —y solo entonces— se abre una fila propia para él
+     y el perfil cede lo que haga falta; en cuanto el aviso se va, la fila
+     desaparece y el perfil recupera su sitio. Se hace con `:has()` para no
+     dejar una fila vacía y su separación consumiendo altura todo el rato, que
+     en un teléfono es justo lo que no sobra.
+
+     Sin soporte de `:has()` el aviso se superpone al perfil, que es exactamente
+     lo que pasaría sin esta regla: se degrada a lo anterior, no a algo peor. */
+  .avisos { grid-area: izquierda; }
+
+  #hud:has(.aviso) {
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "superior"
+      "avisos"
+      "izquierda"
+      "inferior";
+  }
+  #hud:has(.aviso) .avisos { grid-area: avisos; }
+
   /* El panel galáctico vive dentro de #hud-viewport, que aquí no se dibuja:
      un botón que no puede mostrar nada es peor que ningún botón. */
   .controles__boton--galaxia { display: none; }

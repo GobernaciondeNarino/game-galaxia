@@ -28,6 +28,7 @@ import { Anotaciones } from './Anotaciones.js';
 import { ArcoDatos } from './ArcoDatos.js';
 import { Reticula } from './Reticula.js';
 import { Subtitles } from './Subtitles.js';
+import { Avisos } from './Avisos.js';
 import { Comparador } from './panels/Comparador.js';
 import { log } from '../utils/debug.js';
 
@@ -75,6 +76,15 @@ export class HUD {
 
     // El viewport central: es lo ÚNICO que cambia entre los dos estados.
     this.viewport = $('#hud-viewport');
+
+    // Los avisos cuelgan de #hud, no del viewport central. Es deliberado: por
+    // debajo de 720 px el viewport se oculta entero, y con él habría
+    // desaparecido el aviso de audio bloqueado justo en el sitio donde más
+    // falta hace, porque es en el móvil donde el navegador bloquea el audio con
+    // más frecuencia. Colgando de la rejilla, cada tamaño de pantalla les
+    // asigna su celda por CSS y nunca se quedan sin sitio.
+    this.avisos = new Avisos(raiz);
+
     this.panelGalactico = new PanelGalactico(this.viewport);
     // Nace oculto y sin cuenta atrás: la presentación arranca cuando la
     // pantalla de carga se retira, no cuando se construye la HUD, que ocurre
@@ -273,20 +283,43 @@ export class HUD {
       }),
       App.al('voz:comando', ({ texto }) => this.entradas.mostrarComando(texto)),
       App.al('narracion:motor', ({ motor }) => {
-        // Un cambio de motor es información, no un fallo silencioso.
-        this.barra.establecerSubtitulo(
+        // Un cambio de motor es información, no un fallo silencioso: la voz
+        // cambia de golpe a media sesión y conviene decir por qué.
+        this.avisos.mostrar(
           motor === 'navegador'
-            ? 'Narración con la voz del navegador'
-            : 'Narración con voz sintetizada',
+            ? 'Narración con la voz del navegador: no hay voz sintetizada disponible.'
+            : 'Narración con voz sintetizada.',
+          { tono: 'info', clave: 'motor-narracion' },
         );
       }),
-      App.al('escena:escala', ({ aviso }) => this.barra.establecerSubtitulo(aviso)),
+      App.al('escena:escala', ({ aviso }) => {
+        this.avisos.mostrar(aviso, { tono: 'info', clave: 'escala' });
+      }),
       App.al('estado:cargando', ({ valor }) => {
         // Terminada la carga: el panel galáctico se presenta y se retira solo.
         if (!valor && document.body.dataset.vista !== 'cuerpo') this._presentarGalaxia();
       }),
       App.al('narracion:bloqueada', () => {
-        this.barra.establecerSubtitulo('Toca la pantalla para permitir el audio');
+        // Este NO se va solo. Es el único aviso que pide una acción concreta, y
+        // hasta que esa acción ocurre el problema sigue ahí: sin ella no suena
+        // nada y no hay ninguna otra pista de por qué.
+        this.avisos.mostrar(
+          'Toca la pantalla para permitir el audio: el navegador lo bloquea hasta la primera interacción.',
+          { tono: 'aviso', clave: 'audio-bloqueado', persistente: true },
+        );
+      }),
+      // Si el audio acaba sonando, el aviso ya no describe nada. Dejarlo ahí
+      // sería pedir una acción que ya se hizo.
+      App.al('narracion:inicio', () => this.avisos.retirar('audio-bloqueado')),
+      // Este evento se emitía desde la fase 5 y no lo escuchaba nadie: cuando
+      // el navegador no trae síntesis de voz, la narración se apagaba en
+      // silencio absoluto. Ahora al menos se dice, y se dice que el texto sigue
+      // ahí, que es lo que salva la situación.
+      App.al('narracion:sin-motor', () => {
+        this.avisos.mostrar(
+          'Este navegador no puede narrar en voz alta. Los textos siguen disponibles en pantalla.',
+          { tono: 'aviso', clave: 'sin-motor', persistente: true },
+        );
       }),
     ];
   }
@@ -431,6 +464,17 @@ export class HUD {
   }
 
   /**
+   * Muestra un aviso breve sobre la escena.
+   *
+   * Es lo que hay que usar para lo que ACABA DE PASAR. Para describir el estado
+   * actual —qué cuerpo se sigue, de quién es la sesión— está
+   * `barra.establecerSubtitulo`, que no ocupa sitio en pantalla.
+   */
+  avisar(texto, opciones) {
+    return this.avisos.mostrar(texto, opciones);
+  }
+
+  /**
    * Muestra la respuesta a una pregunta, con su fuente.
    *
    * La fuente no es un adorno: es la diferencia entre un dato y una afirmación.
@@ -520,7 +564,7 @@ export class HUD {
       this.barra, this.perfil, this.mapaOrbital, this.composicion, this.geologia,
       this.magnetosfera, this.adicionales, this.navegacion, this.proyeccion,
       this.entradas, this.panelGalactico, this.reticula, this.anotaciones, this.arco,
-      this.subtitulos, this.comparador,
+      this.subtitulos, this.comparador, this.avisos,
     ]) {
       parte?.destruir?.();
     }

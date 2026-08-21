@@ -1372,3 +1372,110 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
   text-align: right;
 }
 .comparador__razon--vacia { color: var(--texto-apagado); }
+
+/* --------------------------------------------------------------------------
+   Avisos: mensajes breves sobre la escena.
+
+   Viven en la esquina superior del viewport central, que es la única franja
+   que no ocupa ningún panel: debajo de la barra, encima de la tira de
+   navegación y entre las dos columnas de datos. Se colocan dentro de
+   #hud-viewport en lugar de con una posición fija y un número mágico, así la
+   rejilla sigue mandando y en las disposiciones estrechas bajan solas.
+
+   Son transitorios y estrechos a propósito. Lo que se ha venido a ver es el
+   Sistema Solar; un aviso que tapa media pantalla se acuerda de sí mismo y se
+   olvida de para qué está.
+   -------------------------------------------------------------------------- */
+.avisos {
+  /* Ocupan la celda del viewport central sin ser hijos suyos: por debajo de
+     720 px esa zona se oculta, y un aviso dentro de ella se habría ocultado
+     con ella. Ahí abajo la celda pasa a ser la del perfil, que está anclado
+     abajo y deja libre la franja de arriba. */
+  grid-area: viewport;
+  align-self: start;
+  justify-self: center;
+  display: grid;
+  gap: var(--e-2);
+  width: min(30rem, 100%);
+}
+
+/* Más específico que `#hud > *`, que pone pointer-events en auto: el hueco
+   entre avisos —y el que queda cuando no hay ninguno— tiene que dejar pasar el
+   ratón al lienzo. Cada aviso lo vuelve a activar para sí mismo. */
+#hud > .avisos { pointer-events: none; }
+
+.aviso {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: var(--e-2);
+  padding: var(--e-2) var(--e-2) var(--e-2) var(--e-3);
+
+  background: var(--panel-fondo);
+  backdrop-filter: blur(var(--panel-desenfoque));
+  border: 1px solid var(--panel-borde);
+  /* La franja de color va a la izquierda y no es lo único que distingue un
+     tono de otro: el texto ya dice qué pasa. El color acompaña, no informa. */
+  border-left-width: 3px;
+  border-left-color: var(--cian-acento);
+  clip-path: polygon(var(--corte) 0, 100% 0, 100% calc(100% - var(--corte)), calc(100% - var(--corte)) 100%, 0 100%, 0 var(--corte));
+
+  pointer-events: auto;
+  /* Se anima el desplazamiento y NO la opacidad, a propósito.
+     Una animación de opacidad que arranque en 0 deja el aviso invisible hasta
+     que el compositor entrega el primer fotograma, y en una máquina cargada
+     eso puede tardar. Medido en este mismo proyecto con render por software:
+     830 ms por fotograma, con la animación clavada en el 0 %. Justo el aviso
+     que más importa —el del audio bloqueado— es el que aparece cuando algo va
+     mal, que es cuando la máquina suele ir peor. Legible desde el primer
+     fotograma; lo único que se anima es de dónde entra. */
+  animation: aviso-entra var(--dur-media) var(--curva);
+}
+
+.aviso[data-tono="aviso"]  { border-left-color: var(--ambar-seleccion); }
+.aviso[data-tono="alerta"] { border-left-color: var(--rojo-alerta); }
+
+.aviso__texto {
+  margin: 0;
+  font-family: var(--fuente-datos);
+  font-size: var(--t-base);
+  line-height: 1.45;
+  color: var(--texto);
+}
+
+.aviso__cerrar {
+  display: grid;
+  place-items: center;
+  /* 24 px es el mínimo de la WCAG 2.2 para puntero fino; más abajo sube a 44
+     cuando el puntero es grueso. */
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--texto-tenue);
+  font-size: var(--t-menor);
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+}
+
+.aviso__cerrar:hover,
+.aviso__cerrar:focus-visible {
+  color: var(--texto);
+  border-color: var(--panel-borde);
+}
+
+@media (pointer: coarse) {
+  .aviso__cerrar { min-width: 44px; min-height: 44px; }
+}
+
+@keyframes aviso-entra {
+  from { transform: translateY(-6px); }
+  to   { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Sin desplazamiento: aparece donde va a quedarse. */
+  .aviso { animation: none; }
+}

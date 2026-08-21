@@ -524,8 +524,11 @@ async function arrancar() {
         const nombre = pareceNombre(crudo);
         if (!nombre) {
           sfx.reproducir('error');
-          anunciar('No he entendido el nombre.');
-          hud.barra.establecerSubtitulo('No he entendido el nombre');
+          // El aviso lleva la salida: un error que solo dice que algo falló
+          // deja a quien lo lee sin saber qué hacer a continuación.
+          hud.avisar('No he entendido el nombre. Prueba con «me llamo» y tu nombre.', {
+            tono: 'alerta', clave: 'nombre',
+          });
           break;
         }
         App.definir('nombre', nombre);
