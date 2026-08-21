@@ -207,20 +207,32 @@
    Barra superior
    ========================================================================== */
 .barra {
-  /* 860 y no 640: con 640 la barra aceptaba compartir fila con los controles a
-     partir de unos 1500 px, se quedaba en 644 y su columna derecha —el reloj de
-     misión y la fecha simulada, que necesitan 305— se salía por debajo del
-     panel de controles. Declarando lo que de verdad ocupa, baja a su propia
-     fila hasta que hay sitio auténtico para las dos. Se veía entre 1500 y
-     1700 px, una franja que no estaba en la lista de tamaños probados. */
-  flex: 1 1 860px;
+  /* La barra se queda solo con la identidad, así que ya no pelea por el ancho:
+     ocupa lo que ocupa su texto y deja el resto del renglón a los controles.
+     Antes repartía tres columnas —identidad, título central y tiempos— con una
+     base flexible de 860 px, y esa altura era justo la que se estaba comiendo
+     la vista de la escena. */
+  flex: 0 0 auto;
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: start;
-  gap: var(--e-4);
+  align-content: center;
+  padding-right: var(--e-3);
   pointer-events: auto;
 }
+
+/* Segunda fila: pestañas de módulo a la izquierda, indicadores a la derecha,
+   las dos por debajo del panel de controles. `flex-basis: 100%` es lo que
+   fuerza el salto de línea sin necesidad de un contenedor aparte. */
+.barra-secundaria {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-2) var(--e-3);
+  pointer-events: auto;
+}
+.barra-secundaria .barra__modulos { margin-top: 0; }
 
 .barra__marca {
   font-family: var(--fuente-titulos);
@@ -309,7 +321,11 @@
 
 /* Controles de escena, a la derecha de la barra */
 .controles {
-  flex: 1 1 auto;
+  /* Que ocupe lo que ocupan sus botones y se pegue a la derecha: estirado de
+     lado a lado dejaba un panel medio vacío que era justo lo contrario de
+     ganar sitio. `margin-left: auto` lo empuja al fondo del renglón. */
+  flex: 0 1 auto;
+  margin-left: auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

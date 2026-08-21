@@ -73,26 +73,45 @@ export class BarraSuperior {
         return nodo;
       }));
 
+    // La barra se queda con la identidad y nada más: comparte renglón con el
+    // panel de controles, y todo lo que no cabía en esa línea baja a la fila de
+    // debajo. Antes ocupaba tres columnas —identidad, título central y tiempos—
+    // y se comía una franja de pantalla que hace falta para ver la escena.
     this.panel = crear('div', { class: 'barra' }, [
-      crear('div', { class: 'barra__identidad' }, [
-        crear('p', { class: 'barra__marca', text: 'ORBIS' }),
-        crear('p', { class: 'barra__version', text: `Interfaz operativa · v${App.version}` }),
-        this.pestanas,
-      ]),
-      crear('div', { class: 'barra__centro' }, [
-        crear('p', { class: 'barra__titulo-central', text: 'Interfaz galáctica' }),
-        crear('p', { class: 'barra__subtitulo', id: 'barra-subtitulo', text: 'Estado del sistema: activo' }),
-      ]),
-      crear('div', { class: 'barra__derecha' }, [
-        crear('div', { class: 'barra__tiempos' }, [
-          crear('span', { class: 'barra__rotulo', text: 'Misión' }), this.reloj,
-          crear('span', { class: 'barra__rotulo', text: 'Fecha simulada' }), this.fecha,
-        ]),
-        this.grupoIndicadores,
-      ]),
+      crear('p', { class: 'barra__marca', text: 'ORBIS' }),
+      crear('p', { class: 'barra__version', text: `Interfaz operativa · v${App.version}` }),
     ]);
 
-    contenedor.append(this.panel);
+    // Segunda fila, bajo los controles: pestañas de módulo a un lado e
+    // indicadores de estado al otro.
+    this.secundaria = crear('div', { class: 'barra-secundaria' }, [
+      this.pestanas,
+      this.grupoIndicadores,
+    ]);
+
+    // El reloj de misión y la fecha simulada dejan de mostrarse. Los nodos
+    // siguen existiendo y actualizándose —el resto del código los usa y no hay
+    // motivo para romperlo— pero no ocupan sitio en pantalla.
+    this.tiempos = crear('div', { class: 'barra__tiempos', hidden: true }, [
+      crear('span', { class: 'barra__rotulo', text: 'Misión' }), this.reloj,
+      crear('span', { class: 'barra__rotulo', text: 'Fecha simulada' }), this.fecha,
+    ]);
+
+    /**
+     * El antiguo título central pasa a ser una región viva invisible.
+     *
+     * Por ahí llegan avisos que importan —«toca la pantalla para permitir el
+     * audio», el cambio de motor de narración, el aviso de escala— y borrar el
+     * elemento los habría hecho desaparecer para todo el mundo. Así los lectores
+     * de pantalla los siguen recibiendo y ningún `establecerSubtitulo` revienta.
+     * Lo que se pierde es su sitio VISIBLE, que es lo que se pidió.
+     */
+    this.centro = crear('div', { class: 'barra__centro visualmente-oculto', role: 'status' }, [
+      crear('p', { class: 'barra__subtitulo', id: 'barra-subtitulo', text: '' }),
+    ]);
+
+    this.panel.append(this.tiempos, this.centro);
+    contenedor.append(this.panel, this.secundaria);
 
     this._alCambiarRed = () => this.actualizarRed();
     window.addEventListener('online', this._alCambiarRed);

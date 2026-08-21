@@ -46,16 +46,6 @@
       "inferior";
   }
   #hud-barra-superior { flex-wrap: wrap; }
-  .barra {
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "identidad derecha"
-      "centro    centro";
-    gap: var(--e-2);
-  }
-  .barra__identidad { grid-area: identidad; }
-  .barra__centro    { grid-area: centro; text-align: left; }
-  .barra__derecha   { grid-area: derecha; }
   .arco { display: none; }
   #hud-estado-entradas { display: none; }
 }
@@ -125,23 +115,27 @@
   }
 
   /* ESTE ERA EL FALLO QUE VACIABA LA PANTALLA EN EL MÓVIL.
-     `.barra` lleva `flex: 1 1 640px`, pensado para una barra en fila: 640 px de
-     ANCHO base. Al pasar el contenedor a columna, el eje principal es el
+     `.barra` llevaba `flex: 1 1 640px`, pensado para una barra en fila: 640 px
+     de ANCHO base. Al pasar el contenedor a columna, el eje principal es el
      vertical y esos 640 px pasaron a ser una ALTURA: la barra sola ocupaba 640
      de los 667 px de un teléfono. El resultado era que los controles caían
      fuera de la pantalla, el perfil del cuerpo se quedaba en 0 px de alto y de
-     la interfaz solo se veía el rótulo ORBIS. */
+     la interfaz solo se veía el rótulo ORBIS. Hoy la barra ya no declara base
+     flexible —solo lleva la identidad—, así que no podría repetirse; el
+     `flex: 0 0 auto` se queda igualmente, porque es lo correcto y porque el
+     comentario merece sobrevivir al fallo. */
   .barra {
     flex: 0 0 auto;
-    grid-template-columns: 1fr;
-    grid-template-areas: "identidad" "derecha";
     padding: var(--e-2);
   }
-  .barra__modulos,
-  .barra__tiempos,
-  .barra__centro { display: none; }
-  .barra__derecha { justify-items: start; }
+  /* Las pestañas de módulo no caben en un teléfono y no son imprescindibles:
+     los cinco paneles de la derecha ya están ocultos a este ancho, así que
+     filtrarlos no filtraría nada. */
+  .barra__modulos { display: none; }
   .barra__marca { font-size: 1.05rem; letter-spacing: 0.22em; }
+
+  /* La fila secundaria se queda solo con los indicadores, pegados al inicio. */
+  .barra-secundaria { justify-content: flex-start; }
 
   /* Las cuatro pastillas de estado (cámara, micrófono, red, FPS) en una sola
      fila piden 321 px: más que los 304 disponibles en una pantalla de 320. Sin

@@ -179,6 +179,27 @@ async function arrancar() {
     App.emitir('vista:general', {});
   }
 
+  /**
+   * Vista galáctica: aleja la cámara hasta ver el Sistema Solar entero.
+   *
+   * Pasadas las 700 unidades aparece el disco de la Vía Láctea —lo controla
+   * Galaxy.actualizarSegunDistancia—, pero a esa distancia el disco queda a los
+   * lados y fuera del encuadre: está centrado a 4.950 unidades, porque el
+   * Sistema Solar se sitúa en el brazo de Orión y no en el centro galáctico. A
+   * 3.000 el sistema entero cabe compacto en medio y el disco lo rodea, que es
+   * el encuadre que se buscaba. Se eligió mirando capturas a 1.500, 3.000,
+   * 5.000, 7.000 y 9.000, no a ojo. Los paneles de datos siguen alrededor.
+   */
+  function vistaGalactica() {
+    App.definir('cuerpoActivo', null);
+    App.definir('vista', 'galaxia');
+    rig.volverAVistaGeneral(3000);
+    narrador?.detener();
+    sfx.reproducir('transicion');
+    anunciar('Vista galáctica. El Sistema Solar completo, con el disco de la Vía Láctea al fondo.');
+    App.emitir('vista:galactica', {});
+  }
+
   function vecino(direccion) {
     const actual = App.estado.cuerpoActivo;
     const indice = actual ? orden.indexOf(actual) : -1;
@@ -253,6 +274,7 @@ async function arrancar() {
   let narrador = null;
 
   const hud = new HUD(catalogo, {
+    vistaGalactica,
     seleccionar,
     vistaGeneral,
     vecino,
@@ -628,7 +650,7 @@ async function arrancar() {
   });
   // Superficie pública para la consola del navegador y las pruebas.
   App.acciones = {
-    seleccionar, vistaGeneral, vecino,
+    seleccionar, vistaGeneral, vistaGalactica, vecino,
     alternarPausa, cambiarVelocidad, mostrarOrbitas, cambiarEscala,
     ejecutarIntencion,
     comparar: (a, b) => hud.compararCuerpos(a, b),

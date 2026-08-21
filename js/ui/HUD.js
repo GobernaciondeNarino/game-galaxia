@@ -109,12 +109,8 @@ export class HUD {
 
     this.botonGalaxia = crear('button', {
       class: 'controles__boton controles__boton--galaxia', type: 'button',
-      'aria-pressed': 'false',
-      title: 'Mostrar u ocultar la interfaz galáctica',
-      onclick: () => {
-        const visible = this.panelGalactico.alternar();
-        this.botonGalaxia.setAttribute('aria-pressed', String(visible));
-      },
+      title: 'Alejar la cámara hasta ver el Sistema Solar entero y el disco galáctico',
+      onclick: () => this.acciones.vistaGalactica?.(),
       text: 'Galaxia',
     });
 
@@ -174,7 +170,10 @@ export class HUD {
       }),
     ]);
 
-    $('#hud-barra-superior').append(this.controles);
+    // Los controles van ENTRE la barra de identidad y la fila secundaria, para
+    // que compartan renglón con la primera y las pestañas y los indicadores
+    // queden debajo de ellos, que es donde se pidieron.
+    this.barra.secundaria.before(this.controles);
   }
 
   /**
@@ -321,12 +320,17 @@ export class HUD {
   establecerVista(vista) {
     const enCuerpo = vista === 'cuerpo';
     document.body.dataset.vista = vista;
+    this.botonGalaxia?.setAttribute('aria-pressed', String(vista === 'galaxia'));
 
     // El panel galáctico se retira con un barrido; no se destruye, así que
     // volver a la vista general no cuesta ni una reconstrucción. Al volver se
     // asoma unos segundos y se va: es un rótulo de contexto, no un panel de
     // trabajo, y el centro de la pantalla lo necesita el Sistema Solar.
-    if (enCuerpo) this.panelGalactico.ocultar();
+    //
+    // En la vista galáctica no se asoma: ahí el centro es justamente lo que se
+    // ha ido a mirar, y taparlo con un panel sería contradecir el botón que
+    // acaba de pulsarse.
+    if (enCuerpo || vista === 'galaxia') this.panelGalactico.ocultar();
     else if (!App.estado.cargando) this._presentarGalaxia();
 
     this.reticula?.establecerVisible(enCuerpo);
@@ -340,12 +344,18 @@ export class HUD {
     }
   }
 
-  /** Asoma el panel galáctico y deja que se retire solo. */
+  /**
+   * Asoma el panel galáctico y deja que se retire solo.
+   *
+   * El panel sigue existiendo y funcionando —lleva la invitación a encender el
+   * micrófono y la cámara, y sus dos cifras citadas— pero ya no lo abre ningún
+   * botón: «Galaxia» ahora aleja la cámara, que es lo que se pidió. Se conserva
+   * entero por si vuelve a hacer falta.
+   */
   _presentarGalaxia() {
     // La primera vez se queda más rato, porque lleva la invitación a encender
     // el micrófono y la cámara y tres segundos no dan para leerla y decidir.
     this.panelGalactico.mostrar(this.panelGalactico.msDePresentacion);
-    this.botonGalaxia?.setAttribute('aria-pressed', 'false');
   }
 
   /** Conecta las anotaciones con la malla del cuerpo mostrado. */
