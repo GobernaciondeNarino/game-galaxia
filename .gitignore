@@ -5,6 +5,9 @@ cache/audio/*
 # Contadores del limitador de peticiones
 cache/limites/
 
+# Tablas de JPL Horizons: una por cuerpo y día, se rehacen solas
+cache/efemerides/
+
 # Registros del backend
 api/logs/*
 !api/logs/.gitkeep

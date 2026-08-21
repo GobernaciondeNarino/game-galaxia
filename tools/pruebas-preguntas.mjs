@@ -69,12 +69,48 @@ console.log('\n▸ Preguntas parecidas que NO deben confundirse');
     ['qué densidad tiene', 'densidad'],
     ['qué gravedad tiene', 'gravedad'],
     ['a qué distancia está del sol', 'distancia'],
+    // El par que más se puede confundir de todos, y el que más importa: uno es
+    // el semieje mayor respecto al Sol, que es una constante orbital y está en
+    // el catálogo; el otro es la separación real respecto a la Tierra HOY, que
+    // cambia cada día y se le pregunta a JPL Horizons. Para Marte son 1,52 ua
+    // frente a cualquier cosa entre 0,4 y 2,7: dar una por la otra sería un
+    // error de más del doble.
+    ['a qué distancia está de la tierra', 'posicion'],
+    ['dónde está ahora', 'posicion'],
+    ['dónde lo veo', 'posicion'],
+    ['se acerca o se aleja', 'posicion'],
     ['a qué orbita', 'padre'],
     ['qué inclinación axial tiene', 'inclinacion'],
     ['cuál es su velocidad de escape', 'escape'],
   ];
   for (const [frase, atributo] of pares) {
     comprobar(`«${frase}»`, preguntas.interpretar(frase, 'marte').atributo, atributo);
+  }
+}
+
+console.log('\n▸ El nombre del cuerpo puede ir EN MEDIO de la pregunta');
+{
+  // Así es como habla la gente, y era justo lo que no se reconocía: el patrón
+  // queda partido en dos por el nombre y la coincidencia exacta no lo encuentra.
+  // Se reconocía «dónde está ahora» y «dónde está ahora Marte», pero no «dónde
+  // está Marte ahora», que es la forma más natural de las tres.
+  const casos = [
+    ['dónde está Marte ahora', 'posicion', 'marte'],
+    ['cuánto pesa Júpiter exactamente', 'masa', 'jupiter'],
+    ['qué temperatura hace en Venus de noche', 'temperatura', 'venus'],
+    ['cuántas lunas tiene Saturno en total', 'satelites', 'saturno'],
+    ['a qué distancia está de la tierra Titán', 'posicion', 'titan'],
+  ];
+  for (const [frase, atributo, cuerpo] of casos) {
+    const r = preguntas.interpretar(frase);
+    comprobar(`«${frase}» → atributo`, r.atributo, atributo);
+    comprobar(`«${frase}» → cuerpo`, r.cuerpo, cuerpo);
+  }
+
+  // Y quitar el nombre no puede convertir una pregunta en otra distinta: las
+  // órdenes siguen sin ser preguntas aunque nombren un cuerpo.
+  for (const orden of ['llévame a Marte', 'háblame de Venus', 'vista general']) {
+    comprobar(`«${orden}» sigue sin ser pregunta`, preguntas.interpretar(orden).atributo, null);
   }
 }
 
@@ -129,7 +165,9 @@ console.log('\n▸ Cada atributo apunta a un campo que existe de verdad');
   const leerRuta = (o, ruta) => ruta.split('.').reduce((v, k) => (v == null ? v : v[k]), o);
 
   for (const [id, datos] of Object.entries(leer('data/preguntas.json').atributos)) {
-    if (datos.campo.startsWith('$')) continue;      // «$fuente» es del cuerpo entero
+    // Los campos con «$» no son rutas del catálogo: «$fuente» es del cuerpo
+    // entero y «$horizons» no está en ningún archivo, se consulta en vivo.
+    if (datos.campo.startsWith('$')) continue;
     const valor = leerRuta(tierra, datos.campo);
     comprobar(`${id} → ${datos.campo} existe en el catálogo`, valor !== undefined, true);
   }

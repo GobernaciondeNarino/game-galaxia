@@ -49,11 +49,18 @@ node tools/pruebas-narracion.mjs           # las tres narraciones de cada cuerpo
 php  tools/pruebas-asistente.php           # validación del nombre y frases
 node tools/pruebas-preguntas.mjs           # reconocedor de preguntas
 node tools/pruebas-datos.mjs               # coherencia del catálogo (masa vs d×V)
+php  tools/pruebas-horizons.php            # parseo de las tablas de JPL (sin red)
 php  tools/pruebas-meteoros.php            # calendario de lluvias de meteoros
 node tools/pruebas-voz.mjs                 # parser de intenciones de voz
 node tools/csp-hash.mjs --verificar        # hash CSP del importmap al día
 find api config -name '*.php' -exec php -l {} \;
 php -S localhost:8080                      # y abrir http://localhost:8080
+```
+
+Fuera de la lista obligatoria, porque sale a internet y tarda medio minuto:
+
+```bash
+php tools/verificar-horizons.php           # contrasta el catálogo con JPL en vivo
 ```
 
 ## Fichas de diseño

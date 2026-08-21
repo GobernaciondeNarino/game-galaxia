@@ -26,6 +26,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/Config.php';
 require_once __DIR__ . '/Catalogo.php';
+require_once __DIR__ . '/Horizons.php';
 
 final class Respuestas
 {
@@ -223,6 +224,86 @@ final class Respuestas
         $enMedio = self::conArticulo($cuerpo, false);
 
         switch ($atributo) {
+            /**
+             * El único atributo que NO sale del catálogo.
+             *
+             * Todos los demás son propiedades que no cambian y por eso están en
+             * un archivo. Dónde está un cuerpo hoy cambia cada día, así que
+             * ningún archivo del repositorio puede contenerlo: se le pregunta a
+             * JPL Horizons, que es de donde salió el resto del catálogo.
+             *
+             * Se distingue a propósito de «distancia», que es el semieje mayor
+             * respecto al Sol y es una constante orbital. Esto otro es la
+             * separación real respecto a la Tierra en esta fecha, y las dos
+             * cifras no se parecen: Marte está a 1,52 ua del Sol siempre, y a
+             * entre 0,4 y 2,7 de nosotros según cuándo se mire.
+             */
+            case 'posicion': {
+                // La Tierra es el punto desde el que se mide todo lo demás, así
+                // que preguntar a qué distancia está de sí misma no tiene
+                // respuesta. Decirlo es más útil que devolver un cero o fingir
+                // que falló la consulta.
+                if ($idCuerpo === 'tierra') {
+                    return [
+                        'texto' => 'Estás en ella. La Tierra es el punto desde el que mido las distancias de todo lo demás, así que su distancia a sí misma no es una pregunta con respuesta.',
+                        'fuente' => 'NASA/JPL Horizons — el geocentro es el origen de coordenadas',
+                        'valor' => null,
+                        'sinDato' => false,
+                    ];
+                }
+
+                $e = Horizons::efemerides($idCuerpo);
+                if ($e === null || $e['distanciaUA'] === null) {
+                    // Sin conexión con el JPL no se rellena el hueco con la
+                    // posición simulada de la escena: son cosas distintas y
+                    // hacerlas pasar por la misma sería inventar un dato.
+                    return [
+                        'texto' => sprintf(
+                            'Ahora mismo no puedo consultar dónde está %s. Esa cifra la calcula JPL Horizons en el momento y no está en mi catálogo, así que prefiero no dártela a medias.',
+                            $enMedio
+                        ),
+                        'fuente' => 'NASA/JPL Horizons (no disponible)',
+                        'valor' => null,
+                        'sinDato' => true,
+                    ];
+                }
+
+                $partes = [sprintf(
+                    'Hoy %s está a %s de la Tierra, es decir %s kilómetros.',
+                    $enMedio,
+                    self::numero((float) $e['distanciaUA'], 3) . ' unidades astronómicas',
+                    self::numero((float) $e['distanciaKm'], 0)
+                )];
+
+                $v = $e['velocidadRadialKms'];
+                if ($v !== null && abs($v) > 0.05) {
+                    $partes[] = sprintf(
+                        'Se %s a %s kilómetros por segundo.',
+                        $v < 0 ? 'acerca' : 'aleja',
+                        self::numero(abs((float) $v), 1)
+                    );
+                }
+
+                if (!empty($e['ascensionRecta']) && !empty($e['declinacion'])) {
+                    $partes[] = sprintf(
+                        'En el cielo está en ascensión recta %s y declinación %s.',
+                        (string) $e['ascensionRecta'],
+                        (string) $e['declinacion']
+                    );
+                }
+
+                // Medido desde el centro de la Tierra, no desde donde esté
+                // quien pregunta: no se pide la ubicación de nadie.
+                $partes[] = 'Medido desde el centro de la Tierra.';
+
+                return [
+                    'texto' => implode(' ', $partes),
+                    'fuente' => (string) $e['fuente'],
+                    'valor' => self::numero((float) $e['distanciaUA'], 3) . ' ua',
+                    'sinDato' => false,
+                ];
+            }
+
             case 'tamano':
                 $tam = self::cifra($cuerpo, $nombre, 'fisica.diametroKm',
                     '%s mide %s kilómetros de diámetro.', 0, 'el diámetro ' . self::deCuerpo($cuerpo));

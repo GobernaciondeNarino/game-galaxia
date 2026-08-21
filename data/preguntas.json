@@ -5,97 +5,275 @@
     "tamano": {
       "etiqueta": "tamaño",
       "campo": "fisica.diametroKm",
-      "patrones": ["que tamano tiene", "cual es su tamano", "como de grande es", "que tan grande es", "cuanto mide", "que diametro tiene", "cual es su diametro", "cual es su radio", "que radio tiene", "es mas grande que", "tamano", "diametro", "radio", "de que tamano"]
+      "patrones": [
+        "que tamano tiene",
+        "cual es su tamano",
+        "como de grande es",
+        "que tan grande es",
+        "cuanto mide",
+        "que diametro tiene",
+        "cual es su diametro",
+        "cual es su radio",
+        "que radio tiene",
+        "es mas grande que",
+        "tamano",
+        "diametro",
+        "radio",
+        "de que tamano"
+      ]
     },
     "masa": {
       "etiqueta": "masa",
       "campo": "fisica.masaKg",
-      "patrones": ["cuanto pesa", "que masa tiene", "cual es su masa", "cuanta masa tiene", "que peso tiene", "masa", "peso"]
+      "patrones": [
+        "cuanto pesa",
+        "que masa tiene",
+        "cual es su masa",
+        "cuanta masa tiene",
+        "que peso tiene",
+        "masa",
+        "peso"
+      ]
     },
     "gravedad": {
       "etiqueta": "gravedad",
       "campo": "fisica.gravedadMs2",
-      "patrones": ["que gravedad tiene", "cual es su gravedad", "cuanto pesaria alli", "cuanto pesaria yo", "cuanta gravedad hay", "gravedad"]
+      "patrones": [
+        "que gravedad tiene",
+        "cual es su gravedad",
+        "cuanto pesaria alli",
+        "cuanto pesaria yo",
+        "cuanta gravedad hay",
+        "gravedad"
+      ]
     },
     "densidad": {
       "etiqueta": "densidad",
       "campo": "fisica.densidadGcm3",
-      "patrones": ["que densidad tiene", "cual es su densidad", "de que esta hecho", "de que esta hecha", "densidad"]
+      "patrones": [
+        "que densidad tiene",
+        "cual es su densidad",
+        "de que esta hecho",
+        "de que esta hecha",
+        "densidad"
+      ]
     },
     "temperatura": {
       "etiqueta": "temperatura",
       "campo": "temperatura",
-      "patrones": ["que temperatura tiene", "que temperatura hace", "cual es su temperatura", "hace frio", "hace calor", "que tan frio es", "que tan caliente es", "cuanto frio hace", "cuanto calor hace", "temperatura"]
+      "patrones": [
+        "que temperatura tiene",
+        "que temperatura hace",
+        "cual es su temperatura",
+        "hace frio",
+        "hace calor",
+        "que tan frio es",
+        "que tan caliente es",
+        "cuanto frio hace",
+        "cuanto calor hace",
+        "temperatura"
+      ]
     },
     "atmosfera": {
       "etiqueta": "atmósfera",
       "campo": "atmosfera",
-      "patrones": ["que atmosfera tiene", "tiene atmosfera", "de que es su atmosfera", "que aire tiene", "se puede respirar", "que hay en su atmosfera", "composicion atmosferica", "atmosfera", "aire"]
+      "patrones": [
+        "que atmosfera tiene",
+        "tiene atmosfera",
+        "de que es su atmosfera",
+        "que aire tiene",
+        "se puede respirar",
+        "que hay en su atmosfera",
+        "composicion atmosferica",
+        "atmosfera",
+        "aire"
+      ]
     },
     "satelites": {
       "etiqueta": "satélites",
       "campo": "satelitesConocidos",
-      "patrones": ["cuantas lunas tiene", "cuantos satelites tiene", "que lunas tiene", "que satelites tiene", "tiene lunas", "tiene satelites", "lunas", "satelites"]
+      "patrones": [
+        "cuantas lunas tiene",
+        "cuantos satelites tiene",
+        "que lunas tiene",
+        "que satelites tiene",
+        "tiene lunas",
+        "tiene satelites",
+        "lunas",
+        "satelites"
+      ]
     },
     "rotacion": {
       "etiqueta": "rotación",
       "campo": "fisica.periodoRotacionHoras",
-      "patrones": ["cuanto dura su dia", "cuanto dura un dia", "cuanto tarda en girar", "cuanto tarda en dar una vuelta sobre si mismo", "que rotacion tiene", "cuanto dura el dia", "rotacion", "su dia"]
+      "patrones": [
+        "cuanto dura su dia",
+        "cuanto dura un dia",
+        "cuanto tarda en girar",
+        "cuanto tarda en dar una vuelta sobre si mismo",
+        "que rotacion tiene",
+        "cuanto dura el dia",
+        "rotacion",
+        "su dia"
+      ]
     },
     "orbita": {
       "etiqueta": "año",
       "campo": "orbita.periodoOrbitalDias",
-      "patrones": ["cuanto dura su ano", "cuanto dura un ano", "cuanto tarda en dar la vuelta al sol", "cuanto tarda en orbitar", "que periodo orbital tiene", "cuanto dura el ano", "periodo orbital", "su ano"]
+      "patrones": [
+        "cuanto dura su ano",
+        "cuanto dura un ano",
+        "cuanto tarda en dar la vuelta al sol",
+        "cuanto tarda en orbitar",
+        "que periodo orbital tiene",
+        "cuanto dura el ano",
+        "periodo orbital",
+        "su ano"
+      ]
     },
     "distancia": {
       "etiqueta": "distancia al Sol",
       "campo": "orbita.semiejeMayorUA",
-      "patrones": ["a que distancia esta del sol", "cual es su distancia al sol", "que lejos esta del sol", "que tan lejos esta", "a que distancia esta", "cuanto dista del sol", "distancia al sol", "distancia"]
+      "patrones": [
+        "a que distancia esta del sol",
+        "cual es su distancia al sol",
+        "que lejos esta del sol",
+        "que tan lejos esta",
+        "a que distancia esta",
+        "cuanto dista del sol",
+        "distancia al sol",
+        "distancia"
+      ]
     },
     "inclinacion": {
       "etiqueta": "inclinación del eje",
       "campo": "fisica.inclinacionAxialGrados",
-      "patrones": ["cuanto se inclina su eje", "que inclinacion axial tiene", "como esta inclinado", "cuanto esta inclinado", "tiene estaciones", "inclinacion axial", "inclinacion del eje"]
+      "patrones": [
+        "cuanto se inclina su eje",
+        "que inclinacion axial tiene",
+        "como esta inclinado",
+        "cuanto esta inclinado",
+        "tiene estaciones",
+        "inclinacion axial",
+        "inclinacion del eje"
+      ]
     },
     "escape": {
       "etiqueta": "velocidad de escape",
       "campo": "fisica.velocidadEscapeKms",
-      "patrones": ["cual es su velocidad de escape", "que velocidad de escape tiene", "a que velocidad hay que salir", "velocidad de escape"]
+      "patrones": [
+        "cual es su velocidad de escape",
+        "que velocidad de escape tiene",
+        "a que velocidad hay que salir",
+        "velocidad de escape"
+      ]
     },
     "albedo": {
       "etiqueta": "albedo",
       "campo": "fisica.albedoGeometrico",
-      "patrones": ["que albedo tiene", "cual es su albedo", "cuanta luz refleja", "que tan brillante es", "albedo"]
+      "patrones": [
+        "que albedo tiene",
+        "cual es su albedo",
+        "cuanta luz refleja",
+        "que tan brillante es",
+        "albedo"
+      ]
     },
     "magnetosfera": {
       "etiqueta": "campo magnético",
       "campo": "magnetosfera",
-      "patrones": ["tiene campo magnetico", "que campo magnetico tiene", "cual es su magnetosfera", "tiene magnetosfera", "campo magnetico", "magnetosfera"]
+      "patrones": [
+        "tiene campo magnetico",
+        "que campo magnetico tiene",
+        "cual es su magnetosfera",
+        "tiene magnetosfera",
+        "campo magnetico",
+        "magnetosfera"
+      ]
     },
     "geologia": {
       "etiqueta": "actividad geológica",
       "campo": "geologia",
-      "patrones": ["tiene volcanes", "es activo geologicamente", "que actividad geologica tiene", "tiene actividad geologica", "hay terremotos", "tiene tectonica", "actividad geologica", "geologia", "volcanes"]
+      "patrones": [
+        "tiene volcanes",
+        "es activo geologicamente",
+        "que actividad geologica tiene",
+        "tiene actividad geologica",
+        "hay terremotos",
+        "tiene tectonica",
+        "actividad geologica",
+        "geologia",
+        "volcanes"
+      ]
     },
     "curiosidad": {
       "etiqueta": "curiosidad",
       "campo": "curiosidades",
-      "patrones": ["dime algo curioso", "cuentame una curiosidad", "algo interesante", "sorprendeme", "que tiene de especial", "que tiene de raro", "curiosidad", "algo curioso"]
+      "patrones": [
+        "dime algo curioso",
+        "cuentame una curiosidad",
+        "algo interesante",
+        "sorprendeme",
+        "que tiene de especial",
+        "que tiene de raro",
+        "curiosidad",
+        "algo curioso"
+      ]
     },
     "tipo": {
       "etiqueta": "tipo",
       "campo": "tipo",
-      "patrones": ["que tipo de cuerpo es", "que es exactamente", "es un planeta", "es una luna", "que clase de cuerpo es", "que tipo es"]
+      "patrones": [
+        "que tipo de cuerpo es",
+        "que es exactamente",
+        "es un planeta",
+        "es una luna",
+        "que clase de cuerpo es",
+        "que tipo es"
+      ]
     },
     "padre": {
       "etiqueta": "a qué orbita",
       "campo": "padre",
-      "patrones": ["a que orbita", "alrededor de que gira", "de quien es luna", "de quien es satelite", "a quien orbita", "alrededor de quien gira"]
+      "patrones": [
+        "a que orbita",
+        "alrededor de que gira",
+        "de quien es luna",
+        "de quien es satelite",
+        "a quien orbita",
+        "alrededor de quien gira"
+      ]
     },
     "fuente": {
       "etiqueta": "fuente",
       "campo": "$fuente",
-      "patrones": ["de donde sacas eso", "de donde sale ese dato", "cual es la fuente", "quien lo midio", "como lo sabes", "de donde viene ese dato", "fuente del dato"]
+      "patrones": [
+        "de donde sacas eso",
+        "de donde sale ese dato",
+        "cual es la fuente",
+        "quien lo midio",
+        "como lo sabes",
+        "de donde viene ese dato",
+        "fuente del dato"
+      ]
+    },
+    "posicion": {
+      "etiqueta": "dónde está hoy",
+      "campo": "$horizons",
+      "patrones": [
+        "donde esta ahora",
+        "donde esta hoy",
+        "donde se encuentra ahora",
+        "a que distancia esta de la tierra",
+        "que distancia hay hasta el",
+        "que lejos esta de nosotros",
+        "donde lo veo",
+        "donde puedo verlo",
+        "en que posicion esta",
+        "posicion actual",
+        "efemerides",
+        "se acerca o se aleja"
+      ]
     }
   }
 }
