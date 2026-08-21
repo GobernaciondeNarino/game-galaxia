@@ -584,8 +584,92 @@
    elegido. `data-modulos` lo pone cada panel al construirse, en PanelesDerecha.
    ========================================================================== */
 body[data-modulo="sensores"]  .panel--derecha:not([data-modulos~="sensores"]),
-body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]) {
+body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]),
+body[data-modulo="asistente"] .panel--derecha:not([data-modulos~="asistente"]) {
   display: none;
+}
+
+/* El panel del asistente es el único que NO sale en SISTEMA. Los otros cinco
+   son fichas del cuerpo que se leen juntas; este es una conversación, y
+   colgarlo debajo de las fichas lo habría dejado siempre fuera de la vista y
+   además habría cambiado la columna de arranque, que estaba bien como estaba. */
+body[data-modulo="sistema"] .panel--asistente { display: none; }
+
+/* --------------------------------------------------------------------------
+   Panel del asistente
+   -------------------------------------------------------------------------- */
+.asistente__bloque { display: grid; gap: var(--e-2); margin-top: var(--e-3); }
+.asistente__bloque:first-of-type { margin-top: var(--e-2); }
+
+.asistente__nombre,
+.asistente__ultimo {
+  margin: 0;
+  font-family: var(--fuente-datos);
+  font-size: var(--t-base);
+  line-height: 1.45;
+  color: var(--texto);
+}
+
+.asistente__rotulo {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cian-acento);
+}
+
+.asistente__sujeto { color: var(--ambar-seleccion); font-weight: 600; }
+
+.asistente__ultimo { color: var(--texto-tenue); font-style: italic; }
+
+.asistente__pie {
+  margin: 0;
+  font-family: var(--fuente-datos);
+  font-size: var(--t-menor);
+  line-height: 1.4;
+  color: var(--texto-apagado);
+}
+
+/* Un enlace de texto y no un botón con caja: es una acción secundaria y no
+   compite con las diecinueve preguntas, que son lo que se ha venido a hacer. */
+.asistente__enlace {
+  justify-self: start;
+  min-height: 24px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--panel-borde);
+  color: var(--cian-acento);
+  font-family: var(--fuente-datos);
+  font-size: var(--t-menor);
+  cursor: pointer;
+}
+.asistente__enlace:hover,
+.asistente__enlace:focus-visible { color: var(--cian-brillante); border-bottom-color: var(--panel-borde-vivo); }
+
+.asistente__preguntas { display: flex; flex-wrap: wrap; gap: var(--e-1) 6px; }
+
+.asistente__pregunta {
+  min-height: 24px;
+  padding: 3px 8px;
+  background: rgba(79, 195, 247, 0.07);
+  border: 1px solid var(--panel-borde);
+  color: var(--texto);
+  font-family: var(--fuente-datos);
+  font-size: var(--t-menor);
+  cursor: pointer;
+  transition: background-color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+}
+.asistente__pregunta:hover,
+.asistente__pregunta:focus-visible {
+  background: rgba(0, 229, 255, 0.16);
+  border-color: var(--panel-borde-vivo);
+}
+
+@media (pointer: coarse) {
+  .asistente__pregunta, .asistente__enlace { min-height: 44px; }
+  .asistente__pregunta { padding: 3px var(--e-2); }
 }
 
 /* ==========================================================================

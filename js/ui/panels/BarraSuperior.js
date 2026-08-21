@@ -20,13 +20,17 @@ import { App } from '../../core/App.js';
  * La nota decía «llega en la fase 7» y «llega en la fase 8», y ambas fases ya
  * están cerradas sin que estos dos módulos entraran en el alcance: la promesa
  * había caducado y seguía en pantalla.
+ *
+ * ASISTENTE ya existe: PanelAsistente. TECNOLOGÍA sigue apagada, y su nota dice
+ * exactamente por qué —no hay ni un dato de misiones ni de sondas en el
+ * catálogo—, que es más honesto que una fecha que nadie va a cumplir.
  */
 const MODULOS = [
   { id: 'sistema', etiqueta: 'Sistema', activo: true, nota: 'todos los paneles' },
   { id: 'sensores', etiqueta: 'Sensores', activo: true, nota: 'atmósfera, geología y magnetosfera' },
   { id: 'analitica', etiqueta: 'Analítica', activo: true, nota: 'mapa orbital y datos comparados' },
-  { id: 'asistente', etiqueta: 'Asistente', activo: false, nota: 'no implementado' },
-  { id: 'tecnologia', etiqueta: 'Tecnología', activo: false, nota: 'no implementado' },
+  { id: 'asistente', etiqueta: 'Asistente', activo: true, nota: 'qué puedes preguntarme, y a quién' },
+  { id: 'tecnologia', etiqueta: 'Tecnología', activo: false, nota: 'sin datos de misiones ni sondas en el catálogo' },
 ];
 
 /**

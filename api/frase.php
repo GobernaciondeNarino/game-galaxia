@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/lib/Respuesta.php';
 require_once __DIR__ . '/lib/Asistente.php';
+require_once __DIR__ . '/lib/Catalogo.php';
 
 header('X-Content-Type-Options: nosniff');
 
@@ -39,7 +40,17 @@ if (preg_match('/^[a-z-]{1,32}$/', $fraseId) !== 1) {
 $variante = isset($_GET['variante']) ? (int) $_GET['variante'] : 0;
 $nombre = Asistente::limpiarNombre(isset($_GET['nombre']) ? (string) $_GET['nombre'] : null);
 
-$texto = Asistente::frase($fraseId, $nombre, $variante);
+// Igual que en tts.php: el cliente dice de qué cuerpo habla y el servidor mira
+// de qué tipo es. Así el texto que se lee en el subtítulo es exactamente el
+// mismo que se sintetiza, que es lo que hace que no se descuadren.
+$tipo = null;
+$idCuerpo = isset($_GET['cuerpo']) ? (string) $_GET['cuerpo'] : '';
+if ($idCuerpo !== '' && preg_match('/^[a-z0-9-]{1,40}$/', $idCuerpo) === 1) {
+    $cuerpo = Catalogo::cuerpo($idCuerpo);
+    $tipo = isset($cuerpo['tipo']) ? (string) $cuerpo['tipo'] : null;
+}
+
+$texto = Asistente::frase($fraseId, $nombre, $variante, $tipo);
 if ($texto === null) {
     // Que no haya versión aplicable no es un error del cliente: «presentacion»
     // sin nombre no existe a propósito. Se responde 204 y el cliente se calla,

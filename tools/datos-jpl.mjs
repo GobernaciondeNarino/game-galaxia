@@ -171,18 +171,39 @@ function radioKm(t) {
   ], undefined, [0.1, 1e6]);
 }
 
+/**
+ * El multiplicador que Horizons pone A VECES detrás de la cifra.
+ *
+ * ESTE ERA EL FALLO QUE METÍA CUATRO ÓRDENES DE MAGNITUD DE ERROR
+ * ───────────────────────────────────────────────────────────────
+ * En las lunas pequeñas de Marte, Horizons reutiliza la etiqueta de la tabla y
+ * corrige con un factor entre paréntesis:
+ *
+ *   Mass (10^20 kg )        =  1.08 (10^-4)   Geometric Albedo    =  0.06
+ *
+ * Eso son 1,08 × 10^-4 × 10^20 = 1,08 × 10^16 kg. El parser leía «1.08», le
+ * aplicaba el 10^20 de la etiqueta y tiraba el paréntesis: diez mil veces de
+ * más para Fobos y cien mil para Deimos. La cifra llegaba a la interfaz y el
+ * asistente la decía en voz alta como si fuese una medida.
+ *
+ * Se ve enseguida cruzándola con la densidad y el radio, que Horizons también
+ * publica: una masa que no cuadra con d × V no es una masa. Esa comprobación
+ * está ahora en tools/pruebas-datos.mjs y falla si vuelve a pasar.
+ */
+const MULTIPLICADOR = String.raw`(?:\s*\(\s*10\^(-?\d+)\s*\))?`;
+
 function masaKg(t) {
   // El exponente viaja en la etiqueta: «Mass x10^24 (kg)= 5.97219».
   const conExponente = [
-    new RegExp(String.raw`Mass[ ,]*x?\s*10\^(\d+)\s*\(?kg\)?[^=\n]*=\s*~?\s*${NUM}`, 'i'),
-    new RegExp(String.raw`Mass[ ,]*\(\s*10\^(\d+)\s*kg\s*\)[^=\n]*=\s*~?\s*${NUM}`, 'i'),
-    new RegExp(String.raw`Mass[ ,]*10\^(\d+)\s*kg[^=\n]*=\s*~?\s*${NUM}`, 'i'),
-    new RegExp(String.raw`Mass[ ,]*x\s*10\^(\d+)[^=\n]*=\s*~?\s*${NUM}`, 'i'),
+    new RegExp(String.raw`Mass[ ,]*x?\s*10\^(\d+)\s*\(?kg\)?[^=\n]*=\s*~?\s*${NUM}${MULTIPLICADOR}`, 'i'),
+    new RegExp(String.raw`Mass[ ,]*\(\s*10\^(\d+)\s*kg\s*\)[^=\n]*=\s*~?\s*${NUM}${MULTIPLICADOR}`, 'i'),
+    new RegExp(String.raw`Mass[ ,]*10\^(\d+)\s*kg[^=\n]*=\s*~?\s*${NUM}${MULTIPLICADOR}`, 'i'),
+    new RegExp(String.raw`Mass[ ,]*x\s*10\^(\d+)[^=\n]*=\s*~?\s*${NUM}${MULTIPLICADOR}`, 'i'),
   ];
   const directo = extraer(
     t,
     conExponente,
-    (m) => Number(m[2]) * 10 ** Number(m[1]),
+    (m) => Number(m[2]) * 10 ** (Number(m[1]) + Number(m[3] ?? 0)),
     [1e14, 1e31],
   );
   if (directo.valor !== null) return directo;

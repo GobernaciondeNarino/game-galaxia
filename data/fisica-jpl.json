@@ -569,7 +569,7 @@
       "revisado": "Jun 02, 2025",
       "fisica": {
         "radioMedioKm": 11.0584,
-        "masaKg": 108000000000000000000,
+        "masaKg": 1.08e+16,
         "densidadGcm3": 1.9,
         "gravedadMs2": null,
         "periodoRotacionHoras": 7.65944,
@@ -591,7 +591,7 @@
       },
       "origen": {
         "radioMedioKm": "radio medio derivado de los semiejes 13.1×11.1×9.3 km — Radius (km)             = 13.1 x11.1 x9.3",
-        "masaKg": "Mass (10^20 kg )        =  1.08 (10^-4)   Geometric Albedo    =  0.06",
+        "masaKg": "Mass (10^20 kg )        =  1.08 (10^-4)   Geometric Albedo    =  0.06  [multiplicador (10^-4) aplicado]",
         "densidadGcm3": "Radius (km)             = 13.1 x11.1 x9.3 Density (g cm^-3)   =  1.90 +- 0.08",
         "gravedadMs2": null,
         "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",
@@ -607,7 +607,7 @@
       "revisado": "Jun 02, 2025",
       "fisica": {
         "radioMedioKm": 6.20305,
-        "masaKg": 180000000000000000000,
+        "masaKg": 1800000000000000.0,
         "densidadGcm3": 1.76,
         "gravedadMs2": null,
         "periodoRotacionHoras": 30.3021,
@@ -629,7 +629,7 @@
       },
       "origen": {
         "radioMedioKm": "radio medio derivado de los semiejes 7.8×6×5.1 km — Radius (km)             = 7.8 x 6.0 x 5.1",
-        "masaKg": "Mass (10^20 kg )        = 1.80 (10^-5)    Geometric Albedo    =  0.06",
+        "masaKg": "Mass (10^20 kg )        = 1.80 (10^-5)    Geometric Albedo    =  0.06  [multiplicador (10^-5) aplicado]",
         "densidadGcm3": "Radius (km)             = 7.8 x 6.0 x 5.1 Density (g cm^-3)   =  1.76 +- 0.30",
         "gravedadMs2": null,
         "periodoRotacionHoras": "rotación síncrona declarada por Horizons: igual al periodo orbital",

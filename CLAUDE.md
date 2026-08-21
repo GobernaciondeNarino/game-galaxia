@@ -48,6 +48,7 @@ node tools/pruebas-guino.mjs               # guiño frente a parpadeo
 node tools/pruebas-narracion.mjs           # las tres narraciones de cada cuerpo
 php  tools/pruebas-asistente.php           # validación del nombre y frases
 node tools/pruebas-preguntas.mjs           # reconocedor de preguntas
+node tools/pruebas-datos.mjs               # coherencia del catálogo (masa vs d×V)
 php  tools/pruebas-meteoros.php            # calendario de lluvias de meteoros
 node tools/pruebas-voz.mjs                 # parser de intenciones de voz
 node tools/csp-hash.mjs --verificar        # hash CSP del importmap al día

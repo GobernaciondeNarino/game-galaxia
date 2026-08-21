@@ -61,6 +61,7 @@ if ($metodo === 'GET') {
         'nombre' => $_GET['nombre'] ?? null,
         'voiceId' => $_GET['voiceId'] ?? null,
         'variante' => $_GET['variante'] ?? 0,
+        'cuerpo' => $_GET['cuerpo'] ?? null,
         'soloCache' => isset($_GET['soloCache']) && $_GET['soloCache'] === '1',
     ];
 } elseif ($metodo === 'POST') {
@@ -143,7 +144,16 @@ if ($meteoros !== '') {
         isset($peticion['nombre']) ? (string) $peticion['nombre'] : null
     );
 
-    $texto = Asistente::frase($fraseId, $nombre, $variante);
+    // El cliente puede decir a QUÉ cuerpo pertenece la entradilla, pero no de
+    // qué tipo es: eso lo resuelve el servidor contra el catálogo. Un cuerpo
+    // desconocido no es un error, solo deja la entradilla sin encuadre.
+    $tipo = null;
+    if (isset($peticion['cuerpo']) && preg_match('/^[a-z0-9-]{1,40}$/', (string) $peticion['cuerpo']) === 1) {
+        $cuerpo = Catalogo::cuerpo((string) $peticion['cuerpo']);
+        $tipo = isset($cuerpo['tipo']) ? (string) $cuerpo['tipo'] : null;
+    }
+
+    $texto = Asistente::frase($fraseId, $nombre, $variante, $tipo);
     if ($texto === null) {
         Respuesta::error(
             404,

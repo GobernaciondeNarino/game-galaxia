@@ -24,6 +24,7 @@ import { NavegacionPlanetaria } from './panels/NavegacionPlanetaria.js';
 import { ProyeccionOrbital } from './panels/ProyeccionOrbital.js';
 import { EstadoEntradas } from './panels/EstadoEntradas.js';
 import { PanelGalactico } from './panels/PanelGalactico.js';
+import { PanelAsistente } from './panels/PanelAsistente.js';
 import { Anotaciones } from './Anotaciones.js';
 import { ArcoDatos } from './ArcoDatos.js';
 import { Reticula } from './Reticula.js';
@@ -62,6 +63,15 @@ export class HUD {
     this.geologia = new ActividadGeologica(derecha);
     this.magnetosfera = new DensidadMagnetosferica(derecha);
     this.adicionales = new DatosAdicionales(derecha);
+
+    // El panel del asistente vive en la misma columna, pero solo se ve con su
+    // pestaña puesta: en SISTEMA no aparece. Los otros cinco son fichas de
+    // datos del cuerpo y se leen juntas; este es una conversación y pide la
+    // columna entera.
+    this.asistente = new PanelAsistente(derecha, {
+      alPreguntar: (texto) => acciones.preguntar?.(texto) ?? Promise.resolve(false),
+      alCambiarNombre: () => acciones.cambiarNombre?.(),
+    });
 
     this.navegacion = new NavegacionPlanetaria($('#hud-navegacion-planetaria'), this.catalogo, {
       alSeleccionar: (id, origen) => acciones.seleccionar(id, origen),
@@ -261,7 +271,9 @@ export class HUD {
     anunciar(
       id === 'sistema'
         ? 'Módulo Sistema: se muestran todos los paneles.'
-        : `Módulo ${id}: ${visibles} panel${visibles === 1 ? '' : 'es'} a la vista.`,
+        : id === 'asistente'
+          ? 'Módulo Asistente: qué puedes preguntarme, y sobre qué cuerpo.'
+          : `Módulo ${id}: ${visibles} panel${visibles === 1 ? '' : 'es'} a la vista.`,
     );
 
     App.emitir('hud:modulo', { id });
@@ -335,6 +347,7 @@ export class HUD {
     this.geologia.mostrar(cuerpo);
     this.magnetosfera.mostrar(cuerpo);
     this.adicionales.mostrar(cuerpo, this.tierra);
+    this.asistente.mostrar(cuerpo);
     this.proyeccion.destacar(cuerpo);
 
     this.barra.establecerSubtitulo(
@@ -564,7 +577,7 @@ export class HUD {
       this.barra, this.perfil, this.mapaOrbital, this.composicion, this.geologia,
       this.magnetosfera, this.adicionales, this.navegacion, this.proyeccion,
       this.entradas, this.panelGalactico, this.reticula, this.anotaciones, this.arco,
-      this.subtitulos, this.comparador, this.avisos,
+      this.subtitulos, this.comparador, this.avisos, this.asistente,
     ]) {
       parte?.destruir?.();
     }

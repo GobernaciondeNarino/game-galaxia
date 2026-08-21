@@ -82,12 +82,145 @@ echo "\n▸ El nombre se encaja en la frase, y la frase la pone el servidor\n";
     comprobar('y no lleva hueco', str_contains((string) $sinNombre, '{nombre}'), false);
 }
 
-echo "\n▸ Frases que solo tienen sentido dirigidas a alguien\n";
+echo "\n▸ Quien no da su nombre también recibe entradilla\n";
 {
-    // «presentacion» son fórmulas del tipo «mira esto, Ana»: sin nombre no
-    // quedan bien, así que no se dice nada en lugar de decir algo forzado.
-    comprobar('presentacion sin nombre no devuelve nada', Asistente::frase('presentacion', null, 0), null);
-    comprobar('presentacion con nombre sí', is_string(Asistente::frase('presentacion', 'Ana', 0)), true);
+    // Antes «presentacion» no tenía versiones sinNombre y quien no daba su
+    // nombre entraba en cada cuerpo sin que el asistente dijese nada.
+    comprobar('presentacion sin nombre devuelve texto', is_string(Asistente::frase('presentacion', null, 0)), true);
+    comprobar('presentacion con nombre también', is_string(Asistente::frase('presentacion', 'Ana', 0)), true);
+
+    // Y sin nombre no puede colarse un hueco a medio rellenar.
+    foreach (Asistente::identificadores() as $id) {
+        for ($v = 0; $v < 12; $v++) {
+            $t = (string) Asistente::frase($id, null, $v);
+            comprobar(
+                sprintf('«%s» v%d sin nombre no deja hueco', $id, $v),
+                strpos($t, '{nombre}') === false,
+                true
+            );
+        }
+    }
+}
+
+echo "\n▸ Ninguna frase da por supuesto el género de quien escucha\n";
+{
+    // «Bienvenido, María» y «Atento, María» estaban mal para media humanidad.
+    // El asistente no sabe el género de quien tiene delante, así que no puede
+    // usar ninguna forma que lo presuponga.
+    // Se buscan las formas ADJETIVAS, que son las que presuponen el género de
+    // quien escucha. El sustantivo no: «te doy la bienvenida» vale para
+    // cualquiera, y prohibirlo por parecerse habría sido un falso positivo.
+    $prohibidas = [
+        '/(^|[.!?¡¿]\s*)bienvenid[oa]\b/iu'       => 'saludo con género',
+        '/\b(atent[oa]|preparad[oa]|list[oa])\s*,/iu' => 'adjetivo con género antes del nombre',
+        '/\b(encantad[oa])\b/iu'                   => 'participio con género',
+    ];
+    $encontradas = 0;
+    foreach (Asistente::identificadores() as $id) {
+        for ($v = 0; $v < 14; $v++) {
+            foreach ([null, 'Ana'] as $nombre) {
+                $t = (string) Asistente::frase($id, $nombre, $v);
+                foreach ($prohibidas as $patron => $motivo) {
+                    if (preg_match($patron, $t) === 1) {
+                        $encontradas++;
+                        comprobar(sprintf('«%s» v%d: %s → «%s»', $id, $v, $motivo, $t), false, true);
+                    }
+                }
+            }
+        }
+    }
+    if ($encontradas === 0) {
+        echo "  ✔ ninguna forma con género en ninguna versión\n";
+    }
+}
+
+echo "\n▸ Entradillas por tipo de cuerpo\n";
+{
+    // El encuadre es estructural —lo dice el catálogo—, no un dato inventado:
+    // una luna no se presenta igual que un cinturón entero.
+    $tipos = Asistente::tiposConVersionPropia('presentacion');
+    comprobar('«presentacion» declara tipos propios', count($tipos) > 0, true);
+    printf("     tipos: %s\n", implode(', ', $tipos));
+
+    foreach ($tipos as $tipo) {
+        $conTipo = Asistente::frase('presentacion', 'Ana', 0, $tipo);
+        $sinTipo = Asistente::frase('presentacion', 'Ana', 0, null);
+        comprobar(sprintf('%s estrena versión propia', $tipo), $conTipo !== $sinTipo, true);
+
+        // Y el total incluye las generales: si las sustituyera, un tipo con tres
+        // versiones repetiría cada tres visitas.
+        comprobar(
+            sprintf('%s suma las generales', $tipo),
+            Asistente::cuantasVersiones('presentacion', true, $tipo)
+                > Asistente::cuantasVersiones('presentacion', true, null),
+            true
+        );
+    }
+
+    // Un tipo sin versiones propias no rompe nada: cae en las generales.
+    comprobar(
+        'un tipo desconocido cae en las generales',
+        Asistente::frase('presentacion', 'Ana', 0, 'no-existe'),
+        Asistente::frase('presentacion', 'Ana', 0, null)
+    );
+}
+
+echo "\n▸ Rotando se recorren TODAS las versiones antes de repetir\n";
+{
+    // Esta es la comprobación que habría cazado el fallo de raíz: la entradilla
+    // pedía la misma variante que la narración, y como la primera visita usa
+    // siempre la narración 0, el asistente decía «Mira esto» en todos y cada
+    // uno de los cuerpos. Ocho versiones escritas y una sola sonando.
+    foreach (['presentacion', 'regreso'] as $id) {
+        foreach ([true, false] as $conNombre) {
+            foreach (array_merge([null], Asistente::tiposConVersionPropia($id)) as $tipo) {
+                $total = Asistente::cuantasVersiones($id, $conNombre, $tipo);
+                $vistas = [];
+                for ($v = 0; $v < $total; $v++) {
+                    $vistas[] = Asistente::frase($id, $conNombre ? 'Ana' : null, $v, $tipo);
+                }
+                comprobar(
+                    sprintf('%s · %s · %s → %d sin repetir', $id, $conNombre ? 'con nombre' : 'sin nombre', $tipo ?? 'general', $total),
+                    count(array_unique($vistas)),
+                    $total
+                );
+                // Y a la vuelta empieza otra vez por la primera.
+                comprobar(
+                    sprintf('%s · %s · %s vuelve a empezar', $id, $conNombre ? 'con nombre' : 'sin nombre', $tipo ?? 'general'),
+                    Asistente::frase($id, $conNombre ? 'Ana' : null, $total, $tipo),
+                    $vistas[0]
+                );
+            }
+        }
+    }
+}
+
+echo "\n▸ Dos cuerpos seguidos no se presentan igual\n";
+{
+    // Se recorre el catálogo entero como lo haría quien va pulsando cuerpos, con
+    // el mismo contador por tipo que lleva el Narrator.
+    require_once __DIR__ . '/../api/lib/Catalogo.php';
+    $turnos = [];
+    $anterior = null;
+    $repetidasSeguidas = 0;
+    $dichas = [];
+    foreach (Catalogo::identificadores() as $id) {
+        $cuerpo = Catalogo::cuerpo($id);
+        $tipo = isset($cuerpo['tipo']) ? (string) $cuerpo['tipo'] : null;
+        $t = $turnos[$tipo] ?? 0;
+        $turnos[$tipo] = $t + 1;
+        $frase = Asistente::frase('presentacion', 'Ana', $t, $tipo);
+        if ($frase === $anterior) {
+            $repetidasSeguidas++;
+        }
+        $anterior = $frase;
+        $dichas[] = $frase;
+    }
+    comprobar('ninguna se repite dos veces seguidas', $repetidasSeguidas, 0);
+    printf("     %d cuerpos, %d entradillas distintas\n", count($dichas), count(array_unique($dichas)));
+    // Con 33 cuerpos y ocho generales más las propias de cada tipo, tiene que
+    // haber bastante más de una docena de aperturas diferentes.
+    comprobar('hay al menos 12 aperturas distintas', count(array_unique($dichas)) >= 12, true);
 }
 
 echo "\n▸ La variante se envuelve en lugar de fallar\n";

@@ -63,6 +63,10 @@ export class Narrator {
      */
     this.visitas = new Map();
 
+    // Turno de cada familia de entradilla («presentacion», «regreso»), aparte
+    // del de las narraciones. Ver _turnoEntradilla.
+    this._turnosEntradilla = new Map();
+
     // Si el diagnóstico de arranque ya nos dijo que el servidor no puede
     // sintetizar, se empieza directamente con la voz del navegador. Así se
     // evita una petición condenada al fracaso —y su error en consola— por cada
@@ -133,13 +137,16 @@ export class Narrator {
    * versiones, y el nombre, que allí se valida antes de encajarlo. Nunca sale
    * de aquí una oración para sintetizar.
    */
-  _urlFrase(frase, variante = 0) {
+  _urlFrase(frase, variante = 0, idCuerpo = null) {
     const partes = [
       `frase=${encodeURIComponent(frase)}`,
       `variante=${variante}`,
     ];
     const nombre = App.estado.nombre;
     if (nombre) partes.push(`nombre=${encodeURIComponent(nombre)}`);
+    // De qué cuerpo se habla, no qué se dice de él: el servidor mira su tipo y
+    // elige el encuadre. Ver Asistente::frase.
+    if (idCuerpo) partes.push(`cuerpo=${encodeURIComponent(idCuerpo)}`);
     return `${rutaApp('api/tts.php')}?${partes.join('&')}`;
   }
 
@@ -153,14 +160,14 @@ export class Narrator {
    * resuelve igualmente. Una frase de cortesía no puede impedir que se oiga la
    * narración, que es lo que de verdad importa.
    */
-  async decirFrase(frase, variante = 0) {
+  async decirFrase(frase, variante = 0, idCuerpo = null) {
     if (this.motor === 'ninguno') return false;
     if (App.preferencias.get('narracionSilenciada')) return false;
 
     // El texto se pide siempre, lo diga quien lo diga: hace falta para el
     // subtítulo, que es obligatorio, y para la voz del navegador cuando no hay
     // síntesis en el servidor. Es una consulta sin coste ni credenciales.
-    const texto = await this._textoFrase(frase, variante);
+    const texto = await this._textoFrase(frase, variante, idCuerpo);
     if (!texto) return false;
 
     this.subtitulos.mostrarFrase(texto);
@@ -194,7 +201,7 @@ export class Narrator {
       reproductor.addEventListener('error', () => acabar(false), { once: true });
 
       this._fraseEnCurso = reproductor;
-      reproductor.src = this._urlFrase(frase, variante);
+      reproductor.src = this._urlFrase(frase, variante, idCuerpo);
       reproductor.play().catch(() => acabar(false));
     });
   }
@@ -292,10 +299,11 @@ export class Narrator {
   }
 
   /** Pide el texto de una frase. Devuelve null si no hay versión aplicable. */
-  async _textoFrase(frase, variante) {
+  async _textoFrase(frase, variante, idCuerpo = null) {
     const partes = [`frase=${encodeURIComponent(frase)}`, `variante=${variante}`];
     const nombre = App.estado.nombre;
     if (nombre) partes.push(`nombre=${encodeURIComponent(nombre)}`);
+    if (idCuerpo) partes.push(`cuerpo=${encodeURIComponent(idCuerpo)}`);
 
     try {
       const respuesta = await fetch(`${rutaApp('api/frase.php')}?${partes.join('&')}`);
@@ -368,6 +376,46 @@ export class Narrator {
   }
 
   /**
+   * Turno de la ENTRADILLA, que no tiene nada que ver con el de la narración.
+   *
+   * AQUÍ ESTABA EL FALLO QUE HACÍA QUE SONASE A GRABACIÓN
+   * ────────────────────────────────────────────────────
+   * La entradilla pedía la misma variante que la narración. Como la primera
+   * visita a cualquier cuerpo usa siempre la narración 0, la entradilla era
+   * siempre la 0 también: «Mira esto» en Mercurio, «Mira esto» en Venus, «Mira
+   * esto» en Marte. Cinco versiones escritas y una sola sonando.
+   *
+   * Con un contador propio que avanza en CADA entradilla, dos cuerpos seguidos
+   * no pueden abrirse igual. Sigue siendo rotación y no azar, por lo mismo de
+   * siempre: con azar puede salir la misma dos veces seguidas, y además no se
+   * podría probar.
+   *
+   * El contador no se acota aquí a propósito. Quien conoce el tamaño de cada
+   * lista es el servidor —depende del tipo de cuerpo y de si hay nombre—, y allí
+   * se envuelve con un módulo. Que crezca sin límite tampoco gasta de más: la
+   * caché de audio se indexa por el TEXTO resultante, no por el número, así que
+   * la vuelta 1 y la vuelta 50 comparten el mismo MP3.
+   *
+   * POR QUÉ UN CONTADOR POR TIPO Y NO UNO SOLO
+   * ──────────────────────────────────────────
+   * El servidor pone las versiones propias del tipo delante de las generales.
+   * Con un contador único, para cuando se llega a la primera luna el contador ya
+   * va por el siete y el encuadre —«bajamos a una luna»— no sale nunca: se ve al
+   * probarlo, quince cuerpos seguidos y las de satélite sin aparecer una sola
+   * vez. Llevando la cuenta por tipo, la primera luna estrena las suyas, la
+   * segunda sigue, y cuando se agotan pasa a las generales.
+   *
+   * El tipo se usa AQUÍ solo para elegir contador. Qué se dice lo sigue
+   * decidiendo el servidor a partir del identificador del cuerpo.
+   */
+  _turnoEntradilla(frase, tipo = null) {
+    const clave = `${frase}:${tipo ?? 'general'}`;
+    const turno = this._turnosEntradilla.get(clave) ?? 0;
+    this._turnosEntradilla.set(clave, turno + 1);
+    return turno;
+  }
+
+  /**
    * Narra un cuerpo. Si ya se estaba narrando otro, se corta de inmediato:
    * dos voces solapadas son peores que ninguna.
    */
@@ -404,7 +452,7 @@ export class Narrator {
       const frase = primeraVez ? 'presentacion' : 'regreso';
       // No se espera a que termine si el usuario cambia de cuerpo mientras
       // tanto: `idActual` habrá cambiado y la narración de este ya no toca.
-      await this.decirFrase(frase, this.varianteActual);
+      await this.decirFrase(frase, this._turnoEntradilla(frase, cuerpo.tipo), id);
       if (this.idActual !== id) return;
     }
 

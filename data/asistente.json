@@ -1,57 +1,172 @@
 {
-  "$esquema": "orbis/asistente/1",
+  "$esquema": "orbis/asistente/2",
   "nota": "Frases del asistente. Viven en el SERVIDOR y no en el navegador por la misma razón que las narraciones: api/tts.php nunca sintetiza texto que venga del cliente. Lo único que el cliente elige es QUÉ frase, con un identificador, y a lo sumo aporta un nombre propio que se valida y se encaja en el hueco {nombre}. Cada entrada tiene varias versiones que se van alternando, para que el asistente no repita la misma fórmula cada vez.",
+  "cambiosDeLaVersion2": [
+    "Las entradillas ya no se elegían: la variante que se pedía era la MISMA de la narración, y como la primera visita a cualquier cuerpo usa la narración 0, el asistente decía «Mira esto» en todos y cada uno de los cuerpos. Ahora la rotación de la entradilla es independiente y avanza en cada una, así que dos cuerpos seguidos nunca se presentan igual.",
+    "«presentacion» ya tiene versiones sinNombre. Antes no había ninguna y quien no daba su nombre entraba en cada cuerpo sin que el asistente dijese nada.",
+    "Entradillas por tipo de cuerpo. Una luna no se presenta igual que una estrella o que un cinturón entero, y ese encuadre es estructural —está en el catálogo, en el campo «tipo»—, no un dato inventado.",
+    "Fuera el género gramatical. «Bienvenido, María» y «Atento, María» estaban mal para media humanidad, y el asistente no sabe ni tiene por qué saber el género de quien tiene delante."
+  ],
+  "reglaDeEstilo": "Una entradilla ENCUADRA, no informa. Nada de cifras, comparaciones ni superlativos aquí: los datos van en la narración, que es donde están citados. Lo único que puede afirmar una entradilla es lo que ya dice la estructura del catálogo —que algo es una luna, que un cinturón no es un cuerpo, que el Sol está en el centro—, y aun eso, de pasada.",
   "validacionNombre": {
     "patron": "letras, espacios, apóstrofos y guiones; entre 1 y 24 caracteres; como mucho tres palabras",
-    "nota": "El hueco {nombre} es la única parte de estas frases que llega del cliente. La validación está en api/lib/Asistente.php y se prueba en tools/pruebas-asistente.mjs."
+    "nota": "El hueco {nombre} es la única parte de estas frases que llega del cliente. La validación está en api/lib/Asistente.php y se prueba en tools/pruebas-asistente.php."
   },
   "frases": {
     "bienvenida": {
-      "descripcion": "Al terminar de cargar, cuando la persona ha dado su nombre.",
+      "descripcion": "Saludo inicial, una sola vez por sesión, justo después de cerrar el diálogo de bienvenida.",
       "conNombre": [
         "Hola, {nombre}. Soy ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
-        "Encantado, {nombre}. Soy ORBIS. Esto que ves está construido con medidas reales: pulsa cualquier cuerpo y te cuento lo que sabemos de él.",
-        "Bienvenido, {nombre}. Soy ORBIS, y esto es el Sistema Solar a escala. Elige por dónde empezamos, o pregúntame y te llevo."
+        "Un placer, {nombre}. Soy ORBIS. Esto que ves está construido con medidas reales: pulsa cualquier cuerpo y te cuento lo que sabemos de él.",
+        "Hola, {nombre}. Soy ORBIS, y esto es el Sistema Solar a escala. Elige por dónde empezamos, o pregúntame y te llevo.",
+        "Te doy la bienvenida, {nombre}. Soy ORBIS. Puedes moverte con el ratón, con la voz o con las manos, y preguntarme por cualquier cosa que veas."
       ],
       "sinNombre": [
         "Hola. Soy ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
-        "Bienvenido. Soy ORBIS, y esto es el Sistema Solar a escala, construido con medidas reales. Elige por dónde empezamos.",
-        "Hola. Soy ORBIS. Pulsa cualquier cuerpo y te cuento lo que sabemos de él, o pregúntame y te llevo hasta allí."
+        "Te doy la bienvenida. Soy ORBIS, y esto es el Sistema Solar a escala, construido con medidas reales. Elige por dónde empezamos.",
+        "Hola. Soy ORBIS. Pulsa cualquier cuerpo y te cuento lo que sabemos de él, o pregúntame y te llevo hasta allí.",
+        "Hola. Soy ORBIS. Puedes moverte con el ratón, con la voz o con las manos, y preguntarme por cualquier cosa que veas."
       ]
     },
     "presentacion": {
-      "descripcion": "Antes de la narración de un cuerpo que se visita por primera vez.",
+      "descripcion": "Entradilla al llegar por primera vez a un cuerpo. Muy corta: lo que viene detrás es la narración.",
       "conNombre": [
         "Mira esto, {nombre}.",
         "Aquí lo tienes, {nombre}.",
         "Fíjate bien, {nombre}.",
-        "Atento, {nombre}.",
-        "Te va a gustar esto, {nombre}."
+        "Vamos allá, {nombre}.",
+        "Te va a gustar esto, {nombre}.",
+        "Ahí lo tienes, {nombre}.",
+        "Mira con calma, {nombre}.",
+        "Ya estamos, {nombre}."
       ],
-      "sinNombre": []
+      "sinNombre": [
+        "Mira esto.",
+        "Aquí lo tienes.",
+        "Fíjate bien.",
+        "Vamos allá.",
+        "Esto te va a gustar.",
+        "Ahí lo tienes.",
+        "Mira con calma.",
+        "Ya estamos."
+      ],
+      "porTipo": {
+        "estrella": {
+          "conNombre": [
+            "Al centro del sistema, {nombre}.",
+            "Empezamos por el centro, {nombre}.",
+            "Aquí, en el centro de todo, {nombre}."
+          ],
+          "sinNombre": [
+            "Al centro del sistema.",
+            "Empezamos por el centro.",
+            "Aquí, en el centro de todo."
+          ]
+        },
+        "planeta": {
+          "conNombre": [
+            "Vamos con este planeta, {nombre}.",
+            "Siguiente planeta, {nombre}.",
+            "Este de aquí, {nombre}."
+          ],
+          "sinNombre": [
+            "Vamos con este planeta.",
+            "Siguiente planeta.",
+            "Este de aquí."
+          ]
+        },
+        "planeta-enano": {
+          "conNombre": [
+            "Uno de los planetas enanos, {nombre}.",
+            "Nos vamos a un enano, {nombre}.",
+            "Este entra en otra categoría, {nombre}."
+          ],
+          "sinNombre": [
+            "Uno de los planetas enanos.",
+            "Nos vamos a un enano.",
+            "Este entra en otra categoría."
+          ]
+        },
+        "satelite": {
+          "conNombre": [
+            "Bajamos a una luna, {nombre}.",
+            "Ahora una luna, {nombre}.",
+            "Vamos con este satélite, {nombre}."
+          ],
+          "sinNombre": [
+            "Bajamos a una luna.",
+            "Ahora una luna.",
+            "Vamos con este satélite."
+          ]
+        },
+        "cinturon": {
+          "conNombre": [
+            "Esto no es un cuerpo, {nombre}: es un cinturón entero.",
+            "Cambiamos de escala, {nombre}. Aquí no hay uno solo.",
+            "Aquí no vamos a un cuerpo, {nombre}, sino a muchos."
+          ],
+          "sinNombre": [
+            "Esto no es un cuerpo: es un cinturón entero.",
+            "Cambiamos de escala. Aquí no hay uno solo.",
+            "Aquí no vamos a un cuerpo, sino a muchos."
+          ]
+        }
+      }
     },
     "regreso": {
-      "descripcion": "Antes de la narración de un cuerpo que ya se había visitado.",
+      "descripcion": "Entradilla al volver a un cuerpo ya visitado. Avisa de que lo que viene es otra de las tres narraciones, no la misma.",
       "conNombre": [
         "Otra vez por aquí, {nombre}. Te cuento algo distinto.",
         "Volvemos, {nombre}. Esta vez por otro lado.",
-        "De nuevo aquí, {nombre}. Queda más que contar."
+        "De nuevo aquí, {nombre}. Queda más que contar.",
+        "Repetimos visita, {nombre}. Cambio de enfoque.",
+        "Aquí otra vez, {nombre}. Va otra cosa.",
+        "Ya conoces esto, {nombre}. Vamos a otra parte de la historia."
       ],
       "sinNombre": [
         "Otra vez por aquí. Te cuento algo distinto.",
         "Volvemos. Esta vez por otro lado.",
-        "De nuevo aquí. Queda más que contar."
-      ]
+        "De nuevo aquí. Queda más que contar.",
+        "Repetimos visita. Cambio de enfoque.",
+        "Aquí otra vez. Va otra cosa.",
+        "Ya conoces esto. Vamos a otra parte de la historia."
+      ],
+      "porTipo": {
+        "satelite": {
+          "conNombre": [
+            "De vuelta a esta luna, {nombre}. Queda más.",
+            "Otra vez en esta luna, {nombre}. Va otra cosa."
+          ],
+          "sinNombre": [
+            "De vuelta a esta luna. Queda más.",
+            "Otra vez en esta luna. Va otra cosa."
+          ]
+        },
+        "cinturon": {
+          "conNombre": [
+            "Volvemos al cinturón, {nombre}. Hay más que contar.",
+            "Otra vuelta por aquí, {nombre}. Cambio de enfoque."
+          ],
+          "sinNombre": [
+            "Volvemos al cinturón. Hay más que contar.",
+            "Otra vuelta por aquí. Cambio de enfoque."
+          ]
+        }
+      }
     },
     "sin-respuesta": {
-      "descripcion": "Cuando se pregunta algo que no está en los datos.",
+      "descripcion": "Cuando se pregunta algo que el catálogo no responde. Decir que no se sabe es parte del trato.",
       "conNombre": [
         "Eso no lo tengo, {nombre}. Solo cuento lo que está medido y citado, y de eso no hay dato.",
-        "No puedo responderte a eso, {nombre}: no está en los datos que manejo, y prefiero no inventarlo."
+        "No puedo responderte a eso, {nombre}: no está en los datos que manejo, y prefiero no inventarlo.",
+        "De eso no tengo dato, {nombre}. Podría inventármelo, pero entonces no te serviría de nada.",
+        "Ahí me pillas, {nombre}. No está medido en lo que manejo, así que no te lo voy a improvisar."
       ],
       "sinNombre": [
         "Eso no lo tengo. Solo cuento lo que está medido y citado, y de eso no hay dato.",
-        "No puedo responder a eso: no está en los datos que manejo, y prefiero no inventarlo."
+        "No puedo responder a eso: no está en los datos que manejo, y prefiero no inventarlo.",
+        "De eso no tengo dato. Podría inventármelo, pero entonces no serviría de nada.",
+        "Ahí me pillas. No está medido en lo que manejo, así que no te lo voy a improvisar."
       ]
     }
   }

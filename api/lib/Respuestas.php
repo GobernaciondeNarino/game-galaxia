@@ -153,7 +153,15 @@ final class Respuestas
         foreach ([30, 24, 18, 12, 6] as $exponente) {
             if ($kg >= 10 ** $exponente) {
                 $mantisa = $kg / (10 ** $exponente);
-                return self::numero($mantisa, 2) . ' ' . self::$escalaLarga[$exponente] . ' de kilogramos';
+                // Los decimales dependen del tamaño de la cifra, no son fijos.
+                // La escala larga solo nombra las potencias de seis, así que
+                // entre una y la siguiente caben seis órdenes de magnitud y la
+                // mantisa puede ser 5,97 o 641.710. Con dos decimales para todo,
+                // Marte quedaba en «641.710,00 trillones de kilogramos»: unos
+                // céntimos de trillón, que no significan nada y suenan a
+                // plantilla mal rellenada.
+                $decimales = $mantisa >= 100 ? 0 : ($mantisa >= 10 ? 1 : 2);
+                return self::numero($mantisa, $decimales) . ' ' . self::$escalaLarga[$exponente] . ' de kilogramos';
             }
         }
         return self::numero($kg, 0) . ' kilogramos';

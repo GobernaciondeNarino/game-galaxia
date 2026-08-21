@@ -96,13 +96,32 @@ final class Asistente
     /**
      * Devuelve el texto de una frase.
      *
+     * SOBRE EL TIPO DE CUERPO
+     * ───────────────────────
+     * Cuando se indica, las versiones propias de ese tipo se ponen DELANTE de
+     * las generales y se rota sobre el total. No sustituyen a las generales: si
+     * lo hicieran, un tipo con tres versiones repetiría cada tres visitas,
+     * mientras que juntando ambas listas hay muchas más y además se alternan
+     * las que encuadran («bajamos a una luna») con las que solo abren («mira
+     * esto»), que es como habla alguien de verdad.
+     *
+     * El tipo NO lo elige el cliente. Lo resuelve el servidor a partir del
+     * identificador del cuerpo, contra el mismo catálogo de siempre. Es la misma
+     * regla de todo este archivo: el cliente dice de qué está hablando, nunca
+     * qué se dice.
+     *
      * @param string      $id       identificador de data/asistente.json
      * @param string|null $nombre   nombre propio ya validado, o null
      * @param int         $variante cuál de las versiones; se envuelve al rango
+     * @param string|null $tipo     tipo del cuerpo que se presenta, si aplica
      * @return string|null null si la frase no existe o no hay versión aplicable
      */
-    public static function frase(string $id, ?string $nombre = null, int $variante = 0): ?string
-    {
+    public static function frase(
+        string $id,
+        ?string $nombre = null,
+        int $variante = 0,
+        ?string $tipo = null
+    ): ?string {
         self::cargar();
         $entrada = self::$frases[$id] ?? null;
         if (!is_array($entrada)) {
@@ -110,11 +129,20 @@ final class Asistente
         }
 
         $clave = $nombre === null ? 'sinNombre' : 'conNombre';
-        $versiones = isset($entrada[$clave]) && is_array($entrada[$clave]) ? $entrada[$clave] : [];
+        $generales = isset($entrada[$clave]) && is_array($entrada[$clave]) ? $entrada[$clave] : [];
 
-        // Sin nombre no hay versión de «presentacion»: sus frases solo tienen
-        // sentido dirigidas a alguien. En ese caso no se dice nada, que es
-        // mejor que decir algo forzado.
+        $propias = [];
+        if ($tipo !== null
+            && isset($entrada['porTipo'][$tipo][$clave])
+            && is_array($entrada['porTipo'][$tipo][$clave])
+        ) {
+            $propias = $entrada['porTipo'][$tipo][$clave];
+        }
+
+        $versiones = array_values(array_merge($propias, $generales));
+
+        // Una frase puede no tener versión aplicable a propósito. En ese caso no
+        // se dice nada, que es mejor que decir algo forzado.
         if ($versiones === []) {
             return null;
         }
@@ -133,5 +161,34 @@ final class Asistente
     {
         self::cargar();
         return array_keys(self::$frases ?? []);
+    }
+
+    /**
+     * Cuántas versiones distintas hay de una frase, contando las del tipo.
+     *
+     * Lo usan las pruebas para comprobar que rotando se recorren todas sin
+     * repetir ninguna antes de tiempo.
+     */
+    public static function cuantasVersiones(string $id, bool $conNombre, ?string $tipo = null): int
+    {
+        self::cargar();
+        $entrada = self::$frases[$id] ?? null;
+        if (!is_array($entrada)) {
+            return 0;
+        }
+        $clave = $conNombre ? 'conNombre' : 'sinNombre';
+        $n = is_array($entrada[$clave] ?? null) ? count($entrada[$clave]) : 0;
+        if ($tipo !== null && is_array($entrada['porTipo'][$tipo][$clave] ?? null)) {
+            $n += count($entrada['porTipo'][$tipo][$clave]);
+        }
+        return $n;
+    }
+
+    /** @return string[] los tipos de cuerpo con entradilla propia para esa frase. */
+    public static function tiposConVersionPropia(string $id): array
+    {
+        self::cargar();
+        $porTipo = self::$frases[$id]['porTipo'] ?? null;
+        return is_array($porTipo) ? array_keys($porTipo) : [];
     }
 }

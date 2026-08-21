@@ -276,6 +276,11 @@ async function arrancar() {
   const hud = new HUD(catalogo, {
     vistaGalactica,
     seleccionar,
+    // Pulsar una pregunta del panel del asistente es exactamente lo mismo que
+    // decirla: entra por el mismo reconocedor y la contesta el mismo servidor.
+    // No hay una segunda vía que pudiera responder otra cosa.
+    preguntar: (texto) => intentarResponder(texto),
+    cambiarNombre: () => abrirBienvenida(),
     vistaGeneral,
     vecino,
     alternarPausa,
@@ -424,6 +429,10 @@ async function arrancar() {
     // así que la lista de comandos nunca puede quedar desfasada.
     hud.mostrarAyuda(vocabulario);
     hud.panelAyuda.hidden = true;
+    // Las preguntas del panel del asistente salen del mismo vocabulario que
+    // acaba de entender el reconocedor, no de una lista escrita a mano: así no
+    // pueden ofrecerse preguntas que luego no se entiendan.
+    hud.asistente.establecerVocabulario(preguntas.atributosDisponibles());
   } catch (err) {
     error('No se pudo cargar el vocabulario de voz:', err);
   }
@@ -454,6 +463,27 @@ async function arrancar() {
     });
     anunciar(datos.texto);
     return true;
+  }
+
+  /**
+   * Abre el diálogo de bienvenida. Se llama al arrancar y cada vez que alguien
+   * quiere cambiar cómo se le llama, desde el panel del asistente.
+   *
+   * El saludo en voz alta va DESPUÉS de cerrarlo, no antes, porque hasta ese
+   * momento no se sabe a quién hay que saludar, y porque los navegadores no
+   * dejan sonar nada hasta que ha habido una interacción: pulsar el botón es
+   * justamente esa interacción.
+   */
+  function abrirBienvenida() {
+    return new Bienvenida({
+      alTerminar: (nombre) => {
+        hud.barra.establecerSubtitulo(
+          nombre ? `Sesión de ${nombre}` : 'Estado del sistema: activo',
+        );
+        narrador.decirFrase('bienvenida', 0);
+        anunciar(nombre ? `Hola, ${nombre}.` : 'Hola.');
+      },
+    });
   }
 
   function ejecutarIntencion(intencion) {
@@ -657,6 +687,7 @@ async function arrancar() {
     alternarPausa, cambiarVelocidad, mostrarOrbitas, cambiarEscala,
     ejecutarIntencion,
     comparar: (a, b) => hud.compararCuerpos(a, b),
+    preguntar: (texto) => intentarResponder(texto),
   };
   App.faseImplementada = 7;
 
@@ -722,15 +753,7 @@ async function arrancar() {
   // cerrar el diálogo, no antes, porque hasta ese momento no se sabe a quién
   // hay que saludar, y porque los navegadores no dejan sonar nada hasta que ha
   // habido una interacción: pulsar el botón es justamente esa interacción.
-  new Bienvenida({
-    alTerminar: (nombre) => {
-      hud.barra.establecerSubtitulo(
-        nombre ? `Sesión de ${nombre}` : 'Estado del sistema: activo',
-      );
-      narrador.decirFrase('bienvenida', 0);
-      anunciar(nombre ? `Hola, ${nombre}.` : 'Hola.');
-    },
-  });
+  abrirBienvenida();
 
   if (depuracion.activo) {
     log('Diagnóstico:', resultados);

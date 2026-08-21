@@ -1881,7 +1881,7 @@
       "padre": "marte",
       "fisica": {
         "radioMedioKm": 11.0584,
-        "masaKg": 108000000000000000000,
+        "masaKg": 1.08e+16,
         "densidadGcm3": 1.9,
         "gravedadMs2": null,
         "periodoRotacionHoras": 7.65944,
@@ -1968,7 +1968,7 @@
       "padre": "marte",
       "fisica": {
         "radioMedioKm": 6.20305,
-        "masaKg": 180000000000000000000,
+        "masaKg": 1800000000000000.0,
         "densidadGcm3": 1.76,
         "gravedadMs2": null,
         "periodoRotacionHoras": 30.3021,
