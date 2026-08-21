@@ -29,9 +29,38 @@ const MODULOS = [
   { id: 'tecnologia', etiqueta: 'Tecnología', activo: false, nota: 'no implementado' },
 ];
 
+/**
+ * Indicadores de estado. Los dos primeros son además el interruptor de su
+ * entrada: pulsarlos enciende o apaga la cámara y el micrófono.
+ *
+ * POR QUÉ AQUÍ, SI YA HAY BOTONES EN OTROS SITIOS
+ * ──────────────────────────────────────────────
+ * Los otros dos sitios desaparecen cuando más falta hacen. El panel de entradas
+ * se oculta por debajo de 1024 px y la ventana de invitación vive dentro del
+ * viewport central, que por debajo de 720 px tampoco se dibuja. En un teléfono
+ * no quedaba ninguna forma de encender la cámara o el micrófono. Estos
+ * indicadores sí están siempre, y ya decían el estado: darles el interruptor es
+ * juntar en un sitio lo que estaba separado sin motivo.
+ *
+ * NO SE PIDE NINGÚN PERMISO DESDE AQUÍ
+ * ────────────────────────────────────
+ * El botón emite un evento y se desentiende. Quien decide es el subsistema, que
+ * es también quien explica lo que implica el permiso antes de pedirlo. La barra
+ * no sabe nada de MediaPipe ni de reconocimiento de voz, y así sigue.
+ */
 const INDICADORES = [
-  { id: 'camara', etiqueta: 'Cámara', simbolo: '◉' },
-  { id: 'microfono', etiqueta: 'Micrófono', simbolo: '▮' },
+  {
+    id: 'camara', etiqueta: 'Cámara', simbolo: '◉',
+    evento: 'entrada:solicitar-camara',
+    encender: 'Encender la cámara para controlar con gestos. El vídeo se procesa en tu navegador y no sale de él.',
+    apagar: 'Apagar la cámara y dejar de seguir las manos.',
+  },
+  {
+    id: 'microfono', etiqueta: 'Micrófono', simbolo: '▮',
+    evento: 'entrada:solicitar-microfono',
+    encender: 'Encender el micrófono para hablar con ORBIS y hacerle preguntas.',
+    apagar: 'Apagar el micrófono y dejar de escuchar.',
+  },
   { id: 'red', etiqueta: 'Red', simbolo: '≋' },
   { id: 'fps', etiqueta: 'FPS', simbolo: '' },
 ];
@@ -61,15 +90,32 @@ export class BarraSuperior {
     this.grupoIndicadores = crear('ul', { class: 'barra__indicadores', 'aria-label': 'Estado de las entradas' },
       INDICADORES.map((i) => {
         const valor = crear('span', { class: 'indicador__valor', text: i.id === 'fps' ? '—' : 'off' });
-        const nodo = crear('li', {
-          class: 'indicador',
-          dataset: { indicador: i.id, estado: 'inactivo' },
-        }, [
+        const contenido = [
           i.simbolo ? crear('span', { class: 'indicador__simbolo', 'aria-hidden': 'true', text: i.simbolo }) : null,
           crear('span', { class: 'indicador__etiqueta', text: i.etiqueta }),
           valor,
-        ]);
-        this.indicadores.set(i.id, { nodo, valor });
+        ];
+
+        // Solo la cámara y el micrófono se pueden encender. La red y los FPS se
+        // leen y ya está: convertirlos en botones prometería una acción que no
+        // existe, y un botón que no hace nada es peor que ningún botón.
+        const interruptor = i.evento
+          ? crear('button', {
+            class: 'indicador__accion',
+            type: 'button',
+            'aria-pressed': 'false',
+            title: i.encender,
+            onclick: () => App.emitir(i.evento, {}),
+          }, contenido)
+          : null;
+
+        const nodo = crear('li', {
+          class: 'indicador',
+          dataset: { indicador: i.id, estado: 'inactivo' },
+        }, interruptor ? [interruptor] : contenido);
+
+        this.indicadores.set(i.id, { nodo, valor, interruptor, definicion: i });
+        if (interruptor) this._describirInterruptor(i.id, 'inactivo', 'off');
         return nodo;
       }));
 
@@ -146,6 +192,28 @@ export class BarraSuperior {
     if (!indicador) return;
     indicador.nodo.dataset.estado = estado;
     indicador.valor.textContent = texto;
+    if (indicador.interruptor) this._describirInterruptor(id, estado, texto);
+  }
+
+  /**
+   * Pone al día lo que el interruptor dice de sí mismo.
+   *
+   * El nombre accesible empieza por el texto que se ve —«Cámara off»— porque el
+   * criterio 2.5.3 de la WCAG exige que el nombre contenga la etiqueta visible:
+   * quien dicta por voz nombra lo que lee, y si el nombre no lo incluye, no hay
+   * forma de pulsarlo hablando. Detrás va lo que pasará al pulsar, que es lo
+   * que de verdad hace falta saber.
+   *
+   * `aria-pressed` no sobra ni repite: dice si está encendido, no qué hará.
+   */
+  _describirInterruptor(id, estado, texto) {
+    const { interruptor, definicion } = this.indicadores.get(id);
+    const encendido = estado === 'activo';
+    interruptor.setAttribute('aria-pressed', String(encendido));
+
+    const accion = encendido ? definicion.apagar : definicion.encender;
+    interruptor.title = accion;
+    interruptor.setAttribute('aria-label', `${definicion.etiqueta} ${texto}. ${accion}`);
   }
 
   actualizarFps(fps) {

@@ -159,8 +159,22 @@
   .barra__modulos { display: none; }
   .barra__marca { font-size: 1.05rem; letter-spacing: 0.22em; }
 
-  /* La fila secundaria se queda solo con los indicadores, pegados al inicio. */
-  .barra-secundaria { justify-content: flex-start; }
+  /* La fila secundaria se queda solo con los indicadores, pegados al inicio.
+
+     Y `flex: 0 0 auto`, que no es cosmético: es EL MISMO FALLO del recuadro de
+     arriba, repetido. `.barra-secundaria` declara `flex: 1 0 100%` para ocupar
+     un renglón entero cuando la barra va en fila. Al girar el eje a columna,
+     ese 100 % deja de ser el ancho y pasa a ser la ALTURA del contenedor: la
+     fila sola pedía toda la altura disponible, no cabía junto a las otras dos y
+     el ajuste la mandaba a una SEGUNDA COLUMNA, fuera de la pantalla por la
+     derecha. Medido: empezaba en x=320 en una pantalla de 320 px de ancho, o
+     sea entera fuera. Los cuatro indicadores existían y no se veía ninguno, y
+     desde hoy son además la única forma de encender la cámara y el micrófono en
+     un teléfono. */
+  .barra-secundaria {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+  }
 
   /* Las cuatro pastillas de estado (cámara, micrófono, red, FPS) en una sola
      fila piden 321 px: más que los 304 disponibles en una pantalla de 320. Sin

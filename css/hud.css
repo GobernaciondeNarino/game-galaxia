@@ -302,7 +302,9 @@
 }
 .barra__reloj, .barra__fecha { font-size: var(--t-menor); }
 
-.barra__indicadores { display: flex; gap: var(--e-2); }
+/* `align-items: center` porque los dos interruptores son más altos que los dos
+   testigos: sin centrar, la fila quedaba escalonada. */
+.barra__indicadores { display: flex; align-items: center; gap: var(--e-2); }
 .indicador {
   display: flex;
   align-items: center;
@@ -315,6 +317,60 @@
   color: var(--texto-apagado);
 }
 .indicador__etiqueta { text-transform: uppercase; }
+
+/* --------------------------------------------------------------------------
+   El indicador que además es interruptor: cámara y micrófono.
+
+   Se distingue a propósito del que solo se lee. La caja deja de ser el <li> y
+   pasa a ser el botón, que es quien recibe el foco, el estado y el puntero; el
+   <li> conserva el color del borde y se lo pasa por herencia, de modo que las
+   reglas de `data-estado` siguen tiñendo los dos por igual.
+   -------------------------------------------------------------------------- */
+.indicador:has(> .indicador__accion) {
+  padding: 0;
+  border-width: 0;
+}
+
+.indicador__accion {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* Alto mínimo de 24 px: el objetivo de puntero de la WCAG 2.2 (2.5.8). Los de
+     red y FPS se quedan más bajos y eso está bien, porque no se pulsan: la
+     diferencia de altura es la pista de cuál de los cuatro hace algo. */
+  min-height: 24px;
+  padding: 2px 6px;
+
+  background: none;
+  border: 1px solid;
+  border-color: inherit;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition: background-color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+}
+
+.indicador__accion:hover {
+  background: rgba(79, 195, 247, 0.12);
+  border-color: var(--panel-borde-vivo);
+}
+
+.indicador__accion:focus-visible {
+  outline: 2px solid var(--cian-brillante);
+  outline-offset: 2px;
+}
+
+/* Encendido: el borde se refuerza. El color ya lo pone `data-estado`, pero el
+   color por sí solo no puede ser lo único que distinga dos estados. */
+.indicador__accion[aria-pressed="true"] { border-width: 2px; }
+
+@media (pointer: coarse) {
+  /* 44 px con el dedo. Aquí no es un lujo: por debajo de 720 px estos dos
+     botones son la ÚNICA forma de encender la cámara y el micrófono, porque el
+     panel de entradas y la ventana de invitación no se dibujan. */
+  .indicador__accion { min-height: 44px; padding: 2px var(--e-2); }
+}
 .indicador[data-estado="activo"]   { color: var(--verde-estado); border-color: rgba(58, 170, 53, 0.55); }
 .indicador[data-estado="aviso"]    { color: var(--ambar-seleccion); border-color: rgba(232, 160, 32, 0.55); }
 .indicador[data-estado="alerta"]   { color: var(--rojo-alerta); border-color: rgba(255, 82, 82, 0.6); }
