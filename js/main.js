@@ -674,7 +674,11 @@ async function arrancar() {
       hud.mostrarRespuesta({
         texto: datos.texto,
         fuente: datos.fuente,
-        valor: datos.datos?.thz ? `${datos.datos.thz} meteoros/hora` : null,
+        // «100 meteoros/hora» a secas se lee como una promesa de lo que se va a
+        // ver, y el THZ no es eso: es la tasa que habría con el radiante en el
+        // cénit y un cielo perfecto. La etiqueta va pegada al número, no en una
+        // nota al pie que nadie mira.
+        valor: datos.datos?.thz ? `${datos.datos.thz}/hora · tasa teórica` : null,
         sinDato: false,
         cuerpo: datos.lluvia ?? 'Fondo esporádico',
         etiqueta: datos.datos?.radiante ? `radiante en ${datos.datos.radiante}` : 'lluvia de meteoros',

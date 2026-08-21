@@ -1,0 +1,407 @@
+{
+  "$esquema": "orbis/meteoros/1",
+  "nota": "Lluvias de meteoros y bólidos históricos. El trazo que cruza la pantalla es SIMULACIÓN y lleva su marca; estos datos NO lo son. Nunca se afirma que ese trazo concreto sea un meteoro que pasó: lo que se cuenta es qué lluvia está activa en la fecha simulada, y qué es esa lluvia. Es la diferencia entre una afirmación comprobable y una mentira.",
+  "avisos": {
+    "fechaDelMaximo": "Las fechas de máximo son las de la Tabla 5 del calendario 2026 del IMO y SOLO valen para 2026. El máximo real lo fija la longitud solar (λ☉), no el calendario, así que se desplaza alrededor de un día de un año a otro. Por eso se guarda también λ☉: es el dato que no caduca. Para decidir qué lluvia está activa se usa el rango de fechas, que dura semanas y al que un día de diferencia no le afecta.",
+    "thz": "El THZ (tasa horaria cenital) es una tasa TEÓRICA: la que se vería con el radiante en el cénit y un cielo de magnitud límite 6,5. Lo que ve una persona real es bastante menos —la NASA da 40 a 50 por hora para las Gemínidas, frente a un THZ de 150—. Se etiqueta como lo que es y no se presenta como una predicción.",
+    "constelaciones": "Las constelaciones de las Cuadrántidas, Gemínidas, Úrsidas y Líridas están citadas explícitamente en la fuente. Las demás se derivan de las coordenadas del radiante publicadas por el IMO aplicando los límites de la IAU, y llevan la marca 'derivada'."
+  },
+  "lluvias": [
+    {
+      "codigo": "QUA",
+      "iau": "010 QUA",
+      "nombre": "Cuadrántidas",
+      "maximo": {
+        "mes": 1,
+        "dia": 3
+      },
+      "longitudSolar": 283.15,
+      "desde": {
+        "mes": 12,
+        "dia": 28
+      },
+      "hasta": {
+        "mes": 1,
+        "dia": 12
+      },
+      "thz": {
+        "min": 80,
+        "max": 120,
+        "nota": "El IMO da 80 y la AMS 120; la NASA habla de 60 a 200. No hay un valor único porque su máximo dura apenas seis horas y varía mucho de un año a otro."
+      },
+      "velocidadKms": 41,
+      "radiante": {
+        "ar": 230,
+        "dec": 49,
+        "constelacion": "el Boyero",
+        "origenConstelacion": "citada"
+      },
+      "progenitor": {
+        "nombre": "del asteroide (196256) 2003 EH₁",
+        "certeza": "confirmado"
+      },
+      "nota": "El nombre viene de Quadrans Muralis, una constelación que ya no existe: la IAU la retiró al fijar las 88 actuales, y la lluvia se quedó con el nombre de un sitio que ya no está en los mapas.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · NASA Science — Quadrantids"
+    },
+    {
+      "codigo": "LYR",
+      "iau": "006 LYR",
+      "nombre": "Líridas",
+      "maximo": {
+        "mes": 4,
+        "dia": 22
+      },
+      "longitudSolar": 32.32,
+      "desde": {
+        "mes": 4,
+        "dia": 14
+      },
+      "hasta": {
+        "mes": 4,
+        "dia": 30
+      },
+      "thz": {
+        "min": 18,
+        "max": 18,
+        "nota": null
+      },
+      "velocidadKms": 49,
+      "radiante": {
+        "ar": 271,
+        "dec": 34,
+        "constelacion": "Hércules",
+        "origenConstelacion": "citada"
+      },
+      "progenitor": {
+        "nombre": "del cometa C/1861 G1 (Thatcher)",
+        "certeza": "confirmado"
+      },
+      "nota": "Pese al nombre, su radiante no está en Lyra sino en Hércules, junto al límite entre ambas: Vega queda a ocho grados al noreste. El nombre es histórico, no una descripción.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · American Meteor Society"
+    },
+    {
+      "codigo": "ETA",
+      "iau": "031 ETA",
+      "nombre": "Eta Acuáridas",
+      "maximo": {
+        "mes": 5,
+        "dia": 6
+      },
+      "longitudSolar": 45.5,
+      "desde": {
+        "mes": 4,
+        "dia": 19
+      },
+      "hasta": {
+        "mes": 5,
+        "dia": 28
+      },
+      "thz": {
+        "min": 50,
+        "max": 50,
+        "nota": null
+      },
+      "velocidadKms": 66,
+      "radiante": {
+        "ar": 338,
+        "dec": -1,
+        "constelacion": "Acuario",
+        "origenConstelacion": "derivada"
+      },
+      "progenitor": {
+        "nombre": "del cometa 1P/Halley",
+        "certeza": "confirmado"
+      },
+      "nota": "Son polvo del Halley, igual que las Oriónidas de octubre: la Tierra cruza dos veces al año la misma corriente de restos, en dos puntos distintos de su órbita.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · NASA Science"
+    },
+    {
+      "codigo": "SDA",
+      "iau": "005 SDA",
+      "nombre": "Delta Acuáridas del Sur",
+      "maximo": {
+        "mes": 7,
+        "dia": 31
+      },
+      "longitudSolar": 128,
+      "desde": {
+        "mes": 7,
+        "dia": 12
+      },
+      "hasta": {
+        "mes": 8,
+        "dia": 23
+      },
+      "thz": {
+        "min": 25,
+        "max": 25,
+        "nota": null
+      },
+      "velocidadKms": 41,
+      "radiante": {
+        "ar": 340,
+        "dec": -16,
+        "constelacion": "Acuario",
+        "origenConstelacion": "derivada"
+      },
+      "progenitor": {
+        "nombre": "probablemente del cometa 96P/Machholz",
+        "certeza": "probable"
+      },
+      "nota": "El progenitor no está confirmado: la NASA dice que se sospecha del 96P/Machholz y añade que no se conoce con precisión de dónde vienen. La hipótesis actual apunta a todo un complejo de cometas emparentados, no a uno solo.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · NASA Science — Southern Delta Aquariids"
+    },
+    {
+      "codigo": "PER",
+      "iau": "007 PER",
+      "nombre": "Perseidas",
+      "maximo": {
+        "mes": 8,
+        "dia": 13
+      },
+      "longitudSolar": 140.0,
+      "desde": {
+        "mes": 7,
+        "dia": 17
+      },
+      "hasta": {
+        "mes": 8,
+        "dia": 24
+      },
+      "thz": {
+        "min": 100,
+        "max": 100,
+        "nota": null
+      },
+      "velocidadKms": 59,
+      "radiante": {
+        "ar": 48,
+        "dec": 58,
+        "constelacion": "Perseo",
+        "origenConstelacion": "derivada"
+      },
+      "progenitor": {
+        "nombre": "del cometa 109P/Swift-Tuttle",
+        "certeza": "confirmado"
+      },
+      "nota": "Son la lluvia más seguida del hemisferio norte, sobre todo porque caen en agosto y se pueden ver sin pasar frío.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · NASA Science"
+    },
+    {
+      "codigo": "ORI",
+      "iau": "008 ORI",
+      "nombre": "Oriónidas",
+      "maximo": {
+        "mes": 10,
+        "dia": 21
+      },
+      "longitudSolar": 208,
+      "desde": {
+        "mes": 10,
+        "dia": 2
+      },
+      "hasta": {
+        "mes": 11,
+        "dia": 7
+      },
+      "thz": {
+        "min": 20,
+        "max": 20,
+        "nota": null
+      },
+      "velocidadKms": 66,
+      "radiante": {
+        "ar": 95,
+        "dec": 16,
+        "constelacion": "Orión",
+        "origenConstelacion": "derivada"
+      },
+      "progenitor": {
+        "nombre": "del cometa 1P/Halley",
+        "certeza": "confirmado"
+      },
+      "nota": "Su radiante queda al norte de Betelgeuse. Comparten origen con las Eta Acuáridas de mayo: las dos son restos del Halley.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · NASA Science"
+    },
+    {
+      "codigo": "STA",
+      "iau": "002 STA",
+      "nombre": "Táuridas del Sur",
+      "maximo": {
+        "mes": 11,
+        "dia": 5
+      },
+      "longitudSolar": 223,
+      "desde": {
+        "mes": 9,
+        "dia": 20
+      },
+      "hasta": {
+        "mes": 11,
+        "dia": 20
+      },
+      "thz": {
+        "min": 5,
+        "max": 7,
+        "nota": "El IMO da 7 y la AMS 5."
+      },
+      "velocidadKms": 27,
+      "radiante": {
+        "ar": 52,
+        "dec": 15,
+        "constelacion": "Tauro",
+        "origenConstelacion": "derivada"
+      },
+      "progenitor": {
+        "nombre": "del cometa 2P/Encke",
+        "certeza": "confirmado"
+      },
+      "nota": "Son las más lentas de todas, a veintisiete kilómetros por segundo, y por eso sus meteoros cruzan el cielo despacio. Se solapan con las Táuridas del Norte, que llegan una semana después.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5"
+    },
+    {
+      "codigo": "LEO",
+      "iau": "013 LEO",
+      "nombre": "Leónidas",
+      "maximo": {
+        "mes": 11,
+        "dia": 17
+      },
+      "longitudSolar": 235.27,
+      "desde": {
+        "mes": 11,
+        "dia": 6
+      },
+      "hasta": {
+        "mes": 11,
+        "dia": 30
+      },
+      "thz": {
+        "min": 15,
+        "max": 15,
+        "nota": "Quince es la tasa de un año normal. Las Leónidas producen tormentas cerca de los pasos de su cometa por el perihelio, cada treinta y tres años: el próximo es en 2031."
+      },
+      "velocidadKms": 71,
+      "radiante": {
+        "ar": 152,
+        "dec": 22,
+        "constelacion": "Leo",
+        "origenConstelacion": "derivada"
+      },
+      "progenitor": {
+        "nombre": "del cometa 55P/Tempel-Tuttle",
+        "certeza": "confirmado"
+      },
+      "nota": "Son las más rápidas de esta lista: entran a setenta y un kilómetros por segundo.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5"
+    },
+    {
+      "codigo": "GEM",
+      "iau": "004 GEM",
+      "nombre": "Gemínidas",
+      "maximo": {
+        "mes": 12,
+        "dia": 14
+      },
+      "longitudSolar": 262.2,
+      "desde": {
+        "mes": 12,
+        "dia": 4
+      },
+      "hasta": {
+        "mes": 12,
+        "dia": 20
+      },
+      "thz": {
+        "min": 150,
+        "max": 150,
+        "nota": "Ciento cincuenta es la tasa teórica; la NASA da de cuarenta a cincuenta por hora para un observador real, y hasta ciento veinte en condiciones perfectas."
+      },
+      "velocidadKms": 35,
+      "radiante": {
+        "ar": 112,
+        "dec": 33,
+        "constelacion": "Géminis",
+        "origenConstelacion": "citada"
+      },
+      "progenitor": {
+        "nombre": "del asteroide 3200 Faetón",
+        "certeza": "confirmado"
+      },
+      "nota": "Casi todas las lluvias vienen de cometas; esta viene de un asteroide, y eso la hace rara. La NASA describe a Faetón como un asteroide o un posible cometa rocoso.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · NASA Science — Geminids"
+    },
+    {
+      "codigo": "URS",
+      "iau": "015 URS",
+      "nombre": "Úrsidas",
+      "maximo": {
+        "mes": 12,
+        "dia": 22
+      },
+      "longitudSolar": 270.7,
+      "desde": {
+        "mes": 12,
+        "dia": 17
+      },
+      "hasta": {
+        "mes": 12,
+        "dia": 26
+      },
+      "thz": {
+        "min": 10,
+        "max": 10,
+        "nota": null
+      },
+      "velocidadKms": 33,
+      "radiante": {
+        "ar": 217,
+        "dec": 76,
+        "constelacion": "la Osa Menor",
+        "origenConstelacion": "citada"
+      },
+      "progenitor": {
+        "nombre": "del cometa 8P/Tuttle",
+        "certeza": "confirmado"
+      },
+      "nota": "Su radiante queda justo al oeste de Kochab, en la Osa Menor, así que desde el hemisferio norte no se pone nunca.",
+      "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026, Tabla 5 · American Meteor Society"
+    }
+  ],
+  "esporadico": {
+    "texto": "En esta fecha no hay ninguna lluvia importante activa, y aun así el cielo sigue teniendo meteoros: es el fondo esporádico, polvo suelto que la Tierra barre todo el año sin que venga de ninguna corriente concreta. Las lluvias son la excepción; esto es lo normal.",
+    "fuente": "International Meteor Organization, Calendario de lluvias de meteoros 2026"
+  },
+  "bolidos": [
+    {
+      "id": "cheliabinsk",
+      "nombre": "el bólido de Cheliábinsk",
+      "fecha": "15 de febrero de 2013",
+      "lugar": "al sureste de Cheliábinsk, Rusia",
+      "texto": "El 15 de febrero de 2013, a las 3 y 20 de la madrugada en tiempo universal, un objeto entró sobre Cheliábinsk con un ángulo de solo diecisiete grados sobre la horizontal y estalló en el aire. Alcanzó magnitud menos veintiocho: treinta veces más brillante que el Sol para quien estuviera justo debajo. Lo registraron sismómetros, sensores de infrasonidos y más de cuatrocientas cámaras de vídeo a hasta setecientos kilómetros. La energía radiada se midió; la energía total se estima entre cuatrocientos y seiscientos kilotones, y el objeto en unos diecinueve metros, entre diecisiete y veinte. Los heridos no los causó el impacto sino los cristales de las ventanas al reventar.",
+      "cierto": "la hora, el ángulo de entrada, el brillo y la energía radiada están medidos",
+      "estimado": "la energía total (400 a 600 kilotones) y el tamaño (17 a 20 metros) son estimaciones con rango declarado",
+      "fuente": "Brown, P. G. et al. (2013). «A 500-kiloton airburst over Chelyabinsk and an enhanced hazard from small impactors». Nature 503, 238-241 · NASA/JPL CNEOS Fireball Database"
+    },
+    {
+      "id": "tunguska",
+      "nombre": "el evento de Tunguska",
+      "fecha": "30 de junio de 1908",
+      "lugar": "río Tunguska Pedregoso, Siberia",
+      "texto": "La mañana del 30 de junio de 1908, algo estalló en el aire sobre Siberia y derribó millones de árboles en unos dos mil ciento cincuenta kilómetros cuadrados, en un patrón con forma de mariposa. No dejó cráter, y no se ha recuperado jamás un solo fragmento del objeto. Un taller de la NASA en 2018 situó la energía más probable entre diez y veinte megatones y el tamaño entre cincuenta y ochenta metros, pero las estimaciones publicadas van de tres a veinte megatones y de treinta a ochenta metros. La primera expedición científica no llegó hasta dos décadas después. Todo lo que se dice en cifras sobre Tunguska es reconstrucción, no medida.",
+      "cierto": "la fecha, el lugar, que fue un estallido aéreo sin cráter y la extensión de la zona arrasada",
+      "estimado": "la energía (3 a 20 megatones) y el tamaño (30 a 80 metros) siguen sin consenso cerrado",
+      "fuente": "Morrison, D. (2018). «Tunguska Workshop: Applying Modern Tools to Understand the 1908 Tunguska Impact». NASA Ames Research Center, NTRS 20190002302 · NASA History"
+    },
+    {
+      "id": "peekskill",
+      "nombre": "el meteorito de Peekskill",
+      "fecha": "9 de octubre de 1992",
+      "lugar": "Peekskill, Nueva York",
+      "texto": "El 9 de octubre de 1992, un bólido cruzó el noreste de Estados Unidos durante más de cuarenta segundos, recorriendo entre setecientos y ochocientos kilómetros de cielo. Al menos dieciséis personas lo grabaron en vídeo, casi todas porque estaban filmando partidos de fútbol americano escolar. De ahí salió el primer meteorito de la historia recuperado tras haberse registrado su entrada en vídeo, y el cuarto del que se conoce la órbita. Pesaba doce kilos con cuatro, es una condrita ordinaria, y se encontró debajo de un Chevrolet Malibu al que había atravesado el maletero, todavía con pintura roja del coche pegada encima.",
+      "cierto": "la masa recuperada, la clasificación, la órbita y la trayectoria están medidas, con sus incertidumbres publicadas",
+      "estimado": "la masa del objeto original sigue sin resolverse: el propio artículo da entre 2 y 25 toneladas según el método",
+      "fuente": "Beech, M. et al. (1995). «The Fall of the Peekskill Meteorite». Earth, Moon, and Planets 68, 189-197 · Brown, P. et al. (1994). Nature 367, 624-626"
+    }
+  ]
+}

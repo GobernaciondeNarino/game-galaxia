@@ -131,6 +131,42 @@ completa. Mientras el aro no se cierre, se puede abortar cerrando la mano.
 
 ---
 
+## Estrellas fugaces
+
+Cada cuarto de hora cruza una estrella fugaz. Si la pulsas, el asistente cuenta
+**qué lluvia de meteoros está activa en la fecha simulada**, con sus datos y su
+fuente. Si adelantas el reloj a diciembre, te tocan las Gemínidas.
+
+Sigue siendo pulsable unos segundos mientras se apaga: un objetivo que durase
+exactamente lo que el destello sería una prueba de reflejos. Es un `<button>`
+de verdad, así que se puede activar con el ratón, con el dedo y con el
+tabulador, y se anuncia a los lectores de pantalla.
+
+**La distinción que sostiene esta función.** Nunca se afirma que ese trazo sea
+un meteoro concreto que pasó: eso sería inventar un dato. Lo que se cuenta es
+«en esta fecha están cayendo las Perseidas, y las Perseidas son esto». El trazo
+lleva su marca `SIMULACIÓN`; las cifras, su cita.
+
+Los datos son del calendario 2026 del International Meteor Organization
+(Tabla 5), la American Meteor Society y NASA Science, y llevan encima tres
+advertencias que vienen de las propias fuentes:
+
+- **La fecha del máximo caduca.** La fija la longitud solar, no el calendario,
+  así que se corre alrededor de un día de un año a otro. Se guarda también λ☉,
+  que es el dato que no envejece, y al contarlo se dice que la fecha se mueve.
+- **El THZ es una tasa teórica**, la que se vería con el radiante en el cénit y
+  un cielo perfecto. La NASA da 40-50 meteoros por hora reales para las
+  Gemínidas frente a un THZ de 150. La etiqueta va pegada al número.
+- **Donde las fuentes discrepan se da el rango.** Las Cuadrántidas son 80 según
+  el IMO y 120 según la AMS; se dice así, en vez de elegir una a dedo. Y el
+  progenitor de las Delta Acuáridas se marca como probable, porque la NASA dice
+  que se sospecha del 96P/Machholz, no que se sepa.
+
+Fuera de las fechas de cualquier lluvia importante no se calla: cuenta que lo
+que se ve entonces es el fondo esporádico, que también existe todo el año.
+
+---
+
 ## El asistente y tu nombre
 
 Al terminar de cargar, ORBIS se presenta y pregunta cómo llamarte. **No hace

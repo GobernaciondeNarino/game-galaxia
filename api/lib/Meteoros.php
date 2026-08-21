@@ -35,7 +35,7 @@ final class Meteoros
         if (self::$datos !== null) {
             return;
         }
-        self::$datos = ['lluvias' => [], 'esporadico' => null];
+        self::$datos = ['lluvias' => [], 'esporadico' => null, 'bolidos' => []];
 
         $ruta = Config::raiz() . '/data/meteoros.json';
         if (!is_readable($ruta)) {
@@ -46,6 +46,7 @@ final class Meteoros
             self::$datos = [
                 'lluvias' => is_array($leido['lluvias'] ?? null) ? $leido['lluvias'] : [],
                 'esporadico' => $leido['esporadico'] ?? null,
+                'bolidos' => is_array($leido['bolidos'] ?? null) ? $leido['bolidos'] : [],
             ];
         }
     }
@@ -148,24 +149,40 @@ final class Meteoros
             (int) $lluvia['desde']['dia'], self::mes((int) $lluvia['desde']['mes']),
             (int) $lluvia['hasta']['dia'], self::mes((int) $lluvia['hasta']['mes'])
         );
+
+        // La fecha del máximo la fija la longitud solar, no el calendario, así
+        // que se corre alrededor de un día de un año a otro. Decirlo cuesta una
+        // oración subordinada y evita dar por exacta una fecha que no lo es.
         $partes[] = sprintf(
-            'Su máximo cae el %d de %s, con unos %d meteoros por hora en condiciones ideales.',
-            (int) $lluvia['maximo']['dia'], self::mes((int) $lluvia['maximo']['mes']),
-            (int) $lluvia['thz']
+            'Su máximo cae el %d de %s, aunque la fecha se corre un día de un año a otro.',
+            (int) $lluvia['maximo']['dia'], self::mes((int) $lluvia['maximo']['mes'])
         );
 
-        if (!empty($lluvia['progenitor'])) {
+        $partes[] = self::fraseThz($lluvia);
+
+        $progenitor = $lluvia['progenitor'] ?? null;
+        if (is_array($progenitor) && !empty($progenitor['nombre'])) {
             $partes[] = sprintf(
                 'Lo que se quema en la atmósfera son restos %s.',
-                (string) $lluvia['progenitor']
+                (string) $progenitor['nombre']
             );
         }
+
         if (!empty($lluvia['velocidadKms'])) {
             $partes[] = sprintf(
                 'Entran a unos %s kilómetros por segundo.',
                 str_replace('.', ',', (string) $lluvia['velocidadKms'])
             );
         }
+
+        $radiante = $lluvia['radiante'] ?? null;
+        if (is_array($radiante) && !empty($radiante['constelacion'])) {
+            $partes[] = sprintf(
+                'Su radiante está en %s.',
+                (string) $radiante['constelacion']
+            );
+        }
+
         if (!empty($lluvia['nota'])) {
             $partes[] = (string) $lluvia['nota'];
         }
@@ -176,12 +193,101 @@ final class Meteoros
             'lluvia' => (string) $lluvia['nombre'],
             'datos' => [
                 'codigo' => (string) ($lluvia['codigo'] ?? ''),
-                'radiante' => (string) ($lluvia['radiante'] ?? ''),
-                'thz' => (int) ($lluvia['thz'] ?? 0),
+                'iau' => (string) ($lluvia['iau'] ?? ''),
+                'radiante' => is_array($radiante) ? (string) ($radiante['constelacion'] ?? '') : '',
+                'radianteDerivado' => is_array($radiante) && ($radiante['origenConstelacion'] ?? '') === 'derivada',
+                'thz' => self::thzEscrito($lluvia),
                 'velocidadKms' => $lluvia['velocidadKms'] ?? null,
-                'progenitor' => (string) ($lluvia['progenitor'] ?? ''),
+                'progenitor' => is_array($progenitor) ? (string) ($progenitor['nombre'] ?? '') : '',
+                'progenitorProbable' => is_array($progenitor) && ($progenitor['certeza'] ?? '') !== 'confirmado',
             ],
         ];
+    }
+
+    /**
+     * La frase del THZ, con la advertencia que le corresponde.
+     *
+     * El THZ es una tasa TEÓRICA: la que se vería con el radiante en el cénit y
+     * un cielo perfecto. Lo que ve una persona real es bastante menos —la NASA
+     * da 40 a 50 por hora para las Gemínidas frente a un THZ de 150—, así que
+     * soltar el número a secas sería prometer un espectáculo que no va a
+     * ocurrir. Y donde las fuentes discrepan se da el rango, no un valor
+     * elegido a dedo.
+     */
+    private static function fraseThz(array $lluvia): string
+    {
+        $thz = $lluvia['thz'] ?? null;
+        if (!is_array($thz)) {
+            return '';
+        }
+        $min = (int) ($thz['min'] ?? 0);
+        $max = (int) ($thz['max'] ?? $min);
+
+        $cifra = $min === $max
+            ? sprintf('unos %d meteoros por hora', $min)
+            : sprintf('entre %d y %d meteoros por hora', $min, $max);
+
+        // Cuando la lluvia trae su propia nota sobre el THZ, la advertencia
+        // general sobra: la nota ya la da con más detalle, y decir dos veces lo
+        // mismo con distintas palabras cansa a quien escucha.
+        if (!empty($thz['nota'])) {
+            return sprintf('En el máximo llega a %s, aunque es una tasa teórica. %s', $cifra, (string) $thz['nota']);
+        }
+
+        return sprintf(
+            'En el máximo llega a %s, pero es una tasa teórica: la que se vería con el radiante en lo alto y un cielo perfectamente oscuro. A ojo, en un sitio real, se ven bastantes menos.',
+            $cifra
+        );
+    }
+
+    /** El THZ para el panel: un número o un rango. */
+    private static function thzEscrito(array $lluvia): string
+    {
+        $thz = $lluvia['thz'] ?? null;
+        if (!is_array($thz)) {
+            return '';
+        }
+        $min = (int) ($thz['min'] ?? 0);
+        $max = (int) ($thz['max'] ?? $min);
+        return $min === $max ? (string) $min : $min . '-' . $max;
+    }
+
+    /**
+     * Un bólido histórico, de los documentados.
+     *
+     * Estos SÍ son sucesos concretos que ocurrieron, con fecha y con artículo
+     * publicado. Se separa lo medido de lo estimado, porque en Tunguska —donde
+     * la primera expedición llegó veinte años tarde— todo lo cuantitativo es
+     * reconstrucción, y presentarlo como medida sería falsearlo.
+     *
+     * @return array|null
+     */
+    public static function bolido(?string $id = null): ?array
+    {
+        self::cargar();
+        $bolidos = self::$datos['bolidos'];
+        if ($bolidos === []) {
+            return null;
+        }
+
+        if ($id !== null) {
+            foreach ($bolidos as $b) {
+                if (($b['id'] ?? '') === $id) {
+                    return $b;
+                }
+            }
+            return null;
+        }
+        return $bolidos[0];
+    }
+
+    /** @return string[] los identificadores de bólido registrados. */
+    public static function bolidosRegistrados(): array
+    {
+        self::cargar();
+        return array_map(static function ($b) {
+            return (string) ($b['id'] ?? '');
+        }, self::$datos['bolidos']);
     }
 
     private static function mes(int $n): string
