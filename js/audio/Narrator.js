@@ -249,6 +249,48 @@ export class Narrator {
     return datos;
   }
 
+  /**
+   * Cuenta qué lluvia de meteoros está activa en la fecha simulada.
+   *
+   * @param {Date} fecha la fecha de la escena, no la del reloj de pared
+   * @returns {Promise<object|null>} { texto, fuente, lluvia, datos }
+   */
+  async contarMeteoros(fecha) {
+    const mes = fecha.getUTCMonth() + 1;
+    const dia = fecha.getUTCDate();
+
+    let datos = null;
+    try {
+      const respuesta = await fetch(`${rutaApp('api/meteoros.php')}?mes=${mes}&dia=${dia}`);
+      if (!respuesta.ok) return null;
+      datos = await respuesta.json();
+    } catch {
+      return null;
+    }
+    if (!datos?.texto) return null;
+
+    this.detener();
+    this.subtitulos.mostrarFrase(datos.texto, 12000);
+
+    if (this.motor === 'servidor') {
+      const reproductor = new Audio();
+      reproductor.volume = this.volumenObjetivo;
+      if (reproductor.volume > 0) {
+        this._fraseEnCurso = reproductor;
+        reproductor.addEventListener('error', () => {
+          if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
+          this._decirFraseConNavegador(datos.texto);
+        }, { once: true });
+        reproductor.src = `${rutaApp('api/tts.php')}?meteoros=${mes}-${dia}`;
+        reproductor.play().catch(() => this._decirFraseConNavegador(datos.texto));
+      }
+    } else if (this.motor === 'navegador') {
+      this._decirFraseConNavegador(datos.texto);
+    }
+
+    return datos;
+  }
+
   /** Pide el texto de una frase. Devuelve null si no hay versión aplicable. */
   async _textoFrase(frase, variante) {
     const partes = [`frase=${encodeURIComponent(frase)}`, `variante=${variante}`];

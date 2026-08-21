@@ -43,6 +43,7 @@ require_once __DIR__ . '/lib/RateLimiter.php';
 require_once __DIR__ . '/lib/Catalogo.php';
 require_once __DIR__ . '/lib/Asistente.php';
 require_once __DIR__ . '/lib/Respuestas.php';
+require_once __DIR__ . '/lib/Meteoros.php';
 
 header('X-Content-Type-Options: nosniff');
 
@@ -56,6 +57,7 @@ if ($metodo === 'GET') {
         'bodyId' => $_GET['bodyId'] ?? '',
         'frase' => $_GET['frase'] ?? null,
         'atributo' => $_GET['atributo'] ?? null,
+        'meteoros' => $_GET['meteoros'] ?? null,
         'nombre' => $_GET['nombre'] ?? null,
         'voiceId' => $_GET['voiceId'] ?? null,
         'variante' => $_GET['variante'] ?? 0,
@@ -86,8 +88,28 @@ $fraseId = isset($peticion['frase']) ? (string) $peticion['frase'] : '';
 $bodyId = isset($peticion['bodyId']) ? (string) $peticion['bodyId'] : '';
 
 $atributo = isset($peticion['atributo']) ? (string) $peticion['atributo'] : '';
+$meteoros = isset($peticion['meteoros']) ? (string) $peticion['meteoros'] : '';
 
-if ($atributo !== '') {
+if ($meteoros !== '') {
+    // Lo que el asistente cuenta al observar una estrella fugaz. Llega una
+    // fecha —dos números— y el texto lo compone Meteoros a partir de las
+    // lluvias documentadas. El trazo es simulación; esto no.
+    if (preg_match('/^(\d{1,2})-(\d{1,2})$/', $meteoros, $partes) !== 1) {
+        Respuesta::error(400, 'fecha_invalida', 'La fecha no tiene un formato válido.');
+    }
+    $mesM = (int) $partes[1];
+    $diaM = (int) $partes[2];
+    if ($mesM < 1 || $mesM > 12 || $diaM < 1 || $diaM > 31) {
+        Respuesta::error(400, 'fecha_invalida', 'La fecha no es válida.');
+    }
+
+    $relato = Meteoros::relato($mesM, $diaM);
+    if (empty($relato['texto'])) {
+        Respuesta::error(404, 'sin_meteoros', 'No hay nada que contar para esa fecha.');
+    }
+    $texto = $relato['texto'];
+    $bodyId = 'meteoros-' . $mesM . '-' . $diaM;
+} elseif ($atributo !== '') {
     // Respuesta a una pregunta: dos identificadores, y el texto lo compone
     // Respuestas a partir del catálogo. Igual que en las otras dos vías, el
     // navegador elige QUÉ se dice, nunca CÓMO se dice.

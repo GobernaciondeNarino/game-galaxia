@@ -24,6 +24,7 @@ import { HandTracking } from './input/HandTracking.js';
 import { GestureRecognizer } from './input/GestureRecognizer.js';
 import { Bienvenida, pareceNombre } from './ui/Bienvenida.js';
 import { Preguntas } from './input/Preguntas.js';
+import { EstrellaFugaz } from './ui/EstrellaFugaz.js';
 import { ReconocedorGuino, ojosDesdeResultado } from './input/ReconocedorGuino.js';
 import { CursorGestual } from './ui/CursorGestual.js';
 import { VoiceCommands } from './input/VoiceCommands.js';
@@ -647,6 +648,45 @@ async function arrancar() {
   document.body.dataset.estado = 'listo';
   anunciar('Sistema Solar cargado. Use Tab para navegar o haga clic sobre un cuerpo.');
 
+  // -------------------------------------------------------- estrellas fugaces --
+  // Cruza una cada cuarto de hora. Al pulsarla, el asistente cuenta qué lluvia
+  // de meteoros está activa EN LA FECHA SIMULADA, no en la de hoy: si el
+  // usuario ha adelantado el reloj a diciembre, le tocan las Gemínidas.
+  // Solo se encienden si hay catálogo de lluvias que contar. Sin él, el trazo
+  // cruzaría la pantalla para decir «no tengo datos» al pulsarlo, que es peor
+  // que no cruzar. Es la misma regla de siempre: si no hay dato, no se finge.
+  let hayMeteoros = false;
+  try {
+    const catalogoMeteoros = await (await fetch(rutaApp('data/meteoros.json'))).json();
+    hayMeteoros = Array.isArray(catalogoMeteoros?.lluvias) && catalogoMeteoros.lluvias.length > 0;
+  } catch {
+    hayMeteoros = false;
+  }
+
+  const fugaces = hayMeteoros ? new EstrellaFugaz(document.body, {
+    alObservar: async () => {
+      const fecha = App.estado.tiempoSimulado ?? new Date();
+      const datos = await narrador?.contarMeteoros(fecha);
+      if (!datos) {
+        anunciar('No he podido recuperar los datos de la lluvia.');
+        return;
+      }
+      hud.mostrarRespuesta({
+        texto: datos.texto,
+        fuente: datos.fuente,
+        valor: datos.datos?.thz ? `${datos.datos.thz} meteoros/hora` : null,
+        sinDato: false,
+        cuerpo: datos.lluvia ?? 'Fondo esporádico',
+        etiqueta: datos.datos?.radiante ? `radiante en ${datos.datos.radiante}` : 'lluvia de meteoros',
+      });
+      anunciar(datos.texto);
+    },
+  }) : null;
+  App.subsistemas.fugaces = fugaces;
+  if (!hayMeteoros) {
+    log('Sin data/meteoros.json: las estrellas fugaces quedan desactivadas.');
+  }
+
   // ------------------------------------------------------------ bienvenida --
   // El asistente se presenta y pregunta el nombre. No bloquea: se puede seguir
   // sin darlo, y entonces habla en general. El saludo en voz alta va DESPUÉS de
@@ -675,6 +715,7 @@ async function arrancar() {
   // colgado si el navegador conserva la página en la caché de retroceso.
   window.addEventListener('pagehide', () => {
     bucle.detener();
+    fugaces?.destruir();
     manos.destruir();
     voz?.destruir();
     cursorGestual.destruir();

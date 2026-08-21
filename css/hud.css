@@ -567,6 +567,83 @@ body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]) {
   letter-spacing: 0.16em;
 }
 /* ==========================================================================
+   Estrella fugaz
+   El trazo es decoración y lleva su marca; los datos que salen al pulsarla son
+   reales. El botón es del tamaño mínimo táctil aunque el trazo se vea fino:
+   la zona sensible y lo que se dibuja no tienen por qué coincidir.
+   ========================================================================== */
+.fugaz {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 23;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transform: translate(var(--desde-x), var(--desde-y));
+  animation: fugaz-cruzar var(--dur-fugaz, 2200ms) var(--curva) forwards;
+}
+.fugaz[data-quieta="si"] {
+  transform: translate(var(--desde-x), var(--desde-y));
+  animation: fugaz-asomar 400ms var(--curva) forwards;
+}
+
+.fugaz__trazo {
+  display: block;
+  width: 90px;
+  height: 2px;
+  border-radius: 2px;
+  transform: rotate(var(--giro, 20deg));
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(207, 230, 255, 0.35) 45%,
+    rgba(255, 255, 255, 0.95) 92%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  box-shadow: 0 0 10px rgba(207, 230, 255, 0.65);
+  pointer-events: none;
+}
+
+.fugaz__marca {
+  position: absolute;
+  top: 100%;
+  margin-top: 2px;
+  font-family: var(--fuente-titulos);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: var(--ambar-seleccion);
+  opacity: 0.75;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.fugaz:hover .fugaz__trazo,
+.fugaz:focus-visible .fugaz__trazo {
+  height: 3px;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.9);
+}
+
+@keyframes fugaz-cruzar {
+  0%   { transform: translate(var(--desde-x), var(--desde-y)); opacity: 0; }
+  12%  { opacity: 1; }
+  55%  { opacity: 1; }
+  /* Se queda donde acaba y se apaga despacio: durante ese rato todavía se
+     puede pulsar, para que atraparla no sea una prueba de reflejos. */
+  100% { transform: translate(var(--hasta-x), var(--hasta-y)); opacity: 0.22; }
+}
+
+@keyframes fugaz-asomar {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ==========================================================================
    Respuesta a una pregunta
    ========================================================================== */
 .respuesta {
