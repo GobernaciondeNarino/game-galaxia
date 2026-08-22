@@ -193,17 +193,29 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 
 ## Seguridad
 
-- **Ninguna credencial llega al navegador.** La clave de ElevenLabs se lee de la
-  variable de entorno `ELEVENLABS_API_KEY` de Plesk o, en su defecto, de
-  `config/secrets.php`, que está en `.gitignore` y bloqueado por `.htaccess`.
+- **Ninguna credencial llega al navegador.** Las dos claves —`ELEVENLABS_API_KEY`
+  para la voz y `ANTHROPIC_API_KEY` para el asistente— se leen de las variables
+  de entorno de Plesk o, en su defecto, de `config/secrets.php`, que está en
+  `.gitignore` y bloqueado por `.htaccess`. La plantilla comentada de los diez
+  valores configurables es [`config/secrets.example.php`](config/secrets.example.php);
+  el procedimiento está en
+  [`docs/DESPLIEGUE-PLESK.md` §5](docs/DESPLIEGUE-PLESK.md).
+- **`api/health.php` dice qué está configurado y de dónde sale**, nunca su
+  valor. Existe porque el fallo más común no es una clave ausente sino una
+  variable de entorno antigua ganándole en silencio al archivo que se acaba de
+  editar.
 - **`api/tts.php` no acepta texto del cliente.** Recibe un `bodyId`, y el texto
   que sintetiza lo toma de su propia copia de `data/sistema-solar.json`. Un
   endpoint que sintetizara el texto recibido sería una pasarela gratuita hacia
   una API de pago a costa del titular de la cuenta; así, el conjunto de textos
   posibles es finito, conocido y cacheable, y el gasto está acotado.
-- Límite de generaciones **nuevas** por IP; servir de caché y precargar no
-  consumen cupo. Verificación TLS obligatoria en las llamadas salientes. La
-  respuesta cruda de ElevenLabs va al registro, nunca al cliente.
+- **`api/chat.php` tampoco sintetiza texto del cliente.** La respuesta del
+  asistente se guarda bajo un hash en `cache/respuestas/` y `api/tts.php` solo
+  acepta ese hash: el endpoint de voz nunca dice lo que le manden.
+- Límite por IP y hora en los tres endpoints de pago —narración, transcripción y
+  conversación—; servir de caché y precargar no consumen cupo. Verificación TLS
+  obligatoria en las llamadas salientes. La respuesta cruda de ElevenLabs va al
+  registro, nunca al cliente.
 - **CSP sin `unsafe-inline` en los scripts.** El único bloque en línea es el
   `importmap` —los navegadores no admiten import maps externos—, autorizado por
   su hash SHA-256. Si lo modificas, ejecuta `node tools/csp-hash.mjs`.

@@ -81,46 +81,63 @@ foreach (['curl' => true, 'json' => true, 'openssl' => true, 'mbstring' => false
 }
 
 // --------------------------------------------------------------------------
-// 3. Escritura en la caché de audio
-//    Sin esto cada visita regeneraría el MP3 y la factura de ElevenLabs se
-//    dispararía: es un fallo crítico, no un detalle.
+// 3. Escritura en las cachés
+//    No basta con que el directorio exista: en Plesk lo habitual es que exista
+//    y pertenezca a otro usuario. Por eso se escribe un archivo de verdad y se
+//    borra, en lugar de fiarse de is_writable().
+//
+//    cache/audio es crítico: sin él cada visita regeneraría el MP3 y la
+//    factura de ElevenLabs se dispararía. Los otros tres solo hacen que se
+//    repita trabajo ya hecho, así que son avisos.
 // --------------------------------------------------------------------------
-$dirCache = RAIZ . '/cache/audio';
-if (!is_dir($dirCache)) {
-    @mkdir($dirCache, 0755, true);
-}
-if (!is_dir($dirCache)) {
-    comprobar('cache_audio', 'escritura en cache/audio', 'error', 'cache/audio no existe y no se pudo crear');
-} elseif (!is_writable($dirCache)) {
-    comprobar('cache_audio', 'escritura en cache/audio', 'error', 'cache/audio no es escribible (revisa permisos y propietario)');
-} else {
-    $prueba = $dirCache . '/.escritura-' . bin2hex(random_bytes(4));
+
+/**
+ * Comprueba que se puede escribir de verdad en un directorio de caché.
+ *
+ * @param string $relativo  ruta desde la raíz del proyecto
+ * @param bool   $critico   si su ausencia rompe algo o solo lo encarece
+ */
+function comprobarEscritura(string $clave, string $relativo, bool $critico, string $paraQue): void
+{
+    $gravedad = $critico ? 'error' : 'aviso';
+    $ruta = RAIZ . '/' . $relativo;
+
+    if (!is_dir($ruta)) {
+        @mkdir($ruta, 0755, true);
+    }
+    if (!is_dir($ruta)) {
+        comprobar($clave, 'escritura en ' . $relativo, $gravedad, 'no existe y no se pudo crear — ' . $paraQue);
+        return;
+    }
+
+    $prueba = $ruta . '/.escritura-' . bin2hex(random_bytes(4));
     $escrito = @file_put_contents($prueba, 'ok') !== false;
     @unlink($prueba);
+
     comprobar(
-        'cache_audio',
-        'escritura en cache/audio',
-        $escrito ? 'ok' : 'error',
-        $escrito ? 'escribible' : 'escritura denegada'
+        $clave,
+        'escritura en ' . $relativo,
+        $escrito ? 'ok' : $gravedad,
+        $escrito ? 'escribible' : 'escritura denegada (revisa permisos y propietario) — ' . $paraQue
     );
 }
+
+comprobarEscritura('cache_audio', 'cache/audio', true,
+    'sin caché, cada visita vuelve a pagar la narración en ElevenLabs');
+comprobarEscritura('cache_efemerides', 'cache/efemerides', false,
+    'sin caché se consulta JPL Horizons en cada pregunta de posición');
+comprobarEscritura('cache_respuestas', 'cache/respuestas', false,
+    'sin caché el asistente responde por escrito pero no se le puede oír');
+comprobarEscritura('cache_limites', 'cache/limites', false,
+    'sin contadores, los topes de gasto por IP no se aplican');
 
 // --------------------------------------------------------------------------
 // 4. Clave de ElevenLabs
 //    Orden de búsqueda: variable de entorno (recomendado en Plesk) →
 //    config/secrets.php. Solo se informa de su presencia.
 // --------------------------------------------------------------------------
-$clave = getenv('ELEVENLABS_API_KEY');
-$origenClave = $clave !== false && $clave !== '' ? 'entorno' : null;
-
-if ($origenClave === null && is_file(RAIZ . '/config/secrets.php')) {
-    /** @var array<string,string> $secretos */
-    $secretos = require RAIZ . '/config/secrets.php';
-    if (is_array($secretos) && !empty($secretos['ELEVENLABS_API_KEY'])) {
-        $clave = $secretos['ELEVENLABS_API_KEY'];
-        $origenClave = 'config/secrets.php';
-    }
-}
+$clave = Config::obtener('ELEVENLABS_API_KEY');
+$origenClave = Config::origen('ELEVENLABS_API_KEY');
 
 comprobar(
     'clave_elevenlabs', 'clave de ElevenLabs',
@@ -138,23 +155,11 @@ comprobar(
 //     del código, o puede que ni siquiera se esté usando ElevenLabs porque
 //     falta la clave y todo va con la voz del navegador.
 // --------------------------------------------------------------------------
-$vozEntorno = getenv('ELEVENLABS_VOICE_ID');
-$origenVoz = null;
-$vozActiva = Config::VOZ_PREDETERMINADA;
-
-if ($vozEntorno !== false && $vozEntorno !== '') {
-    $vozActiva = $vozEntorno;
-    $origenVoz = 'variable de entorno ELEVENLABS_VOICE_ID';
-} elseif (is_file(RAIZ . '/config/secrets.php')) {
-    $secretosVoz = require RAIZ . '/config/secrets.php';
-    if (is_array($secretosVoz) && !empty($secretosVoz['ELEVENLABS_VOICE_ID'])) {
-        $vozActiva = (string) $secretosVoz['ELEVENLABS_VOICE_ID'];
-        $origenVoz = 'config/secrets.php';
-    }
-}
-if ($origenVoz === null) {
-    $origenVoz = 'valor fijado en api/lib/Config.php';
-}
+$vozActiva = (string) Config::obtener('ELEVENLABS_VOICE_ID', Config::VOZ_PREDETERMINADA);
+$origenVoz = Config::origen('ELEVENLABS_VOICE_ID');
+$origenVoz = $origenVoz === 'entorno'
+    ? 'variable de entorno ELEVENLABS_VOICE_ID'
+    : ($origenVoz ?? 'valor fijado en api/lib/Config.php');
 
 comprobar(
     'voz_elevenlabs', 'voz de la narración',
@@ -163,6 +168,42 @@ comprobar(
         ? 'se usaría ' . $vozActiva . ' (origen: ' . $origenVoz . '), pero sin clave de API '
           . 'no se llega a ElevenLabs y suena la voz del navegador'
         : $vozActiva . ' (origen: ' . $origenVoz . ')'
+);
+
+// --------------------------------------------------------------------------
+// 4c. Asistente conversacional
+//     Son dos piezas y fallan por separado: la clave se configura y el SDK se
+//     sube. Con la clave puesta y sin la carpeta api/vendor —el fallo típico
+//     de un despliegue por FTP que se dejó 2.339 archivos por el camino— el
+//     asistente devolvería 503 sin que se entienda por qué.
+// --------------------------------------------------------------------------
+$origenAnthropic = Config::origen('ANTHROPIC_API_KEY');
+comprobar(
+    'clave_anthropic', 'clave de Anthropic',
+    $origenAnthropic !== null ? 'ok' : 'aviso',
+    $origenAnthropic !== null
+        ? 'configurada (origen: ' . $origenAnthropic . ')'
+        : 'ausente — el asistente no conversará; las preguntas del catálogo se siguen respondiendo'
+);
+
+$sdk = RAIZ . '/api/vendor/autoload.php';
+comprobar(
+    'sdk_anthropic', 'SDK de Anthropic',
+    is_readable($sdk) ? 'ok' : ($origenAnthropic !== null ? 'error' : 'aviso'),
+    is_readable($sdk)
+        ? 'api/vendor presente'
+        : 'falta api/vendor — ¿subiste la carpeta completa?'
+);
+
+// El modelo también se puede sustituir, y conviene ver cuál está activo antes
+// de preguntarse por qué una respuesta salió peor de lo esperado.
+comprobar(
+    'modelo_asistente', 'modelo del asistente',
+    'ok',
+    (string) Config::obtener('ORBIS_MODELO', 'claude-opus-5')
+        . (Config::origen('ORBIS_MODELO') !== null
+            ? ' (origen: ' . Config::origen('ORBIS_MODELO') . ')'
+            : ' (valor fijado en api/lib/Conversacion.php)')
 );
 
 // --------------------------------------------------------------------------

@@ -146,35 +146,26 @@ carpeta es realmente escribible por PHP.
 
 ---
 
-## 5. La clave de ElevenLabs
+## 5. Configuración: claves, voz y topes de gasto
 
-### Recomendado: variable de entorno
+Todo lo configurable de ORBIS —las dos claves de API, el código de la voz, el
+modelo y los topes de gasto— sale del mismo sitio. **Ningún valor de estos toca
+el navegador jamás**: los lee PHP en el servidor y ahí se quedan.
 
-Plesk → *Dominios* → **Configuración de PHP** → *Variables de entorno*:
-
-| Nombre | Valor |
-|---|---|
-| `ELEVENLABS_API_KEY` | tu clave |
-| `ELEVENLABS_VOICE_ID` | *(opcional)* otra voz distinta de la de ORBIS |
-
-Así la clave no toca el disco del sitio y no puede filtrarse por una regla de
-Apache mal escrita.
-
-**La única variable obligatoria es `ELEVENLABS_API_KEY`.** La voz de ORBIS
-(`lE5ZJB6jGeeuvSNxOvs2`) va fijada en `api/tts.php`; un id de voz es un
-identificador público, no una credencial, y sin la clave de API no sirve para
-nada. Define `ELEVENLABS_VOICE_ID` solo si quieres cambiarla.
-
-> Con PHP-FPM puede hacer falta reiniciar el *pool* del dominio para que las
-> variables se apliquen (Plesk lo ofrece en la misma pantalla).
-
-### Alternativa: `config/secrets.php`
+### 5.1 El archivo de configuración
 
 ```bash
 cp config/secrets.example.php config/secrets.php
-# edita config/secrets.php y rellena los valores
+# edita config/secrets.php y rellena lo que necesites
 chmod 640 config/secrets.php
 ```
+
+En el *Administrador de archivos* de Plesk: duplicar `secrets.example.php` y
+renombrar la copia a `secrets.php`.
+
+La plantilla trae los diez valores comentados uno a uno. Lo que dejes vacío usa
+el valor por omisión, así que **no hace falta rellenarlo todo**: con
+`ELEVENLABS_API_KEY` y `ANTHROPIC_API_KEY` ORBIS ya funciona entero.
 
 Después **comprueba que está bloqueado**:
 
@@ -182,8 +173,79 @@ Después **comprueba que está bloqueado**:
 https://tu-dominio/config/secrets.php   →  debe devolver 403
 ```
 
-Si devuelve una página en blanco o el contenido del archivo, detén el despliegue
-y revisa `config/.htaccess` y que `AllowOverride` esté habilitado.
+Si devuelve una página en blanco o el contenido del archivo, detén el
+despliegue y revisa `config/.htaccess` y que `AllowOverride` esté habilitado.
+
+### 5.2 Alternativa para las claves: variables de entorno
+
+Plesk → *Dominios* → **Configuración de PHP** → *Variables de entorno*. Sirve
+para cualquiera de los diez nombres de la tabla de abajo.
+
+Es mejor sitio para las dos claves de API: no tocan el disco del sitio, así que
+no pueden acabar en una copia de seguridad descargable ni viajar en un
+despliegue por FTP.
+
+> **La variable de entorno GANA al archivo.** Si defines las dos, el archivo se
+> ignora en silencio. Es la causa número uno de «he cambiado la voz y suena
+> igual»; `api/health.php` dice de dónde sale cada valor precisamente por eso.
+
+> Con PHP-FPM puede hacer falta reiniciar el *pool* del dominio para que las
+> variables se apliquen (Plesk lo ofrece en la misma pantalla).
+
+### 5.3 Todo lo que se puede configurar
+
+| Nombre | Para qué | Si falta |
+|---|---|---|
+| `ELEVENLABS_API_KEY` | Narración hablada y dictado por voz | Narra la voz del navegador, bastante peor |
+| `ELEVENLABS_VOICE_ID` | **Código de la voz** de ORBIS | `lE5ZJB6jGeeuvSNxOvs2`, la voz de ORBIS |
+| `ELEVENLABS_MODEL_ID` | Modelo de síntesis | `eleven_multilingual_v2` |
+| `ELEVENLABS_VOCES_PERMITIDAS` | Voces que `api/tts.php` acepta, separadas por comas | Solo la voz activa |
+| `ELEVENLABS_STT_MODEL` | Modelo de transcripción | `scribe_v1` |
+| `ANTHROPIC_API_KEY` | **Asistente conversacional** | El asistente no conversa; las preguntas del catálogo se siguen respondiendo |
+| `ORBIS_MODELO` | Modelo del asistente | `claude-opus-5` |
+| `LIMITE_GENERACIONES_HORA` | Narraciones nuevas por IP y hora | `30` |
+| `LIMITE_TRANSCRIPCIONES_HORA` | Transcripciones por IP y hora | `120` |
+| `LIMITE_CONVERSACION_HORA` | Respuestas del asistente por IP y hora | `60` |
+| `ORBIS_SAL_LIMITES` | Sal con la que se anonimizan las IP de los contadores | Una compartida por todas las instalaciones — **pon una propia** |
+
+`ORBIS_SAL_LIMITES` merece un minuto: los topes cuentan por visitante y ORBIS
+guarda un **hash** de la IP en lugar de la IP, para que en `cache/limites/` no
+quede una lista de quién ha entrado. Un hash sin sal propia se puede deshacer
+probando —solo hay unos pocos miles de millones de direcciones—, así que ponle
+algo tuyo: `head -c 32 /dev/urandom | base64`.
+
+**Ninguna es obligatoria para que ORBIS arranque.** Sin las dos claves la
+interfaz funciona entera: se navega, se lee, se compara y se pregunta al
+catálogo. Lo que se pierde es la voz sintetizada y la conversación libre.
+
+### 5.4 Cambiar la voz
+
+1. Saca el código en <https://elevenlabs.io> → *Voices* → elige una →
+   *Copiar ID*. O con la clave:
+   ```bash
+   curl -H "xi-api-key: TU_CLAVE" https://api.elevenlabs.io/v1/voices
+   ```
+2. Ponlo en `ELEVENLABS_VOICE_ID`.
+3. **Borra `cache/audio/`.** Los MP3 ya generados siguen ahí con la voz vieja y
+   se seguirían sirviendo tal cual. Es la segunda causa de «he cambiado la voz
+   y suena igual».
+4. Confirma en `api/health.php`: la comprobación `voz_elevenlabs` dice el
+   código activo **y de dónde sale**.
+
+Un identificador de voz es público —sin la clave de API no sirve para nada— así
+que puede verse sin problema. La clave, no.
+
+### 5.5 Rotar una clave
+
+Si una clave se ha visto alguna vez fuera del servidor —un correo, una captura,
+un mensaje— dala por comprometida:
+
+1. Genera una nueva en el panel del proveedor y **revoca la anterior**.
+2. Cámbiala en la variable de entorno o en `config/secrets.php`.
+3. `https://tu-dominio/api/health.php?red=1` para confirmar que la nueva vale.
+
+No hay que tocar nada más: la caché de audio sigue sirviendo, porque lo que
+guarda son MP3 ya pagados, no la clave.
 
 ---
 
@@ -203,6 +265,21 @@ En este orden:
    generando—; la segunda es instantánea y trae la cabecera
    `X-Orbis-Cache: hit`. Con `&soloCache=1` no genera nada: devuelve el audio
    si ya existe y `204` si no, y es lo que usa la precarga.
+
+2 ter. **El asistente conversacional.** Desde una terminal:
+   ```bash
+   curl -sS -X POST https://tu-dominio/api/chat.php \
+        -H 'Content-Type: application/json' \
+        -d '{"turnos":[{"rol":"usuario","texto":"¿Cuánto mide Marte?"}]}'
+   ```
+   Debe devolver JSON con un campo `texto`. Un **503** con
+   `asistente_no_configurado` significa que falta `ANTHROPIC_API_KEY` o la
+   carpeta `api/vendor`; `api/health.php` distingue cuál de las dos.
+
+   Y comprueba lo que de verdad importa: que la cifra que responda **coincida
+   con `data/sistema-solar.json`**. El asistente no responde de memoria, cada
+   dato se lo devuelve una herramienta leyendo el catálogo. Si alguna vez
+   contesta algo que no está ahí, es un fallo grave, no un detalle.
 
 3. **`http://tu-dominio/`** (sin la ese)
    Debe redirigir a `https://` con un 301.
@@ -237,6 +314,11 @@ En este orden:
 | Un modelo da 404 | `hand_landmarker.task` o `face_landmarker.task` no llegaron al servidor | `node tools/vendor.mjs mediapipe` y comprueba que `assets/models/` se desplegó entero |
 | El guiño no funciona pero las manos sí | falta `face_landmarker.task`; se avisa en el panel de entradas | mismo remedio; entretanto, el puño y la voz siguen deteniendo la narración |
 | Error 500 en `api/*.php` | Versión de PHP o extensión ausente | Mira el registro de errores del dominio en Plesk |
+| El asistente responde 503 `asistente_no_configurado` | Falta `ANTHROPIC_API_KEY`, o falta `api/vendor/` | `api/health.php` dice cuál de las dos: mira `clave_anthropic` y `sdk_anthropic` |
+| Se cambió la voz y sigue sonando la anterior | Una variable de entorno gana al archivo, o la caché sirve los MP3 viejos | `api/health.php` → `voz_elevenlabs` dice el origen; luego borra `cache/audio/` |
+| El asistente responde por escrito pero no se le oye | `cache/respuestas/` no escribible | `api/health.php` → `cache_respuestas`; `chmod 775` con el propietario correcto |
+| Las preguntas de posición tardan mucho | `cache/efemerides/` no escribible: se llama a JPL en cada una | `api/health.php` → `cache_efemerides` |
+| Los topes de gasto no se aplican | `cache/limites/` no escribible: sin contadores no hay límite | `api/health.php` → `cache_limites`. **Revísalo antes de abrir al público** |
 
 ### Registros
 

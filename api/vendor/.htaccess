@@ -1,0 +1,13 @@
+# Dependencias de terceros instaladas por Composer (SDK de Anthropic y sus
+# librerías). Son código que se incluye desde api/lib/, nunca puntos de entrada
+# HTTP: aquí no hay nada que servir.
+#
+# Sin este archivo, los más de dos mil .php del SDK quedan accesibles por URL.
+# Ninguno imprime nada al invocarse suelto, pero enumerarlos revela versiones
+# exactas de cada librería, que es media pista para quien busca un fallo
+# conocido. Superficie de ataque que no cuesta nada cerrar.
+Require all denied
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

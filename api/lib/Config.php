@@ -42,17 +42,50 @@ final class Config
             return $entorno;
         }
 
-        if (self::$secretos === null) {
-            $ruta = __DIR__ . '/../../config/secrets.php';
-            $cargado = is_file($ruta) ? require $ruta : [];
-            self::$secretos = is_array($cargado) ? $cargado : [];
-        }
+        self::cargarSecretos();
 
         if (isset(self::$secretos[$clave]) && self::$secretos[$clave] !== '') {
             return (string) self::$secretos[$clave];
         }
 
         return $predeterminado;
+    }
+
+    /**
+     * De dónde sale un valor: 'entorno', 'config/secrets.php' o null.
+     *
+     * Existe para api/health.php, que tiene que poder decir POR QUÉ está
+     * ganando un valor y no otro. Es la respuesta a «he cambiado la voz y
+     * suena igual»: casi siempre hay una variable de entorno antigua que gana
+     * a lo que se acaba de escribir en config/secrets.php.
+     *
+     * Nunca devuelve el valor, solo su procedencia: así el diagnóstico puede
+     * ser público sin filtrar una credencial.
+     */
+    public static function origen(string $clave): ?string
+    {
+        $entorno = getenv($clave);
+        if ($entorno !== false && $entorno !== '') {
+            return 'entorno';
+        }
+
+        self::cargarSecretos();
+        if (isset(self::$secretos[$clave]) && self::$secretos[$clave] !== '') {
+            return 'config/secrets.php';
+        }
+
+        return null;
+    }
+
+    /** Lee config/secrets.php una sola vez por petición. */
+    private static function cargarSecretos(): void
+    {
+        if (self::$secretos !== null) {
+            return;
+        }
+        $ruta = self::raiz() . '/config/secrets.php';
+        $cargado = is_file($ruta) ? require $ruta : [];
+        self::$secretos = is_array($cargado) ? $cargado : [];
     }
 
     /** Igual que obtener() pero para valores numéricos. */
