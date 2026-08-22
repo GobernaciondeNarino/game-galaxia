@@ -218,6 +218,17 @@
      esto la barra se sale por la derecha y la de FPS queda cortada. */
   .barra__indicadores { flex-wrap: wrap; }
 
+  /* Y por debajo de 360 px se aprieta lo justo para que quepan en UN renglón.
+     Medido en una pantalla de 320: las cuatro suman 289 px y los tres huecos
+     de 8 px las mandaban a un tercer renglón, 24 px de barra por 9 px de
+     exceso. Con huecos de 4 px y dos de holgura a cada lado caben en 297 y la
+     barra baja de 136 a 112 px. No se recorta ningún rótulo: una pastilla que
+     solo enseñara «◉» no diría si es la cámara o el micrófono. */
+  @media (max-width: 360px) {
+    .barra__indicadores { gap: 4px; }
+    .indicador { padding: 2px 4px; }
+  }
+
   .controles { width: 100%; justify-content: space-between; padding: var(--e-2); }
   .controles__valor { min-width: 4em; }
 
@@ -481,4 +492,128 @@
   /* GALAXIA: fuera todo lo que tape el disco. */
   body[data-seccion="galaxia"] #hud-panel-izquierdo,
   body[data-seccion="galaxia"] #hud-navegacion-planetaria { display: none; }
+}
+
+/* ==========================================================================
+   HOJA DE COMANDOS TRAS UNA HAMBURGUESA (solo pantallas estrechas)
+
+   QUÉ PROBLEMA RESUELVE
+   ─────────────────────
+   Los once mandos de escena —vista general, galaxia, las tres teclas de
+   tiempo, órbitas, escala real, silencio, volumen, repetir y ayuda— ocupaban
+   cuatro renglones en lo alto de un teléfono: cerca de 200 px de los 667 que
+   hay, gastados antes de que empezara la escena. Por debajo de 380 px la fila
+   se convertía además en una tira que se recorre con el dedo SIN NINGUNA SEÑAL
+   de que se pudiera recorrer: los últimos mandos estaban ahí y no había cómo
+   saberlo. Recogidos tras un botón ocupan 44 px y se abren enteros.
+
+   QUÉ SE QUEDA FUERA, A PROPÓSITO
+   ───────────────────────────────
+   Los cuatro indicadores —cámara, micrófono, red y FPS— siguen a la vista. Dos
+   son estado y no mandos, y los otros dos son la única forma de encender la
+   cámara y el micrófono en un teléfono: esconder que la cámara está encendida
+   es justo lo que nunca hay que esconder.
+
+   SOLO POR DEBAJO DE 1024 px
+   ──────────────────────────
+   Por encima no hay ni botón ni hoja: los controles siguen en su renglón, tal
+   cual estaban. `body[data-comandos]` existe igual, pero ninguna regla de
+   escritorio lo mira, así que no significa nada allí.
+   ========================================================================== */
+
+/* En escritorio el botón ni se dibuja. */
+.barra__comandos { display: none; }
+
+@media (max-width: 1024px) {
+  /* La hoja se ancla al bloque entero de la barra superior, no a la fila de
+     identidad: así cae por debajo de los indicadores en vez de encima. */
+  #hud-barra-superior { position: relative; }
+
+  /* La fila de identidad pasa a dos columnas y el botón se queda a la derecha,
+     a la altura de las dos líneas de texto. Las tres posiciones van explícitas
+     porque el flujo automático colocaría la versión al lado de la marca. */
+  .barra { grid-template-columns: minmax(0, 1fr) auto; }
+  .barra__marca   { grid-area: 1 / 1; }
+  .barra__version { grid-area: 2 / 1; }
+
+  .barra__comandos {
+    grid-area: 1 / 2 / 3 / 3;
+    justify-self: end;
+    align-self: center;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    /* 44 px: el objetivo táctil mínimo del criterio 2.5.5. */
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 var(--e-2);
+
+    background: none;
+    border: 1px solid var(--panel-borde);
+    color: var(--texto);
+    cursor: pointer;
+    transition: color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+  }
+  .barra__comandos-icono  { font-size: 1.1rem; line-height: 1; }
+  .barra__comandos-rotulo {
+    font-family: var(--fuente-titulos);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .barra__comandos[aria-expanded="true"] {
+    color: var(--cian-brillante);
+    border-color: var(--panel-borde-vivo);
+  }
+  .barra__comandos:focus-visible {
+    outline: 2px solid var(--cian-brillante);
+    outline-offset: 2px;
+  }
+
+  /* Cerrada, la hoja no se dibuja: sus mandos salen del orden de tabulación
+     solos, sin tener que repartir `tabindex` por once elementos. */
+  .controles { display: none; }
+
+  body[data-comandos="abierto"] .controles {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: calc(var(--z-hud) + 4);
+
+    /* Los mandos vuelven a envolverse y a leerse de izquierda a derecha. Esto
+       deshace de paso la tira horizontal de ≤380 px, que aquí ya no hace falta:
+       en la hoja cabe todo sin recorrer nada. */
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--e-2) var(--e-3);
+    margin: 0;
+    overflow-x: visible;
+
+    /* Por si la pantalla es muy baja —un teléfono en horizontal—: la hoja se
+       desplaza en vertical en lugar de salirse por abajo. */
+    max-height: 60vh;
+    overflow-y: auto;
+
+    padding: var(--e-3);
+    /* Fondo opaco, al contrario que el resto de paneles: esto se dibuja ENCIMA
+       de la escena, y sobre la superficie clara de un planeta el texto de los
+       mandos no se leía. Es el mismo fondo que la barra de abajo. */
+    background: rgba(5, 11, 24, 0.94);
+    border: 1px solid var(--panel-borde);
+    pointer-events: auto;
+  }
+  /* La tira de ≤380 px declara `flex: none` en cada mando para no encogerlos.
+     Dentro de la hoja estorba: el deslizador de volumen se quedaba en su ancho
+     mínimo. */
+  body[data-comandos="abierto"] .controles > *,
+  body[data-comandos="abierto"] .controles__grupo > * { flex: 0 1 auto; }
+
+  /* Sin animación de entrada, y no por descuido: una hoja que aparece con una
+     transición de opacidad se queda invisible cuando el compositor va lento
+     —ya pasó con los avisos— y lo que se abre tiene que verse SIEMPRE. */
 }

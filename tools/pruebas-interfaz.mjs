@@ -41,6 +41,7 @@ const comprobar = (nombre, real, esperado) => {
 const hud = leer('js/ui/HUD.js');
 const main = leer('js/main.js');
 const cssHud = leer('css/hud.css');
+const cssResp = leer('css/responsive.css');
 
 console.log('\n▸ Todo mando de la HUD llama a una acción que existe');
 {
@@ -83,6 +84,30 @@ console.log('\n▸ La vista previa de la cámara va reflejada, y solo una vez');
   comprobar('el lienzo no se refleja también', reglasLienzo.some((r) => /scaleX/.test(r)), false);
   comprobar('el lienzo se dibuja ya reflejado', /const x = \(p\) => \(1 - p\.x\) \* ancho;/.test(leer('js/input/HandTracking.js')), true);
   comprobar('y el cursor gestual, igual', /\(1 - estado\.cursor\.x\)/.test(leer('js/ui/CursorGestual.js')), true);
+}
+
+console.log('\n▸ La hoja de comandos existe solo en móvil');
+{
+  comprobar('los controles tienen identificador', /id: 'hud-controles'/.test(hud), true);
+  comprobar('el botón apunta a ese identificador', /'aria-controls': 'hud-controles'/.test(hud), true);
+  comprobar('y declara si está abierto', /'aria-expanded'/.test(hud), true);
+
+  // En escritorio no se dibuja: la regla que lo esconde tiene que estar FUERA
+  // de cualquier consulta de medios, o el botón aparecería en pantalla ancha.
+  const fueraDeMedios = cssResp.replace(/@media[^{]*\{(?:[^{}]|\{[^{}]*\})*\}/g, '');
+  comprobar('el botón está oculto por defecto', /\.barra__comandos \{ display: none; \}/.test(fueraDeMedios), true);
+
+  // Y la hoja solo se pliega por debajo de 1024 px: por encima, los controles
+  // siguen en su renglón de siempre.
+  const movil = cssResp.slice(cssResp.lastIndexOf('@media (max-width: 1024px)'));
+  comprobar('la hoja se pliega en móvil', /\.controles \{ display: none; \}/.test(movil), true);
+  comprobar('y se despliega con el atributo', /body\[data-comandos="abierto"\] \.controles \{/.test(movil), true);
+  comprobar('el estado no vive en una clase suelta', /document\.body\.dataset\.comandos/.test(hud), true);
+
+  // Los indicadores NO entran en la hoja: son el único interruptor de cámara y
+  // micrófono que hay en un teléfono, y esconderlos escondería que están
+  // encendidos.
+  comprobar('los indicadores se quedan fuera', /barra__indicadores/.test(movil.match(/\.controles \{ display: none; \}[\s\S]*/)?.[0] ?? ''), false);
 }
 
 console.log(fallos ? `\n✘ ${fallos} comprobación(es) fallida(s)\n` : '\n✔ Todas las comprobaciones pasan\n');

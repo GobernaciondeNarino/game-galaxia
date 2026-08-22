@@ -162,10 +162,11 @@ export class HUD {
       onchange: (e) => this.acciones.cambiarEscala?.(e.target.checked ? 'real' : 'didactico'),
     });
 
-    this.controles = crear('div', { class: 'panel controles' }, [
+    this.controles = crear('div', { class: 'panel controles', id: 'hud-controles' }, [
       crear('button', {
         class: 'controles__boton', type: 'button',
         onclick: () => this.acciones.vistaGeneral(),
+        dataset: { cierra: 'si' },
         title: 'Volver a la vista general (Esc)',
         text: 'Vista general',
       }),
@@ -208,6 +209,7 @@ export class HUD {
         class: 'controles__boton controles__boton--icono',
         type: 'button',
         'aria-label': 'Ayuda: qué puedes decir y pulsar (F1)',
+        dataset: { cierra: 'si' },
         title: 'Ayuda (F1)',
         onclick: () => this.mostrarAyuda(),
         text: '?',
@@ -218,6 +220,111 @@ export class HUD {
     // que compartan renglón con la primera y las pestañas y los indicadores
     // queden debajo de ellos, que es donde se pidieron.
     this.barra.secundaria.before(this.controles);
+    this._montarBotonComandos();
+  }
+
+  /**
+   * El botón de hamburguesa que guarda los mandos de escena. SOLO EN MÓVIL.
+   *
+   * POR QUÉ
+   * ───────
+   * En un teléfono los once mandos ocupaban cuatro renglones —unos 200 px— en
+   * lo alto de la pantalla, antes de que empezara la escena. Por debajo de 380
+   * px se convertían además en una tira que se recorre con el dedo, sin ninguna
+   * señal de que se pudiera recorrer: los últimos mandos existían y no había
+   * forma de saberlo. Recogidos tras un botón ocupan 44 px y se abren enteros.
+   *
+   * QUÉ NO SE GUARDA AQUÍ
+   * ─────────────────────
+   * Los cuatro indicadores —cámara, micrófono, red y FPS— se quedan a la vista.
+   * Dos de ellos no son mandos sino estado, y los otros dos son la ÚNICA forma
+   * de encender la cámara y el micrófono en un teléfono: meterlos detrás de un
+   * botón añadiría un toque a lo que más se usa y escondería el aviso de que la
+   * cámara está encendida, que es justo lo que nunca debe esconderse.
+   *
+   * NO ES UN DIÁLOGO
+   * ────────────────
+   * Es una revelación: `aria-expanded` y `aria-controls`, sin `role="dialog"`
+   * ni trampa de foco. Detrás sigue viéndose la escena y se puede seguir
+   * girando; atrapar el foco prometería una modalidad que no existe. Cerrada,
+   * la hoja está en `display: none`, así que sus mandos salen del orden de
+   * tabulación sin tener que tocar `tabindex`.
+   *
+   * En escritorio el botón no se dibuja y los controles siguen exactamente
+   * donde estaban: esto no cambia nada por encima de 1024 px.
+   */
+  _montarBotonComandos() {
+    this.iconoComandos = crear('span', { class: 'barra__comandos-icono', 'aria-hidden': 'true', text: '☰' });
+
+    // El nombre accesible empieza por «Comandos», el texto que se ve: el
+    // criterio 2.5.3 de la WCAG lo exige para que se pueda pulsar dictando.
+    this.botonComandos = crear('button', {
+      class: 'barra__comandos',
+      type: 'button',
+      'aria-expanded': 'false',
+      'aria-controls': 'hud-controles',
+      'aria-label': 'Comandos de la escena',
+      title: 'Mandos de tiempo, órbitas, escala y sonido',
+      onclick: () => this.alternarComandos(),
+    }, [
+      this.iconoComandos,
+      crear('span', { class: 'barra__comandos-rotulo', text: 'Comandos' }),
+    ]);
+    this.barra.panel.append(this.botonComandos);
+
+    // Los mandos que cambian de vista cierran la hoja; los interruptores no.
+    // Subir el volumen o parar el tiempo son cosas que se hacen seguidas, y
+    // cerrar tras cada una obligaría a reabrir para el siguiente toque.
+    this._alPulsarComando = (evento) => {
+      if (evento.target.closest('[data-cierra]')) this.alternarComandos(false);
+    };
+    this.controles.addEventListener('click', this._alPulsarComando);
+
+    // Escape cierra la hoja ANTES de que llegue a los controles de teclado, que
+    // lo entienden como «vuelve a la vista general». En captura, y solo cuando
+    // hay algo que cerrar.
+    this._alTeclearComandos = (evento) => {
+      if (evento.key !== 'Escape' || document.body.dataset.comandos !== 'abierto') return;
+      evento.stopPropagation();
+      this.alternarComandos(false);
+    };
+    document.addEventListener('keydown', this._alTeclearComandos, true);
+
+    // Un toque fuera cierra: es lo que se espera de cualquier menú desplegable,
+    // y sin ello la hoja se queda tapando la escena que se quería mirar.
+    this._alTocarFuera = (evento) => {
+      if (document.body.dataset.comandos !== 'abierto') return;
+      if (evento.target.closest('#hud-controles, .barra__comandos')) return;
+      this.alternarComandos(false);
+    };
+    document.addEventListener('pointerdown', this._alTocarFuera);
+  }
+
+  /**
+   * Abre o cierra la hoja de comandos.
+   *
+   * El estado vive en `body[data-comandos]` y no en una clase del elemento,
+   * igual que el módulo y la sección: quien decide si se ve es el CSS, y por
+   * encima de 1024 px ese atributo no significa nada porque ninguna regla lo
+   * mira. Así el botón puede quedarse en el DOM sin efectos en escritorio.
+   *
+   * @param {boolean} [abrir] Si se omite, alterna.
+   */
+  alternarComandos(abrir) {
+    const abierto = abrir ?? document.body.dataset.comandos !== 'abierto';
+    if (abierto) document.body.dataset.comandos = 'abierto';
+    else delete document.body.dataset.comandos;
+
+    this.botonComandos?.setAttribute('aria-expanded', String(abierto));
+    if (this.iconoComandos) this.iconoComandos.textContent = abierto ? '✕' : '☰';
+
+    // Al cerrar, el foco vuelve al botón: si estaba dentro de la hoja, cerrarla
+    // lo dejaría en un elemento oculto y el siguiente tabulador empezaría desde
+    // el principio del documento.
+    if (!abierto && this.controles?.contains(document.activeElement)) {
+      this.botonComandos?.focus();
+    }
+    return abierto;
   }
 
   /**
@@ -657,6 +764,10 @@ export class HUD {
     clearTimeout(this._temporizadorSugerencias);
     clearTimeout(this._temporizadorRespuesta);
     this.panelRespuesta?.remove();
+    document.removeEventListener('keydown', this._alTeclearComandos, true);
+    document.removeEventListener('pointerdown', this._alTocarFuera);
+    delete document.body.dataset.comandos;
+    this.botonComandos?.remove();
     this.controles?.remove();
     this.panelAyuda?.remove();
     this.avisoSugerencias?.remove();

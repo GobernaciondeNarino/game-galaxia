@@ -50,7 +50,7 @@ php  tools/pruebas-asistente.php           # validación del nombre y frases
 node tools/pruebas-preguntas.mjs           # reconocedor de preguntas
 node tools/pruebas-datos.mjs               # coherencia del catálogo (masa vs d×V)
 node tools/pruebas-sol.mjs                 # flujo del plasma en la superficie
-node tools/pruebas-interfaz.mjs            # mandos de la HUD y espejo de la cámara      
+node tools/pruebas-interfaz.mjs            # mandos, espejo de la cámara y hoja de comandos
 php  tools/pruebas-horizons.php            # parseo de las tablas de JPL (sin red)
 php  tools/pruebas-conversacion.php        # herramientas del asistente (sin red)
 php  tools/pruebas-meteoros.php            # calendario de lluvias de meteoros
