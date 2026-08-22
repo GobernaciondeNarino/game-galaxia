@@ -384,3 +384,101 @@
   .subtitulo__texto { font-size: 0.875rem; }
   .controles__volumen { width: 48px; }
 }
+
+/* ==========================================================================
+   MENÚ INFERIOR FIJO (solo pantallas estrechas)
+
+   Cinco destinos, que es el tope de Material Design para una barra inferior.
+   No es arbitrario: con seis, los rótulos dejan de caber en un teléfono de
+   320 px y los objetivos táctiles bajan de 44. Cada uno lleva icono Y rótulo,
+   porque solo con iconos media pantalla adivina mal para qué sirven.
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .menu-inferior {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: calc(var(--z-hud) + 5);
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+
+    background: rgba(5, 11, 24, 0.92);
+    -webkit-backdrop-filter: blur(var(--panel-desenfoque));
+    backdrop-filter: blur(var(--panel-desenfoque));
+    border-top: 1px solid var(--panel-borde);
+
+    /* El área segura NO es opcional. En un iPhone la franja de abajo la ocupa
+       el indicador de inicio, y lo que quede pegado al borde se ve pero no se
+       puede pulsar. En un navegador sin muescas, `env()` vale 0 y no estorba. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    pointer-events: auto;
+  }
+
+  .menu-inferior__destino {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 2px;
+    /* 44 px de alto útil, sin contar el área segura. */
+    min-height: 44px;
+    padding: 6px 2px;
+
+    background: none;
+    border: 0;
+    border-top: 2px solid transparent;
+    color: var(--texto-apagado);
+    cursor: pointer;
+    transition: color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+  }
+
+  .menu-inferior__simbolo { font-size: 1.1rem; line-height: 1; }
+
+  .menu-inferior__rotulo {
+    font-family: var(--fuente-titulos);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    /* Un rótulo partido en dos líneas descuadra la fila entera. */
+    white-space: nowrap;
+  }
+
+  /* El destino activo se marca con color Y con una barra arriba: el color por
+     sí solo no puede ser lo único que distinga un estado. */
+  .menu-inferior__destino[aria-current="page"] {
+    color: var(--cian-brillante);
+    border-top-color: var(--cian-brillante);
+  }
+  .menu-inferior__destino:focus-visible {
+    outline: 2px solid var(--cian-brillante);
+    outline-offset: -3px;
+  }
+
+  /* La rejilla deja sitio abajo para que la barra no tape nada. Se suma el
+     área segura por el mismo motivo que arriba. */
+  #hud { padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px)); }
+  #hud-subtitulos { bottom: calc(126px + env(safe-area-inset-bottom, 0px)); }
+
+  /* Con la barra abajo, las pestañas de módulo de la barra superior sobran:
+     llevan a los mismos sitios y ocupan alto arriba. */
+  .barra__modulos { display: none; }
+}
+
+/* Cada destino enseña una cosa. Es lo que hace que la barra ORDENE en lugar de
+   ser cinco atajos: en un teléfono solo cabe una cosa a la vez, así que elegir
+   dónde estás y elegir qué miras son la misma decisión. */
+@media (max-width: 1024px) {
+  /* CUERPOS: la tira de navegación manda; el perfil se aparta. */
+  body[data-seccion="cuerpos"] #hud-panel-izquierdo { display: none; }
+
+  /* DATOS: la ficha del cuerpo a pantalla casi completa, en vez del 38 % que
+     le toca cuando comparte sitio con la escena. */
+  body[data-seccion="datos"] #hud-panel-izquierdo { max-height: 100%; }
+  body[data-seccion="datos"] #hud-navegacion-planetaria { display: none; }
+
+  /* GALAXIA: fuera todo lo que tape el disco. */
+  body[data-seccion="galaxia"] #hud-panel-izquierdo,
+  body[data-seccion="galaxia"] #hud-navegacion-planetaria { display: none; }
+}

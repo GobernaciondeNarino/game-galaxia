@@ -26,6 +26,7 @@ import { EstadoEntradas } from './panels/EstadoEntradas.js';
 import { PanelGalactico } from './panels/PanelGalactico.js';
 import { PanelCuriosidades } from './panels/PanelCuriosidades.js';
 import { PanelConversacion } from './panels/PanelConversacion.js';
+import { MenuInferior } from './panels/MenuInferior.js';
 import { Anotaciones } from './Anotaciones.js';
 import { ArcoDatos } from './ArcoDatos.js';
 import { Reticula } from './Reticula.js';
@@ -117,6 +118,13 @@ export class HUD {
     this.arco = new ArcoDatos(document.body);
     this.subtitulos = new Subtitles($('#hud-subtitulos'));
     this.comparador = new Comparador(document.body);
+
+    // La barra fija de abajo. Se construye siempre; el CSS decide si se dibuja,
+    // que es solo por debajo de 1024 px. Construirla condicionalmente obligaría
+    // a rehacerla al girar el teléfono.
+    this.menu = new MenuInferior(raiz, {
+      alElegir: (id) => this._irASeccion(id),
+    });
 
     this._montarControlesEscena();
     this._suscribir();
@@ -286,6 +294,49 @@ export class HUD {
     );
 
     App.emitir('hud:modulo', { id });
+  }
+
+  /**
+   * Qué hace cada destino de la barra inferior.
+   *
+   * Dos de ellos mueven la CÁMARA y tres cambian lo que se ENSEÑA, y esa
+   * mezcla es deliberada: en un teléfono «dónde estoy» y «qué miro» son la
+   * misma decisión, porque solo cabe una cosa a la vez. Separarlos en dos
+   * mandos distintos habría sido fiel a la arquitectura y confuso de usar.
+   *
+   * El estado vive en `body[data-seccion]`, igual que el módulo vive en
+   * `body[data-modulo]`: quien decide qué se ve es el CSS, y cambiar de sección
+   * no reconstruye nada.
+   */
+  _irASeccion(id) {
+    switch (id) {
+      case 'sistema':
+        this._cambiarModulo('sistema');
+        this.acciones.vistaGeneral?.();
+        break;
+
+      case 'galaxia':
+        this._cambiarModulo('sistema');
+        this.acciones.vistaGalactica?.();
+        break;
+
+      case 'cuerpos':
+        // No mueve la cámara: solo deja la tira de navegación a la vista para
+        // elegir. Viajar sin que se haya elegido nada sería decidir por quien
+        // acaba de pulsar «elegir».
+        this._cambiarModulo('sistema');
+        this.navegacion?.panel?.removeAttribute('hidden');
+        break;
+
+      case 'datos':
+        this._cambiarModulo('sistema');
+        break;
+
+      case 'asistente':
+        this._cambiarModulo('asistente');
+        break;
+    }
+    App.emitir('hud:seccion', { id });
   }
 
   _suscribir() {
@@ -586,7 +637,7 @@ export class HUD {
       this.barra, this.perfil, this.mapaOrbital, this.composicion, this.geologia,
       this.magnetosfera, this.adicionales, this.navegacion, this.proyeccion,
       this.entradas, this.panelGalactico, this.reticula, this.anotaciones, this.arco,
-      this.subtitulos, this.comparador, this.avisos, this.curiosidades, this.charla,
+      this.subtitulos, this.comparador, this.avisos, this.curiosidades, this.charla, this.menu,
     ]) {
       parte?.destruir?.();
     }

@@ -1762,3 +1762,12 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
   .charla__campo, .charla__enviar, .charla__dictar { min-height: 44px; }
   .charla__dictar { min-width: 44px; }
 }
+
+/* ==========================================================================
+   Menú inferior fijo.
+
+   Nace oculto: solo se dibuja por debajo de 1024 px, y esa regla vive en
+   responsive.css. En un escritorio la HUD enseña todo a la vez y esta barra
+   solo le quitaría alto.
+   ========================================================================== */
+.menu-inferior { display: none; }
