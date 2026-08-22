@@ -115,6 +115,28 @@ echo "\n▸ El archivo real está protegido por partida doble\n";
     // .htaccess, sus 2.339 archivos quedan accesibles por HTTP.
     $vendor = (string) @file_get_contents($raiz . '/api/vendor/.htaccess');
     comprobar('api/vendor/ también', strpos($vendor, 'Require all denied') !== false, true);
+
+    // cache/ guarda el audio ya pagado, las respuestas del asistente y los
+    // contadores por IP. Apache hereda la directiva en los subdirectorios, así
+    // que un solo .htaccess arriba los cubre a los cuatro.
+    $cache = (string) @file_get_contents($raiz . '/cache/.htaccess');
+    comprobar('cache/ está denegado por Apache', strpos($cache, 'Require all denied') !== false, true);
+}
+
+echo "\n▸ Los cuatro directorios de caché viajan en el repositorio\n";
+{
+    // Se versionan vacíos, con su .gitkeep, por la misma razón que el modelo de
+    // MediaPipe se versiona entero: que desplegar sea un «git pull» y no una
+    // lista de carpetas que hay que acordarse de crear a mano. El olvido más
+    // caro es cache/limites: sin contadores, los topes de gasto no se aplican y
+    // nadie se entera hasta que llega la factura.
+    foreach (['audio', 'limites', 'efemerides', 'respuestas'] as $dir) {
+        comprobar(
+            sprintf('cache/%s existe y está marcado', $dir),
+            is_file($raiz . '/cache/' . $dir . '/.gitkeep'),
+            true
+        );
+    }
 }
 
 echo "\n▸ api/health.php informa de cada pieza configurable\n";

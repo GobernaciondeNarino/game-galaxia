@@ -2,14 +2,22 @@
 cache/audio/*
 !cache/audio/.gitkeep
 
-# Contadores del limitador de peticiones
-cache/limites/
+# Contadores del limitador de peticiones.
+# El directorio SÍ se versiona (con su .gitkeep) y su contenido no: es el mismo
+# trato que cache/audio. Un «cache/limites/» a secas excluía la carpeta entera,
+# así que en un despliegue por FTP no llegaba y había que acordarse de crearla a
+# mano. Aquí el olvido es caro: sin poder escribir los contadores, los topes de
+# gasto por IP no se aplican y nadie se entera hasta que llega la factura.
+cache/limites/*
+!cache/limites/.gitkeep
 
 # Tablas de JPL Horizons: una por cuerpo y día, se rehacen solas
-cache/efemerides/
+cache/efemerides/*
+!cache/efemerides/.gitkeep
 
 # Respuestas del asistente, guardadas solo para poder decirlas en voz alta
-cache/respuestas/
+cache/respuestas/*
+!cache/respuestas/.gitkeep
 
 # Registros del backend
 api/logs/*
