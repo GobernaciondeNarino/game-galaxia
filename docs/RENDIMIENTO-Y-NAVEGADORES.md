@@ -7,29 +7,48 @@ que no se ha podido medir se dice expresamente.
 
 ## 1. Qué se descarga al abrir la página
 
-Medido con el inspector de red, con la caché vacía.
+Medido en Chromium con la caché vacía, contando cada recurso una vez, hasta que
+la aplicación se declara cargada.
 
 | Recurso | Peso | Notas |
 |---|---|---|
-| `three.module.min.js` + `three.core.min.js` | 731 kB | ≈ 190 kB con Brotli |
-| Addons de Three.js | 105 kB | OrbitControls, post-procesado, CSS2D |
-| Tipografías (`woff2`) | 140 kB | solo subconjuntos `latin` y `latin-ext` |
-| Texturas de **512 px** | ~1,4 MB | 17 archivos |
-| `data/sistema-solar.json` | 132 kB | ≈ 18 kB con Brotli |
-| Código de ORBIS | ~150 kB | 41 módulos |
-| **Total hasta poder navegar** | **≈ 2,6 MB** | |
+| `three.module.min.js` + `three.core.min.js` | 732 kB | ≈ 190 kB con Brotli |
+| Texturas, **nivel ligero** | 718 kB | 33 archivos de 512 px |
+| Código de ORBIS | 407 kB | 50 módulos, sin minimizar |
+| Texturas, resolución completa | 253 kB | el cielo estrellado y el cuerpo inicial |
+| Datos (JSON) | 242 kB | ≈ 30 kB con Brotli |
+| Addons de Three.js | 104 kB | OrbitControls, post-procesado, CSS2D |
+| Hojas de estilo | 96 kB | |
+| Tipografías (`woff2`) | 56 kB | solo subconjuntos `latin` y `latin-ext` |
+| **Total hasta poder navegar** | **2,56 MB** | 115 recursos |
+
+> Con `php -S` salen 145 peticiones para esos 115 recursos: el servidor de
+> desarrollo no manda cabeceras de caché, así que el navegador vuelve a pedir la
+> textura ligera que ya tiene cuando la piden a la vez la esfera y su miniatura
+> de la tira. En producción no pasa: el `.htaccess` marca las imágenes como
+> `immutable`.
 
 **Lo que NO se descarga al abrir:**
 
-- las texturas de 2048 px (≈ 8 MB): solo la del cuerpo que se enfoca;
+- los mapas en resolución completa (42 MB en total): solo el del cuerpo que
+  se enfoca;
 - los modelos de manos (7,8 MB) y de rostro (3,8 MB) y el WASM de MediaPipe
   (22 MB): solo si se enciende la cámara. El de rostro se carga después del de
   manos y solo sirve para distinguir un guiño de un parpadeo; si falla, se avisa
   y el control por manos sigue funcionando igual;
 - el audio de las narraciones: solo el del cuerpo activo y sus dos vecinos.
 
-Sin el nivel de detalle de las texturas, el arranque descargaría **8 MB en
-lugar de 1,4 MB**. En una conexión de 2 Mb/s eso son 32 segundos frente a 6.
+Sin el nivel de detalle de las texturas, el arranque descargaría los **42 MB**
+de los mapas completos en lugar de 718 kB.
+
+El nivel ligero estuvo roto sin que se notara. `tools/texturas.mjs` le pedía a
+la API de Commons una miniatura de 512 px y la API respondía «thumbwidth: 512»
+acompañada de una URL que apunta a la de 960, porque Wikimedia redondea a sus
+tamaños en caché. Los 35 archivos «@512» medían en realidad 960 px y pesaban
+3,53 MB entre todos, casi lo mismo que los completos: el nivel que existe para
+que la escena sea navegable de inmediato no aligeraba nada. Ahora se derivan en
+local del archivo completo con `tools/reducir-textura.php`, miden de verdad 512
+px y pesan 836 kB en disco. La carga inicial bajó de 5,24 MB a 2,56 MB.
 
 ---
 
@@ -38,9 +57,14 @@ lugar de 1,4 MB**. En una conexión de 2 Mb/s eso son 32 segundos frente a 6.
 Cada textura existe en dos tamaños, generados por `tools/texturas.mjs`:
 
 ```
-jupiter@512.jpg     89 kB   se carga en el arranque
+jupiter@512.jpg     18 kB   se carga en el arranque
 jupiter.jpg        487 kB   se carga al enfocar Júpiter
 ```
+
+El nivel ligero siempre es `.jpg`, aunque el completo no lo sea: lo produce GD
+recodificando. Un PNG de 512 px de una fotografía pesa cinco veces más que el
+JPEG equivalente y a ese tamaño no se distingue. Es lo que pasaba con Titán, el
+único mapa del catálogo que es un PNG.
 
 El intercambio ocurre durante el viaje de cámara, que dura más de un segundo,
 así que no se percibe. La textura reducida se libera **solo cuando la nueva ya

@@ -21,8 +21,12 @@
  * satélite saldría con texto escrito en la superficie.
  */
 import { mkdir, writeFile, access, readFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const ejecutar = promisify(execFile);
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DESTINO = join(RAIZ, 'assets/textures');
@@ -57,7 +61,11 @@ const CATALOGO = [
   // Cartografía real de satélites, de dominio público (NASA/USGS). Solo entran
   // mapas equirectangulares de proporción 2:1; cualquier otra cosa se rechaza
   // automáticamente porque no envuelve correctamente una esfera.
-  { archivo: 'titan.jpg',          titulo: 'Titan map April 2011 full.png',                    ancho: 2048 },
+  // .png y no .jpg: el nombre lo pone esta tabla y el contenido lo pone la
+  // fuente, y aquí la fuente es un PNG. Se llamaba «titan.jpg» y era un PNG;
+  // el navegador lo servía igual porque mira el contenido, pero un archivo que
+  // miente sobre su formato acaba rompiendo la herramienta que se lo crea.
+  { archivo: 'titan.png',          titulo: 'Titan map April 2011 full.png',                    ancho: 2048 },
   { archivo: 'triton.jpg',         titulo: 'Triton map no grid.jpg',                           ancho: 2048 },
 
   // Cuerpos que se dibujaban con un color plano por no tener aquí su mapa, no
@@ -155,6 +163,31 @@ async function consultar(titulo, ancho) {
   };
 }
 
+/**
+ * Reduce una textura a 512 px con GD, sobrescribiéndola.
+ *
+ * Se hace con PHP porque PHP ya es un requisito del proyecto —es el backend
+ * entero— y GD viene con él. La alternativa era una dependencia de Node solo
+ * para esto, y la regla 1 del pliego dice que no hay npm ni paso de
+ * compilación. Esto se ejecuta SOLO al regenerar las texturas; el servidor no
+ * lo llama nunca.
+ *
+ * Si GD no está, no se rompe la descarga: se avisa y se queda el archivo tal
+ * cual llegó. Pesará de más, pero funcionará.
+ */
+async function reducir(origen, destino) {
+  try {
+    const { stdout } = await ejecutar('php', [join(RAIZ, 'tools/reducir-textura.php'), origen, destino, '512', '82']);
+    return stdout.trim();
+  } catch (err) {
+    // Sin GD no se rompe la descarga: se copia el completo tal cual y se avisa.
+    // Pesará de más, pero la escena funcionará igual.
+    await writeFile(destino, await readFile(origen));
+    console.log('    ! no se pudo reducir (¿falta php-gd?):', String(err.message).split('\n')[0]);
+    return `copia del completo, SIN reducir`;
+  }
+}
+
 async function principal() {
   await mkdir(DESTINO, { recursive: true });
   const creditos = [];
@@ -163,7 +196,10 @@ async function principal() {
 
   for (const entrada of CATALOGO) {
     const rutaGrande = join(DESTINO, entrada.archivo);
-    const rutaPequena = join(DESTINO, entrada.archivo.replace(/(\.\w+)$/, '@512$1'));
+    // El nivel ligero SIEMPRE es .jpg: lo produce GD recodificando, sea cual
+    // sea el formato del original. Un PNG de 512 px de una foto pesa cinco
+    // veces más que el JPEG equivalente y no se distingue a ese tamaño.
+    const rutaPequena = join(DESTINO, entrada.archivo.replace(/\.\w+$/, '@512.jpg'));
 
     console.log(`▸ ${entrada.archivo}`);
     const info = await consultar(entrada.titulo, entrada.ancho);
@@ -188,23 +224,31 @@ async function principal() {
     });
 
     if (!FORZAR && (await existe(rutaGrande))) {
-      console.log('    · ya estaba, se omite');
+      console.log('    · ya estaba, no se vuelve a descargar');
       omitidos++;
-      continue;
+    } else {
+      const grande = await pedir(info.url, true);
+      await writeFile(rutaGrande, grande);
+      console.log(`    ✓ ${info.ancho}×${info.alto} · ${(grande.length / 1024).toFixed(0)} kB`);
+      descargados++;
     }
 
-    const grande = await pedir(info.url, true);
-    await writeFile(rutaGrande, grande);
-    console.log(`    ✓ ${info.ancho}×${info.alto} · ${(grande.length / 1024).toFixed(0)} kB`);
-    descargados++;
-
-    // Nivel reducido: lo sirve la carga inicial para que la escena sea
-    // navegable de inmediato en conexiones lentas.
-    const pequena = await consultar(entrada.titulo, 512);
-    const bytes = await pedir(pequena.url, true);
-    await writeFile(rutaPequena, bytes);
-    console.log(`    ✓ 512 px · ${(bytes.length / 1024).toFixed(0)} kB`);
-    descargados++;
+    // Nivel ligero: lo sirve la carga inicial para que la escena sea navegable
+    // de inmediato en conexiones lentas.
+    //
+    // Se DERIVA del archivo completo que ya está en disco, no se descarga
+    // aparte. Antes se pedía a la API una miniatura de 512 px, y la API
+    // respondía «thumbwidth: 512» acompañada de una URL que apunta a la de 960,
+    // porque Wikimedia redondea a sus tamaños en caché: los 35 archivos «@512»
+    // medían 960 px y pesaban 3,53 MB entre todos, casi lo mismo que los
+    // completos. El nivel ligero no aligeraba nada.
+    //
+    // Derivarlo en local arregla las dos cosas de una vez: mide de verdad 512
+    // px —0,79 MB entre todos, cuatro veces y media menos en la carga inicial—
+    // y ahorra una segunda descarga por textura.
+    if (FORZAR || !(await existe(rutaPequena))) {
+      console.log(`    ✓ nivel ligero · ${await reducir(rutaGrande, rutaPequena)}`);
+    }
   }
 
   await writeFile(

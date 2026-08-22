@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { DOS_PI, generador } from '../utils/math.js';
+import { rutaReducida } from './CelestialBody.js';
 
 export class Galaxy {
   constructor(gestor, { textura = null, radio = 9000, particulas = 12000, semilla = 31415 } = {}) {
@@ -40,7 +41,7 @@ export class Galaxy {
     if (textura) {
       // El cielo ocupa toda la pantalla al fondo: la versión de 512 px basta
       // hasta que el resto de la escena está lista.
-      material.map = this.gestor.cargarTextura(textura.replace(/(\.\w+)$/, '@512$1'));
+      material.map = this.gestor.cargarTextura(rutaReducida(textura));
       this.rutaCieloCompleta = textura;
       // El fondo estelar no debe competir con la escena: se atenúa.
       material.color.setScalar(0.55);

@@ -1216,7 +1216,7 @@
       },
       "satelitesConocidos": null,
       "render": {
-        "textura": "assets/textures/titan.jpg",
+        "textura": "assets/textures/titan.png",
         "color": "#D9A441",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null

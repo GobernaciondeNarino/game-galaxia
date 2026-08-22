@@ -16,11 +16,19 @@ import { Orbit, EPOCA_J2000 } from './Orbit.js';
 const MS_POR_HORA = 3_600_000;
 
 /**
- * Ruta de la versión de 512 px de una textura.
- * El convenio lo fija tools/texturas.mjs: jupiter.jpg → jupiter@512.jpg.
+ * Ruta del nivel ligero de una textura.
+ *
+ * El convenio lo fija tools/texturas.mjs: jupiter.jpg → jupiter@512.jpg. La
+ * extensión SIEMPRE pasa a .jpg, sea cual sea la del original, porque el nivel
+ * ligero lo produce GD recodificando: un PNG de 512 px de una foto pesa cinco
+ * veces más que el JPEG equivalente y a ese tamaño no se distingue.
+ *
+ * Antes esta línea estaba copiada en tres módulos y conservaba la extensión.
+ * En cuanto una textura dejó de ser .jpg —Titán, que es un PNG— los tres
+ * empezaron a pedir un archivo que no existe.
  */
 export function rutaReducida(ruta) {
-  return ruta.replace(/(\.\w+)$/, '@512$1');
+  return ruta.replace(/\.\w+$/, '@512.jpg');
 }
 
 /** Segmentos de la esfera según su tamaño en pantalla. Un satélite de 0,06

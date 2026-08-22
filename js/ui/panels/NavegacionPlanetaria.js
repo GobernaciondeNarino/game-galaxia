@@ -11,6 +11,7 @@
  */
 
 import { crear } from '../../utils/dom.js';
+import { rutaReducida } from '../../system/CelestialBody.js';
 
 export class NavegacionPlanetaria {
   constructor(contenedor, catalogo, { alSeleccionar } = {}) {
@@ -75,7 +76,7 @@ export class NavegacionPlanetaria {
     const disco = crear('span', {
       class: 'miniatura__disco',
       style: cuerpo.render?.textura
-        ? `background-image:url(${cuerpo.render.textura.replace(/(\.\w+)$/, '@512$1')});`
+        ? `background-image:url(${rutaReducida(cuerpo.render.textura)});`
         : `background:radial-gradient(circle at 34% 30%, ${color}, #10141c 78%);`,
       'aria-hidden': 'true',
     });

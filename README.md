@@ -185,14 +185,10 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 5. **Precarga de la ruta crítica** (`preload` de tipografías y datos,
    `modulepreload` de `main.js` y Three.js) para adelantar las peticiones sin
    esperar a que el analizador de CSS las descubra.
-6. **Texturas por niveles.** Primero la versión de 512 px, para que la escena
-   sea navegable de inmediato; la de 2K se pide solo al enfocar un cuerpo, y el
-   intercambio ocurre durante el viaje de cámara, así que no se percibe. El
-   arranque baja de 8 MB a 1,4 MB de texturas.
-7. **Progreso real en el arranque**, medido con el `LoadingManager` de Three.js.
-   Nunca una barra simulada.
-8. **Audio de narración cacheado en el servidor** y precargado únicamente para
-   el cuerpo activo y sus dos vecinos en la tira de navegación.
+6. **Texturas por niveles.** Primero el nivel ligero de 512 px, para que la
+   escena sea navegable de inmediato; el mapa completo se cambia durante el
+   viaje de cámara, que dura más de un segundo, así que no se percibe. El
+   arranque baja de los 42 MB de mapas completos a 718 kB de texturas.
 
 ---
 
