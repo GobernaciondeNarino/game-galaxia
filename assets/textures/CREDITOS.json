@@ -273,6 +273,14 @@
       "licencia": "CC BY-SA 3.0",
       "urlLicencia": "https://creativecommons.org/licenses/by-sa/3.0",
       "fuente": "https://commons.wikimedia.org/wiki/File:Deimos%20color%20map.jpg"
+    },
+    {
+      "archivo": "io.jpg",
+      "obra": "Io for GeoHacks.jpg",
+      "autor": "U.S. Geological Survey Astrogeology Research Program",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Io%20for%20GeoHacks.jpg"
     }
   ]
 }

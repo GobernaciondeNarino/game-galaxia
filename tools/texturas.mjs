@@ -11,10 +11,14 @@
  *   node tools/texturas.mjs --forzar    vuelve a descargar aunque exista
  *
  * REGLA DE RIGOR: aquí solo entran mapas fotográficos o cartográficos reales.
- * Wikimedia Commons aloja también texturas «fictional» de Ceres, Eris, Haumea
- * y Makemake —invenciones artísticas, porque no existe cartografía de esos
- * cuerpos—. NO se descargan. Esos cuerpos se dibujan con un color plano y la
- * interfaz los marca como SIMULACIÓN.
+ * Wikimedia Commons aloja también texturas «fictional» de Eris, Haumea y
+ * Makemake —invenciones artísticas, porque de esos cuerpos no existe
+ * cartografía—. NO se descargan: se dibujan con un color plano y la interfaz
+ * los marca como SIMULACIÓN.
+ *
+ * Y tampoco entra un mapa real con rótulos encima. Existe uno de Ío con los
+ * nombres de las regiones grabados en la imagen; envuelto en la esfera, el
+ * satélite saldría con texto escrito en la superficie.
  */
 import { mkdir, writeFile, access, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
@@ -80,10 +84,21 @@ const CATALOGO = [
   { archivo: 'fobos.jpg',          titulo: 'Phobos Viking Mosaic DLRcontrol 7200.jpg',         ancho: 2048 },
   { archivo: 'deimos.jpg',         titulo: 'Deimos color map.jpg',                             ancho: 1264 },
 
-  // NO se añaden: Eris, Makemake y Haumea, porque de esos NO existe
-  // cartografía —son puntos de luz incluso para el Hubble— y lo único que
-  // circula son invenciones artísticas. Tampoco Ío: se buscó y en Commons no
-  // hay ningún mapa suyo en proporción 2:1, que es la que envuelve una esfera.
+  // Ío. La búsqueda anterior se dio por vencida demasiado pronto: dijo que en
+  // Commons no había ningún mapa suyo en proporción 2:1 y sí lo hay. Es el
+  // fotomosaico Voyager + Galileo del USGS, de dominio público, con cobertura
+  // declarada de -90 a 90 de latitud y de 0 a 360 de longitud.
+  //
+  // Hay otra copia del mismo mapa a 4096 px, pero lleva los nombres de las
+  // regiones ROTULADOS ENCIMA: al envolverla en la esfera, Ío saldría con
+  // «COLCHIS REGIO» escrito en la superficie. Se prefiere esta, más pequeña y
+  // limpia; 1225 px está en la línea de Calisto, Rea y las lunas de Urano.
+  { archivo: 'io.jpg',             titulo: 'Io for GeoHacks.jpg',                              ancho: 1225 },
+
+  // NO se añaden: Eris, Makemake y Haumea. De esos NO existe cartografía —son
+  // puntos de luz incluso para el Hubble— y lo único que circula son
+  // invenciones artísticas. Se dibujan con un color plano y la interfaz los
+  // marca como SIMULACIÓN, que es lo honesto: no hay foto que enseñar.
 ];
 
 /** Descarga con reintentos: Commons devuelve 429 con facilidad. */

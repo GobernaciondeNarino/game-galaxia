@@ -2082,14 +2082,13 @@
       },
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/io.jpg",
         "color": "#E8D26A",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Ío está cartografiado por las Voyager y Galileo, pero en Commons no hay ningún mapa suyo en proporción 2:1, que es la única que envuelve una esfera sin deformarla. Color plano hasta encontrar uno.",
         "radioEscalado": 0.29408,
         "distanciaEscalada": 13.005,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
