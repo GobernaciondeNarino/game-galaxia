@@ -144,9 +144,22 @@ export class HUD {
 
     this.botonGalaxia = crear('button', {
       class: 'controles__boton controles__boton--galaxia', type: 'button',
+      dataset: { cierra: 'si' },
       title: 'Alejar la cámara hasta ver el Sistema Solar entero y el disco galáctico',
       onclick: () => this.acciones.vistaGalactica?.(),
       text: 'Galaxia',
+    });
+
+    /**
+     * La casilla se guarda porque el modo de escala no se cambia solo desde
+     * aquí: «modo real» también es un comando de voz y una tecla. Sin la
+     * referencia, la casilla se quedaba diciendo lo contrario de lo que estaba
+     * pasando en la escena.
+     */
+    this.interruptorEscala = crear('input', {
+      type: 'checkbox',
+      checked: App.preferencias.get('escala') === 'real',
+      onchange: (e) => this.acciones.cambiarEscala?.(e.target.checked ? 'real' : 'didactico'),
     });
 
     this.controles = crear('div', { class: 'panel controles' }, [
@@ -187,11 +200,7 @@ export class HUD {
         crear('span', { text: 'Órbitas' }),
       ]),
       crear('label', { class: 'controles__interruptor', title: 'Escala real: proporciones astronómicas verdaderas' }, [
-        crear('input', {
-          type: 'checkbox',
-          checked: App.preferencias.get('escala') === 'real',
-          onchange: (e) => this.acciones.cambiarEscala(e.target.checked ? 'real' : 'didactico'),
-        }),
+        this.interruptorEscala,
         crear('span', { text: 'Escala real' }),
       ]),
       this._crearControlesNarracion(),
@@ -364,8 +373,12 @@ export class HUD {
           { tono: 'info', clave: 'motor-narracion' },
         );
       }),
-      App.al('escena:escala', ({ aviso }) => {
-        this.avisos.mostrar(aviso, { tono: 'info', clave: 'escala' });
+      App.al('escena:escala', ({ modo, aviso }) => {
+        // Llega también cuando el modo lo cambia la voz o el teclado, y
+        // entonces la casilla hay que ponerla al día: es la única parte de la
+        // interfaz que afirma en qué escala se está.
+        if (this.interruptorEscala) this.interruptorEscala.checked = modo === 'real';
+        if (aviso) this.avisos.mostrar(aviso, { tono: 'info', clave: 'escala' });
       }),
       App.al('estado:cargando', ({ valor }) => {
         // Terminada la carga: el panel galáctico se presenta y se retira solo.

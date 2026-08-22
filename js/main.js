@@ -288,6 +288,12 @@ async function arrancar() {
     alternarPausa,
     cambiarVelocidad,
     mostrarOrbitas,
+    // Faltaba, y el interruptor de «Escala real» llevaba desde la fase 2 sin
+    // hacer nada: `this.acciones.cambiarEscala` no existía, la casilla se
+    // marcaba y el `TypeError` moría en la consola sin que se viera un solo
+    // cambio en la escena. El resto de acciones sí estaban; esta se quedó solo
+    // en `FallbackControls`, que es quien atiende la tecla, no la casilla.
+    cambiarEscala,
     // La HUD necesita la malla del cuerpo para anclar las anotaciones a su
     // superficie; se la pide al sistema en lugar de guardar una referencia.
     obtenerCuerpo3D: (id) => sistema.obtener(id),
