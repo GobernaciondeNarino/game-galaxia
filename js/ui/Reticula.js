@@ -13,6 +13,7 @@
 
 import * as THREE from 'three';
 import { svg } from './graficos.js';
+import { aPantalla } from '../utils/math.js';
 
 const HZ = 30;
 
@@ -101,8 +102,7 @@ export class Reticula {
   }
 
   _proyectar(vector, camara, ancho, alto) {
-    const v = this._vector.copy(vector).project(camara);
-    return { x: ((v.x + 1) / 2) * ancho, y: ((-v.y + 1) / 2) * alto };
+    return aPantalla(vector, camara, ancho, alto, this._vector);
   }
 
   destruir() {

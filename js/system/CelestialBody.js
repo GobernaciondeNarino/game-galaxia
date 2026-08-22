@@ -114,37 +114,53 @@ export class CelestialBody {
    * fotograma con el cuerpo en gris.
    */
   mejorarTextura() {
-    const ruta = this.datos.render?.textura;
-    if (!ruta || this._texturaMejorada) return;
-    this._texturaMejorada = true;
-
-    const completa = this.gestor.cargarTextura(ruta);
-    completa.addEventListener?.('dispose', () => {});
-
-    const aplicar = () => {
+    this._conTexturaCompleta((completa) => {
       const anterior = this.malla.material.map;
       this.malla.material.map = completa;
       this.malla.material.needsUpdate = true;
       if (anterior && anterior !== completa) anterior.dispose();
       this.texturaReducida = null;
+    });
+  }
+
+  /**
+   * Carga la textura de resolución completa y llama a `aplicar` cuando llega.
+   *
+   * La espera vivía duplicada aquí y en Sun.js, que la sobrescribe entera solo
+   * porque el Sol no aplica la textura a `material.map` sino a un uniforme de
+   * su shader. Lo que cambia es esa línea; todo lo demás —el guardián de una
+   * sola vez, la carga y el sondeo— era idéntico.
+   *
+   * Hay sondeo y no solo un evento porque el TextureLoader de Three NO emite
+   * «load» sobre la textura: rellena `image` y ya está. Se escuchan los dos y
+   * el guardián `hecho` impide que se aplique dos veces si llegan ambos, que
+   * es lo que pasaba antes.
+   */
+  _conTexturaCompleta(aplicar) {
+    const ruta = this.datos.render?.textura;
+    if (!ruta || this._texturaMejorada) return;
+    this._texturaMejorada = true;
+
+    const completa = this.gestor.cargarTextura(ruta);
+    let hecho = false;
+    const unaVez = () => {
+      if (hecho) return;
+      hecho = true;
+      aplicar(completa);
     };
 
-    if (completa.image) aplicar();
-    else completa.addEventListener?.('load', aplicar);
+    if (completa.image) { unaVez(); return; }
 
-    // El TextureLoader de Three no emite «load» sobre la textura, sino que
-    // rellena `image`. Se comprueba con un sondeo corto y acotado.
-    if (!completa.image) {
-      let intentos = 0;
-      const sondeo = setInterval(() => {
-        if (completa.image) {
-          clearInterval(sondeo);
-          aplicar();
-        } else if (++intentos > 100) {
-          clearInterval(sondeo);   // 10 s: se queda la reducida.
-        }
-      }, 100);
-    }
+    completa.addEventListener?.('load', unaVez);
+    let intentos = 0;
+    const sondeo = setInterval(() => {
+      if (completa.image) {
+        clearInterval(sondeo);
+        unaVez();
+      } else if (++intentos > 100) {
+        clearInterval(sondeo);   // 10 s: se queda la reducida.
+      }
+    }, 100);
   }
 
   /** Conecta el cuerpo a una órbita construida a partir de sus elementos. */

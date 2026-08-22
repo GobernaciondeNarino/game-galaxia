@@ -217,41 +217,15 @@ export class Narrator {
    * @returns {Promise<object|null>} { texto, fuente, valor, sinDato }
    */
   async responder(idCuerpo, atributo) {
-    let datos = null;
-    try {
-      const respuesta = await fetch(
-        `${rutaApp('api/respuesta.php')}?bodyId=${encodeURIComponent(idCuerpo)}` +
-        `&atributo=${encodeURIComponent(atributo)}`,
-      );
-      if (!respuesta.ok) return null;
-      datos = await respuesta.json();
-    } catch {
-      return null;
-    }
+    const consulta =
+      `bodyId=${encodeURIComponent(idCuerpo)}&atributo=${encodeURIComponent(atributo)}`;
+
+    const datos = await this._pedirJson(`${rutaApp('api/respuesta.php')}?${consulta}`);
     if (!datos?.texto) return null;
 
     this.detener();
     this.subtitulos.mostrarFrase(datos.texto, 9000);
-
-    if (this.motor === 'servidor') {
-      const reproductor = new Audio();
-      reproductor.volume = this.volumenObjetivo;
-      if (reproductor.volume > 0) {
-        this._fraseEnCurso = reproductor;
-        reproductor.addEventListener('error', () => {
-          // Sin síntesis en el servidor, lo dice el navegador: la respuesta no
-          // puede quedarse muda solo porque falte una clave de API.
-          if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
-          this._decirFraseConNavegador(datos.texto);
-        }, { once: true });
-        reproductor.src =
-          `${rutaApp('api/tts.php')}?bodyId=${encodeURIComponent(idCuerpo)}` +
-          `&atributo=${encodeURIComponent(atributo)}`;
-        reproductor.play().catch(() => this._decirFraseConNavegador(datos.texto));
-      }
-    } else if (this.motor === 'navegador') {
-      this._decirFraseConNavegador(datos.texto);
-    }
+    this._decirConVozDelServidor(consulta, datos.texto);
 
     return datos;
   }
@@ -275,17 +249,7 @@ export class Narrator {
       return;
     }
 
-    const reproductor = new Audio();
-    reproductor.volume = this.volumenObjetivo;
-    if (reproductor.volume <= 0) return;
-
-    this._fraseEnCurso = reproductor;
-    reproductor.addEventListener('error', () => {
-      if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
-      this._decirFraseConNavegador(texto);
-    }, { once: true });
-    reproductor.src = `${rutaApp('api/tts.php')}?respuesta=${encodeURIComponent(huella)}`;
-    reproductor.play().catch(() => this._decirFraseConNavegador(texto));
+    this._decirConVozDelServidor(`respuesta=${encodeURIComponent(huella)}`, texto);
   }
 
   /**
@@ -298,34 +262,12 @@ export class Narrator {
     const mes = fecha.getUTCMonth() + 1;
     const dia = fecha.getUTCDate();
 
-    let datos = null;
-    try {
-      const respuesta = await fetch(`${rutaApp('api/meteoros.php')}?mes=${mes}&dia=${dia}`);
-      if (!respuesta.ok) return null;
-      datos = await respuesta.json();
-    } catch {
-      return null;
-    }
+    const datos = await this._pedirJson(`${rutaApp('api/meteoros.php')}?mes=${mes}&dia=${dia}`);
     if (!datos?.texto) return null;
 
     this.detener();
     this.subtitulos.mostrarFrase(datos.texto, 12000);
-
-    if (this.motor === 'servidor') {
-      const reproductor = new Audio();
-      reproductor.volume = this.volumenObjetivo;
-      if (reproductor.volume > 0) {
-        this._fraseEnCurso = reproductor;
-        reproductor.addEventListener('error', () => {
-          if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
-          this._decirFraseConNavegador(datos.texto);
-        }, { once: true });
-        reproductor.src = `${rutaApp('api/tts.php')}?meteoros=${mes}-${dia}`;
-        reproductor.play().catch(() => this._decirFraseConNavegador(datos.texto));
-      }
-    } else if (this.motor === 'navegador') {
-      this._decirFraseConNavegador(datos.texto);
-    }
+    this._decirConVozDelServidor(`meteoros=${mes}-${dia}`, datos.texto);
 
     return datos;
   }
@@ -337,15 +279,60 @@ export class Narrator {
     if (nombre) partes.push(`nombre=${encodeURIComponent(nombre)}`);
     if (idCuerpo) partes.push(`cuerpo=${encodeURIComponent(idCuerpo)}`);
 
+    const datos = await this._pedirJson(`${rutaApp('api/frase.php')}?${partes.join('&')}`);
+    return typeof datos?.texto === 'string' ? datos.texto : null;
+  }
+
+  /**
+   * Pide JSON a un endpoint de ORBIS. Devuelve null ante cualquier problema.
+   *
+   * Lo repetían `responder`, `contarMeteoros` y `_textoFrase` con el mismo
+   * try/catch. Que un endpoint no conteste NUNCA debe romper la interfaz: la
+   * narración es un extra y sin ella se sigue navegando, leyendo y comparando.
+   */
+  async _pedirJson(url) {
     try {
-      const respuesta = await fetch(`${rutaApp('api/frase.php')}?${partes.join('&')}`);
+      const respuesta = await fetch(url);
+      // 204 es «no hay versión aplicable», no un fallo: llega sin cuerpo.
       if (respuesta.status === 204 || !respuesta.ok) return null;
-      const datos = await respuesta.json();
-      return typeof datos?.texto === 'string' ? datos.texto : null;
+      return await respuesta.json();
     } catch {
-      // Sin red no hay entradilla, y no pasa nada: es un adorno, no el mensaje.
       return null;
     }
+  }
+
+  /**
+   * Dice un texto con la voz buena, y si no puede, con la del navegador.
+   *
+   * Estaba copiado tres veces —respuesta a una pregunta, respuesta del
+   * asistente y lluvia de meteoros— idéntico salvo la consulta que se le pasa
+   * a api/tts.php. Tres copias de una cadena de reserva son tres sitios donde
+   * se puede quedar muda de formas distintas.
+   *
+   * @param {string} consulta lo que va tras la «?» de api/tts.php
+   * @param {string} texto    lo mismo que se está diciendo, para la reserva
+   */
+  _decirConVozDelServidor(consulta, texto) {
+    if (this.motor !== 'servidor') {
+      if (this.motor === 'navegador') this._decirFraseConNavegador(texto);
+      return;
+    }
+
+    const reproductor = new Audio();
+    reproductor.volume = this.volumenObjetivo;
+    // Silenciado: no se pide el audio siquiera. Generarlo costaría dinero y
+    // nadie lo iba a oír.
+    if (reproductor.volume <= 0) return;
+
+    this._fraseEnCurso = reproductor;
+    reproductor.addEventListener('error', () => {
+      // Sin síntesis en el servidor, lo dice el navegador: la respuesta no
+      // puede quedarse muda solo porque falte una clave de API.
+      if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
+      this._decirFraseConNavegador(texto);
+    }, { once: true });
+    reproductor.src = `${rutaApp('api/tts.php')}?${consulta}`;
+    reproductor.play().catch(() => this._decirFraseConNavegador(texto));
   }
 
   /** La entradilla con la voz del navegador, para cuando no hay ElevenLabs. */

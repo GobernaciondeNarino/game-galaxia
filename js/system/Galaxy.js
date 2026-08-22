@@ -11,15 +11,7 @@
  */
 
 import * as THREE from 'three';
-import { DOS_PI } from '../utils/math.js';
-
-function generador(semilla) {
-  let estado = semilla >>> 0;
-  return () => {
-    estado = (estado * 1664525 + 1013904223) >>> 0;
-    return estado / 4294967296;
-  };
-}
+import { DOS_PI, generador } from '../utils/math.js';
 
 export class Galaxy {
   constructor(gestor, { textura = null, radio = 9000, particulas = 12000, semilla = 31415 } = {}) {

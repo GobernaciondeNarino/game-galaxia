@@ -396,22 +396,19 @@ export class Sun extends CelestialBody {
     return destello;
   }
 
-  /** Sustituye la textura de la fotosfera por la de resolución completa. */
+  /**
+   * Sustituye la textura de la fotosfera por la de resolución completa.
+   *
+   * Se sobrescribe porque el Sol no dibuja con `material.map` sino con un
+   * ShaderMaterial propio: la textura va a un uniforme. La espera —cargar,
+   * sondear, aplicar una sola vez— la pone la clase base.
+   */
   mejorarTextura() {
-    const ruta = this.datos.render?.textura;
-    if (!ruta || this._texturaMejorada) return;
-    this._texturaMejorada = true;
-
-    const completa = this.gestor.cargarTextura(ruta);
-    let intentos = 0;
-    const sondeo = setInterval(() => {
-      if (completa.image) {
-        clearInterval(sondeo);
-        const anterior = this.materialSuperficie.uniforms.mapa.value;
-        this.materialSuperficie.uniforms.mapa.value = completa;
-        if (anterior && anterior !== completa) anterior.dispose();
-      } else if (++intentos > 100) clearInterval(sondeo);
-    }, 100);
+    this._conTexturaCompleta((completa) => {
+      const anterior = this.materialSuperficie.uniforms.mapa.value;
+      this.materialSuperficie.uniforms.mapa.value = completa;
+      if (anterior && anterior !== completa) anterior.dispose();
+    });
   }
 
   actualizar(fecha, delta = 0) {

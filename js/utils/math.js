@@ -16,6 +16,37 @@ export const acotar = (valor, minimo, maximo) => Math.min(maximo, Math.max(minim
 export const mezclar = (a, b, t) => a + (b - a) * t;
 
 /**
+ * Generador congruencial lineal. Determinista: la misma semilla da siempre la
+ * misma secuencia, que es justo lo que hace falta para que el cinturón de
+ * asteroides y el disco galáctico se dibujen iguales en cada carga.
+ *
+ * Estaba copiado carácter a carácter en AsteroidBelt.js y en Galaxy.js. Son los
+ * dos únicos sitios donde ORBIS usa números pseudoaleatorios, y los dos están
+ * etiquetados SIMULACIÓN en la interfaz: NADA que se presente como dato sale
+ * de aquí. Las constantes son las de Numerical Recipes.
+ */
+export function generador(semilla) {
+  let estado = semilla >>> 0;
+  return () => {
+    estado = (estado * 1664525 + 1013904223) >>> 0;
+    return estado / 4294967296;
+  };
+}
+
+/**
+ * Proyecta un punto del mundo a píxeles de pantalla.
+ *
+ * Lo repetían Anotaciones.js y Reticula.js con el mismo cuerpo. El vector de
+ * trabajo se pasa desde fuera y se reutiliza: esto se llama para cada
+ * anotación en CADA fotograma, y crear un Vector3 por llamada llenaría el
+ * recolector de basura sin necesidad.
+ */
+export function aPantalla(vector, camara, ancho, alto, auxiliar) {
+  const v = auxiliar.copy(vector).project(camara);
+  return { x: ((v.x + 1) / 2) * ancho, y: ((-v.y + 1) / 2) * alto };
+}
+
+/**
  * Interpolación exponencial independiente de la tasa de fotogramas.
  *
  * Un `mezclar(actual, objetivo, 0.1)` por fotograma se mueve al doble de

@@ -18,7 +18,7 @@
 
 import * as THREE from 'three';
 import { crear } from '../utils/dom.js';
-import { latLonAVector } from '../utils/math.js';
+import { latLonAVector, aPantalla } from '../utils/math.js';
 
 const SEPARACION_MINIMA = 26;   // px entre centros de etiqueta
 const HZ = 20;
@@ -188,8 +188,7 @@ export class Anotaciones {
   }
 
   _proyectar(vector, camara, ancho, alto) {
-    const v = this._vector.copy(vector).project(camara);
-    return { x: ((v.x + 1) / 2) * ancho, y: ((-v.y + 1) / 2) * alto };
+    return aPantalla(vector, camara, ancho, alto, this._vector);
   }
 
   destruir() {
