@@ -207,6 +207,28 @@ despliegue por FTP.
 | `LIMITE_TRANSCRIPCIONES_HORA` | Transcripciones por IP y hora | `120` |
 | `LIMITE_CONVERSACION_HORA` | Respuestas del asistente por IP y hora | `60` |
 | `ORBIS_SAL_LIMITES` | Sal con la que se anonimizan las IP de los contadores | Una compartida por todas las instalaciones — **pon una propia** |
+| `TOPE_DIARIO_NARRACION` | Narraciones nuevas de **todo el sitio** en 24 h | `500` |
+| `TOPE_DIARIO_TRANSCRIPCION` | Transcripciones de todo el sitio en 24 h | `1500` |
+| `TOPE_DIARIO_CONVERSACION` | Respuestas del asistente de todo el sitio en 24 h | `400` |
+
+### Dos límites, y hacen falta los dos
+
+`LIMITE_*_HORA` acota lo que gasta **una persona**. `TOPE_DIARIO_*` acota lo que
+gasta **el sitio**. Con sesenta conversaciones por IP y hora, diez direcciones
+distintas son seiscientas respuestas de un modelo de pago en una tarde: el
+límite por IP no lo ve, porque cada una va sobrada de cupo.
+
+Los techos diarios **no son un objetivo de uso, son un freno de emergencia**. Un
+día normal no se acerca. Si se alcanzan, algo está pasando —un bucle, un
+rastreador, alguien probando— y es preferible que el sitio deje de gastar unas
+horas a que siga pagando. Cuando se llega, ORBIS lo dice con esas palabras y
+sigue funcionando: la voz pasa a la del navegador, las narraciones ya guardadas
+suenan igual y las preguntas del catálogo se contestan como siempre. Solo se
+detiene lo que cuesta dinero.
+
+Los valores por omisión son un punto de partida razonable, no una decisión de
+presupuesto: revísalos con la factura de las dos APIs delante. Poner un cero
+desactiva ese techo.
 
 `ORBIS_SAL_LIMITES` merece un minuto: los topes cuentan por visitante y ORBIS
 guarda un **hash** de la IP en lugar de la IP, para que en `cache/limites/` no

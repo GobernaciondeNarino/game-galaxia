@@ -217,10 +217,18 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 - **`api/chat.php` tampoco sintetiza texto del cliente.** La respuesta del
   asistente se guarda bajo un hash en `cache/respuestas/` y `api/tts.php` solo
   acepta ese hash: el endpoint de voz nunca dice lo que le manden.
-- Límite por IP y hora en los tres endpoints de pago —narración, transcripción y
-  conversación—; servir de caché y precargar no consumen cupo. Verificación TLS
-  obligatoria en las llamadas salientes. La respuesta cruda de ElevenLabs va al
-  registro, nunca al cliente.
+- **Dos límites en los tres endpoints de pago** —narración, transcripción y
+  conversación—: uno por IP y hora, y un techo diario del sitio entero. El
+  primero acota lo que gasta una persona; el segundo, lo que gasta el sitio, que
+  es lo que un límite por IP no ve: con diez direcciones distintas, sesenta
+  peticiones por hora cada una son seiscientas. Servir de caché y precargar no
+  consumen cupo. Al llegar a un techo se dice cuál de los dos ha sido, porque
+  «has preguntado demasiado» y «el sitio ha gastado su día» piden cosas
+  distintas de quien lo lee.
+- Los contadores guardan un **hash de la IP con una sal propia de la
+  instalación**, no la IP: el límite funciona igual y en el disco no queda una
+  lista de quién ha entrado. Verificación TLS obligatoria en las llamadas
+  salientes. La respuesta cruda de ElevenLabs va al registro, nunca al cliente.
 - **CSP sin `unsafe-inline` en los scripts.** El único bloque en línea es el
   `importmap` —los navegadores no admiten import maps externos—, autorizado por
   su hash SHA-256. Si lo modificas, ejecuta `node tools/csp-hash.mjs`.

@@ -176,6 +176,41 @@ return [
      */
     'LIMITE_CONVERSACION_HORA' => 60,
 
+    // ── Techos del SITIO ENTERO, por día ────────────────────────────────
+    //
+    //  Los tres límites de arriba acotan lo que gasta UNA persona. Estos acotan
+    //  lo que gasta el sitio. Hacen falta los dos: con sesenta conversaciones
+    //  por IP y hora, diez direcciones distintas son seiscientas respuestas de
+    //  un modelo de pago en una tarde, y sin techo nada las frenaba.
+    //
+    //  NO son un objetivo de uso: son un freno de emergencia. Un día normal no
+    //  se acerca. Si se alcanza, algo está pasando —un bucle, un rastreador,
+    //  alguien probando— y es mejor que el sitio deje de gastar unas horas a
+    //  que siga pagando. Cuando se llega, la interfaz lo dice con esas palabras
+    //  y sigue funcionando: la voz pasa a la del navegador y las preguntas del
+    //  catálogo se contestan igual.
+    //
+    //  Ponlos a cero para desactivarlos. Si los subes, súbelos a sabiendas.
+
+    /**
+     * Narraciones NUEVAS de todo el sitio en 24 h. Las cacheadas no cuentan.
+     *
+     * Con 500 hay de sobra: el catálogo entero son 33 cuerpos × 3 narraciones,
+     * más las frases, y una vez generadas no se vuelven a pagar nunca.
+     */
+    'TOPE_DIARIO_NARRACION' => 500,
+
+    /** Transcripciones de todo el sitio en 24 h. */
+    'TOPE_DIARIO_TRANSCRIPCION' => 1500,
+
+    /**
+     * Respuestas del asistente de todo el sitio en 24 h.
+     *
+     * Es el más caro de los tres y el que conviene mirar primero si el gasto
+     * sorprende: cada respuesta puede encadenar varias llamadas a herramientas.
+     */
+    'TOPE_DIARIO_CONVERSACION' => 400,
+
     /**
      * Sal con la que se anonimizan las direcciones IP de los contadores.
      *

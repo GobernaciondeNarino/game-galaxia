@@ -54,12 +54,25 @@ if (!Conversacion::disponible()) {
 
 // Cada respuesta cuesta dinero, así que el límite es más estrecho que el de la
 // narración: sin él, una pestaña con un bucle vaciaría la cuenta en una tarde.
-$limitador = new RateLimiter(Config::entero('LIMITE_CONVERSACION_HORA', 60));
+$limitador = new RateLimiter(
+    Config::entero('LIMITE_CONVERSACION_HORA', 60),
+    3600,
+    'conversacion',
+    Config::entero('TOPE_DIARIO_CONVERSACION', 400)
+);
 $cuota = $limitador->consumir();
 if (!($cuota['permitido'] ?? true)) {
     header('Retry-After: ' . (string) ($cuota['esperaSegundos'] ?? 600));
-    Respuesta::error(429, 'demasiadas_preguntas',
-        'Has hecho muchas preguntas seguidas. Espera un poco y sigue: los datos no se van a ninguna parte.');
+    $porElSitio = ($cuota['motivo'] ?? null) === 'tope_diario';
+    Respuesta::error(
+        429,
+        'demasiadas_preguntas',
+        $porElSitio
+            ? 'Hoy ya se ha alcanzado el máximo de conversaciones de todo el sitio. Vuelve mañana; '
+                . 'mientras tanto, el módulo Curiosidades sigue respondiendo del catálogo.'
+            : 'Has hecho muchas preguntas seguidas. Espera un poco y sigue: los datos no se van a ninguna parte.',
+        $porElSitio ? 'tope diario del sitio' : 'cupo por IP agotado'
+    );
 }
 
 $crudo = (string) file_get_contents('php://input');

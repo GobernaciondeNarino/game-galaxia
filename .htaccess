@@ -119,7 +119,12 @@ DirectoryIndex index.html
 # ---------------------------------------------------------------------------
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^(config|api/lib|api/logs|tools|docs/borradores)/ - [F,L]
+  # api/vendor son las dependencias de Composer: código que se incluye desde
+  # api/lib, nunca un punto de entrada. Sin esto, sus más de dos mil .php se
+  # podían pedir por URL y enumerarlos revelaba la versión exacta de cada
+  # librería. Tienen además su propio .htaccess; esto es la segunda cerradura,
+  # por si el hosting no honra los .htaccess de subdirectorio.
+  RewriteRule ^(config|cache|api/lib|api/logs|api/vendor|tools|docs/borradores)/ - [F,L]
 </IfModule>
 
 <FilesMatch "^(\.htaccess|\.gitignore|\.env|composer\.(json|lock)|package(-lock)?\.json|.*\.md)$">

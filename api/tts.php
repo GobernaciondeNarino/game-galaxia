@@ -281,19 +281,32 @@ if ($voz === '') {
 // ---------------------------------------------------------------------------
 // 5. Límite de generaciones nuevas por IP
 // ---------------------------------------------------------------------------
-$limitador = new RateLimiter(Config::entero('LIMITE_GENERACIONES_HORA', 30));
+$limitador = new RateLimiter(
+    Config::entero('LIMITE_GENERACIONES_HORA', 30),
+    3600,
+    'narracion',
+    Config::entero('TOPE_DIARIO_NARRACION', 500)
+);
 $cupo = $limitador->consumir();
 
 header('X-Orbis-Cupo-Restante: ' . $cupo['restantes']);
 
 if (!$cupo['permitido']) {
     header('Retry-After: ' . $cupo['esperaSegundos']);
+    // Se distingue quién ha llegado al tope. Decirle a alguien «has pedido
+    // demasiadas» cuando quien se ha pasado es el sitio entero es mentira, y
+    // además le hace creer que la culpa es suya y que esperando un rato se
+    // arregla, cuando puede faltar un día.
+    $porElSitio = ($cupo['motivo'] ?? null) === 'tope_diario';
     Respuesta::error(
         429,
         'limite_alcanzado',
-        'Se ha alcanzado el límite de narraciones nuevas por hora. Vuelve a intentarlo más tarde; '
-            . 'mientras tanto se usará la voz del navegador.',
-        'cupo agotado'
+        $porElSitio
+            ? 'Hoy ya se ha alcanzado el máximo de narraciones nuevas de todo el sitio. '
+                . 'Se seguirá oyendo con la voz del navegador; las ya guardadas suenan igual que siempre.'
+            : 'Se ha alcanzado el límite de narraciones nuevas por hora. Vuelve a intentarlo más tarde; '
+                . 'mientras tanto se usará la voz del navegador.',
+        $porElSitio ? 'tope diario del sitio' : 'cupo por IP agotado'
     );
 }
 

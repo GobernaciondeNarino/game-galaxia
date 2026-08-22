@@ -79,13 +79,27 @@ if ($clave === null || $clave === '') {
 
 // Límite propio, más generoso que el de la síntesis porque cada fragmento es
 // corto, pero límite al fin y al cabo.
-$limitador = new RateLimiter(Config::entero('LIMITE_TRANSCRIPCIONES_HORA', 120));
+$limitador = new RateLimiter(
+    Config::entero('LIMITE_TRANSCRIPCIONES_HORA', 120),
+    3600,
+    'transcripcion',
+    Config::entero('TOPE_DIARIO_TRANSCRIPCION', 1500)
+);
 $cupo = $limitador->consumir();
 header('X-Orbis-Cupo-Restante: ' . $cupo['restantes']);
 
 if (!$cupo['permitido']) {
     header('Retry-After: ' . $cupo['esperaSegundos']);
-    Respuesta::error(429, 'limite_alcanzado', 'Se ha alcanzado el límite de transcripciones por hora.');
+    $porElSitio = ($cupo['motivo'] ?? null) === 'tope_diario';
+    Respuesta::error(
+        429,
+        'limite_alcanzado',
+        $porElSitio
+            ? 'Hoy ya se ha alcanzado el máximo de transcripciones de todo el sitio. Escribe la pregunta '
+                . 'en lugar de dictarla.'
+            : 'Se ha alcanzado el límite de transcripciones por hora.',
+        $porElSitio ? 'tope diario del sitio' : 'cupo por IP agotado'
+    );
 }
 
 // ---------------------------------------------------------------------------
