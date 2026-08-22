@@ -33,7 +33,6 @@
  */
 
 import { crear, anunciar } from '../../utils/dom.js';
-import { App } from '../../core/App.js';
 
 /**
  * Los cinco destinos.
@@ -126,6 +125,3 @@ export class MenuInferior {
     delete document.body.dataset.seccion;
   }
 }
-
-/** Los identificadores de los destinos, para las pruebas. */
-export const DESTINOS_MENU = DESTINOS.map((d) => d.id);

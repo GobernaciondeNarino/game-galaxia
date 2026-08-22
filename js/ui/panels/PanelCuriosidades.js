@@ -143,13 +143,3 @@ export class PanelCuriosidades {
     this.panel.remove();
   }
 }
-
-/** El identificador del panel, para las pruebas. */
-export const SELECTOR_CURIOSIDADES = '.panel--curiosidades';
-
-/** Atajo para las pruebas: los botones de pregunta que hay ahora mismo. */
-export const preguntasVisibles = (raiz = document) =>
-  [...raiz.querySelectorAll('.curiosidades__pregunta')].map((b) => b.dataset.atributo);
-
-export const tituloCuriosidades = (raiz = document) =>
-  $('.panel--curiosidades .panel__titulo', raiz)?.textContent ?? '';

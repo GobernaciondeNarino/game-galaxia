@@ -217,24 +217,4 @@ export function barrasAsignacion(filas) {
       ])));
 }
 
-/** Minigráfico de línea a partir de una serie real de pares [x, y]. */
-export function minilinea(serie, { ancho = 120, alto = 34 } = {}) {
-  if (!serie?.length) return sinDatos();
-  const ys = serie.map((p) => p[1]);
-  const min = Math.min(...ys);
-  const max = Math.max(...ys);
-  const rango = max - min || 1;
-
-  const trozos = serie.map((p, i) => {
-    const x = (i / (serie.length - 1)) * ancho;
-    const y = alto - ((p[1] - min) / rango) * (alto - 4) - 2;
-    return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-
-  return svg('svg', {
-    class: 'minilinea', viewBox: `0 0 ${ancho} ${alto}`,
-    preserveAspectRatio: 'none', 'aria-hidden': 'true', focusable: 'false',
-  }, [svg('path', { d: trozos.join(' '), class: 'minilinea__linea' })]);
-}
-
 export { svg };

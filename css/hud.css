@@ -276,22 +276,12 @@
 .barra__modulo:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .barra__centro { text-align: center; }
-.barra__titulo-central {
-  font-family: var(--fuente-titulos);
-  font-size: var(--t-mayor);
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--texto);
-}
 .barra__subtitulo {
   font-size: var(--t-menor);
   letter-spacing: 0.08em;
   color: var(--texto-tenue);
 }
 
-/* `min-width: 0` es la red de seguridad: sin él, una columna de rejilla con
-   `minmax(0, 1fr)` sigue dejando que su contenido se desborde hacia fuera. */
-.barra__derecha { display: grid; justify-items: end; gap: var(--e-2); min-width: 0; }
 .barra__tiempos {
   display: grid;
   grid-template-columns: auto auto;
@@ -573,8 +563,6 @@
 .asignacion__relleno { display: block; height: 100%; background: var(--ambar-seleccion); }
 .asignacion__valor { font-size: 9px; text-align: right; }
 
-.minilinea { width: 100%; height: auto; }
-.minilinea__linea { fill: none; stroke: var(--cian-acento); stroke-width: 1.2; }
 
 /* Mapa orbital */
 .mapa__svg { width: 100%; height: auto; max-height: 160px; }

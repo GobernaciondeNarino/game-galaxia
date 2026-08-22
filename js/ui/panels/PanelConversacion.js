@@ -25,7 +25,6 @@
  */
 
 import { crear, anunciar } from '../../utils/dom.js';
-import { App } from '../../core/App.js';
 
 /** Cuántos turnos se recuerdan. El servidor recorta igualmente. */
 const TURNOS = 12;
