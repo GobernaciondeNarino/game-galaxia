@@ -276,11 +276,13 @@ async function arrancar() {
   const hud = new HUD(catalogo, {
     vistaGalactica,
     seleccionar,
-    // Pulsar una pregunta del panel del asistente es exactamente lo mismo que
+    // Pulsar una pregunta del panel de curiosidades es exactamente lo mismo que
     // decirla: entra por el mismo reconocedor y la contesta el mismo servidor.
     // No hay una segunda vía que pudiera responder otra cosa.
     preguntar: (texto) => intentarResponder(texto),
     cambiarNombre: () => abrirBienvenida(),
+    conversar: (turnos) => conversar(turnos),
+    dictar: () => App.emitir('entrada:solicitar-microfono', {}),
     vistaGeneral,
     vecino,
     alternarPausa,
@@ -429,10 +431,10 @@ async function arrancar() {
     // así que la lista de comandos nunca puede quedar desfasada.
     hud.mostrarAyuda(vocabulario);
     hud.panelAyuda.hidden = true;
-    // Las preguntas del panel del asistente salen del mismo vocabulario que
+    // Las preguntas del panel de curiosidades salen del mismo vocabulario que
     // acaba de entender el reconocedor, no de una lista escrita a mano: así no
     // pueden ofrecerse preguntas que luego no se entiendan.
-    hud.asistente.establecerVocabulario(preguntas.atributosDisponibles());
+    hud.curiosidades.establecerVocabulario(preguntas.atributosDisponibles());
   } catch (err) {
     error('No se pudo cargar el vocabulario de voz:', err);
   }
@@ -467,7 +469,7 @@ async function arrancar() {
 
   /**
    * Abre el diálogo de bienvenida. Se llama al arrancar y cada vez que alguien
-   * quiere cambiar cómo se le llama, desde el panel del asistente.
+   * quiere cambiar cómo se le llama, desde el panel de curiosidades.
    *
    * El saludo en voz alta va DESPUÉS de cerrarlo, no antes, porque hasta ese
    * momento no se sabe a quién hay que saludar, y porque los navegadores no
@@ -484,6 +486,54 @@ async function arrancar() {
         anunciar(nombre ? `Hola, ${nombre}.` : 'Hola.');
       },
     });
+  }
+
+  /**
+   * Habla con el asistente de verdad.
+   *
+   * Manda la conversación entera —el servidor la recorta— y ejecuta lo que
+   * decida: si dice «mostrar Encélado», la cámara viaja mientras la respuesta
+   * se oye. Ese es el punto de que la escena sea parte de la respuesta y no un
+   * mando aparte.
+   *
+   * El historial no se guarda en ninguna parte: vive en el panel, viaja en cada
+   * turno y se olvida al recargar. Ni localStorage —prohibido— ni sesión en el
+   * servidor, que obligaría a identificar a quien pregunta.
+   */
+  async function conversar(turnos) {
+    let datos = null;
+    try {
+      const peticion = await fetch(rutaApp('api/chat.php'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mensajes: turnos,
+          cuerpo: App.estado.cuerpoActivo,
+          nombre: App.estado.nombre,
+        }),
+      });
+      datos = await peticion.json().catch(() => null);
+
+      if (!peticion.ok) {
+        // Un 503 no es un fallo: es un despliegue sin clave de Anthropic. Se
+        // dice con esas palabras en lugar de un error genérico, porque la
+        // diferencia entre «está roto» y «falta configurarlo» importa.
+        return { texto: null, motivo: datos?.mensaje ?? 'El asistente no está disponible ahora mismo.' };
+      }
+    } catch (err) {
+      error('La conversación falló:', err);
+      return { texto: null, motivo: 'No he podido conectar con el servidor.' };
+    }
+
+    if (!datos?.texto) return { texto: null, motivo: 'El asistente no ha devuelto respuesta.' };
+
+    for (const accion of datos.acciones ?? []) {
+      if (accion.tipo === 'mostrar' && accion.cuerpo) seleccionar(accion.cuerpo, 'asistente');
+      else if (accion.tipo === 'vista_general') vistaGeneral();
+    }
+
+    narrador?.decirRespuestaLibre(datos.texto, datos.voz);
+    return datos;
   }
 
   function ejecutarIntencion(intencion) {
@@ -606,14 +656,53 @@ async function arrancar() {
   });
 
   App.al('voz:no-entendido', async ({ texto, sugerencias }) => {
-    // Antes de rendirse: puede que no fuera una orden sino una pregunta. El
-    // parser de intenciones solo entiende órdenes, así que aquí es donde tiene
-    // sentido probar el otro vocabulario, y no antes: «háblame de Marte» debe
-    // seguir siendo el comando de siempre, no una consulta sobre Marte.
+    // Con el módulo ASISTENTE abierto, cualquier cosa que no sea una orden es
+    // una pregunta para la conversación. Eso es lo que significa un chatbot por
+    // voz: no hay que acertar con la fórmula, se habla y ya.
+    //
+    // Y solo con ese módulo abierto, a propósito. Quien está mirando los
+    // paneles de datos no ha pedido conversar, y mandar cada frase suelta a una
+    // API de pago sin que nadie lo haya pedido sería cobrarle por equivocarse.
+    if (document.body.dataset.modulo === 'asistente' && hud.charla && !hud.charla.desactivado) {
+      hud.charla.preguntar(texto);
+      return;
+    }
+
+    // Fuera de ese módulo: puede que no fuera una orden sino una de las
+    // preguntas del catálogo. El parser de intenciones solo entiende órdenes,
+    // así que aquí es donde tiene sentido probar el otro vocabulario, y no
+    // antes: «háblame de Marte» debe seguir siendo el comando de siempre.
     if (await intentarResponder(texto)) return;
 
     sfx.reproducir('error');
     hud.mostrarSugerencias(texto, sugerencias);
+  });
+
+  // El panel de conversación refleja si el micrófono está escuchando, para que
+  // el botón de dictar diga la verdad y no solo parpadee.
+  App.al('voz:activa', () => hud.charla?.establecerDictado(true));
+  App.al('voz:inactiva', () => hud.charla?.establecerDictado(false));
+
+  // Y si el servidor no tiene clave configurada, se dice una sola vez al abrir
+  // el módulo, en lugar de dejar que falle pregunta a pregunta.
+  App.al('hud:modulo', async ({ id }) => {
+    if (id !== 'asistente' || hud.charla?.comprobado) return;
+    hud.charla.comprobado = true;
+    try {
+      const r = await fetch(rutaApp('api/chat.php'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mensajes: [] }),
+      });
+      if (r.status === 503) {
+        const datos = await r.json().catch(() => null);
+        hud.charla.desactivar(datos?.mensaje
+          ?? 'La conversación libre no está configurada en este servidor. Prueba el módulo Curiosidades.');
+      }
+    } catch {
+      // Sin red no se desactiva nada: puede ser un corte momentáneo y la
+      // siguiente pregunta lo dirá con más precisión que un aviso adelantado.
+    }
   });
 
   // ------------------------------------------------------------------ bucle --

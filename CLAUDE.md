@@ -50,6 +50,7 @@ php  tools/pruebas-asistente.php           # validación del nombre y frases
 node tools/pruebas-preguntas.mjs           # reconocedor de preguntas
 node tools/pruebas-datos.mjs               # coherencia del catálogo (masa vs d×V)
 php  tools/pruebas-horizons.php            # parseo de las tablas de JPL (sin red)
+php  tools/pruebas-conversacion.php        # herramientas del asistente (sin red)
 php  tools/pruebas-meteoros.php            # calendario de lluvias de meteoros
 node tools/pruebas-voz.mjs                 # parser de intenciones de voz
 node tools/csp-hash.mjs --verificar        # hash CSP del importmap al día

@@ -257,6 +257,38 @@ export class Narrator {
   }
 
   /**
+   * Dice en voz alta una respuesta de la conversación.
+   *
+   * Se pide por su HASH, no por su texto: api/tts.php no sintetiza texto que
+   * venga del navegador —sería un proxy abierto a una API de pago— y la
+   * respuesta la escribió el propio servidor en api/chat.php, que la guardó y
+   * devolvió su huella. Así el asistente habla con la voz buena sin abrir ese
+   * agujero. Sin huella, o si falla, lo dice el navegador.
+   */
+  decirRespuestaLibre(texto, huella) {
+    if (!texto) return;
+    this.detener();
+    this.subtitulos.mostrarFrase(texto, 12000);
+
+    if (this.motor !== 'servidor' || !huella) {
+      if (this.motor !== 'ninguno') this._decirFraseConNavegador(texto);
+      return;
+    }
+
+    const reproductor = new Audio();
+    reproductor.volume = this.volumenObjetivo;
+    if (reproductor.volume <= 0) return;
+
+    this._fraseEnCurso = reproductor;
+    reproductor.addEventListener('error', () => {
+      if (this._fraseEnCurso === reproductor) this._fraseEnCurso = null;
+      this._decirFraseConNavegador(texto);
+    }, { once: true });
+    reproductor.src = `${rutaApp('api/tts.php')}?respuesta=${encodeURIComponent(huella)}`;
+    reproductor.play().catch(() => this._decirFraseConNavegador(texto));
+  }
+
+  /**
    * Cuenta qué lluvia de meteoros está activa en la fecha simulada.
    *
    * @param {Date} fecha la fecha de la escena, no la del reloj de pared

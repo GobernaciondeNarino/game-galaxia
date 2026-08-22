@@ -87,7 +87,11 @@
 .panel {
   position: relative;
   padding: var(--e-3);
-  background: var(--panel-fondo);
+  /* Fondo transparente: los paneles dejan ver la escena entera por debajo.
+     El desenfoque de fondo y el filo luminoso se quedan, y son ahora los que
+     separan el panel de lo que hay detrás; sin ellos, sobre una textura clara
+     el texto se apoyaría directamente en el planeta. */
+  background: transparent;
   border: 1px solid var(--panel-borde);
   -webkit-backdrop-filter: blur(var(--panel-desenfoque));
   backdrop-filter: blur(var(--panel-desenfoque));
@@ -585,24 +589,26 @@
    ========================================================================== */
 body[data-modulo="sensores"]  .panel--derecha:not([data-modulos~="sensores"]),
 body[data-modulo="analitica"] .panel--derecha:not([data-modulos~="analitica"]),
+body[data-modulo="curiosidades"] .panel--derecha:not([data-modulos~="curiosidades"]),
 body[data-modulo="asistente"] .panel--derecha:not([data-modulos~="asistente"]) {
   display: none;
 }
 
-/* El panel del asistente es el único que NO sale en SISTEMA. Los otros cinco
+/* Curiosidades es el único panel que NO sale en SISTEMA. Los otros cinco
    son fichas del cuerpo que se leen juntas; este es una conversación, y
    colgarlo debajo de las fichas lo habría dejado siempre fuera de la vista y
    además habría cambiado la columna de arranque, que estaba bien como estaba. */
-body[data-modulo="sistema"] .panel--asistente { display: none; }
+body[data-modulo="sistema"] .panel--curiosidades,
+body[data-modulo="sistema"] .panel--charla { display: none; }
 
 /* --------------------------------------------------------------------------
-   Panel del asistente
+   Panel de curiosidades
    -------------------------------------------------------------------------- */
-.asistente__bloque { display: grid; gap: var(--e-2); margin-top: var(--e-3); }
-.asistente__bloque:first-of-type { margin-top: var(--e-2); }
+.curiosidades__bloque { display: grid; gap: var(--e-2); margin-top: var(--e-3); }
+.curiosidades__bloque:first-of-type { margin-top: var(--e-2); }
 
-.asistente__nombre,
-.asistente__ultimo {
+.curiosidades__nombre,
+.curiosidades__ultimo {
   margin: 0;
   font-family: var(--fuente-datos);
   font-size: var(--t-base);
@@ -610,7 +616,7 @@ body[data-modulo="sistema"] .panel--asistente { display: none; }
   color: var(--texto);
 }
 
-.asistente__rotulo {
+.curiosidades__rotulo {
   margin: 0;
   font-family: var(--fuente-titulos);
   font-size: var(--t-micro);
@@ -619,11 +625,11 @@ body[data-modulo="sistema"] .panel--asistente { display: none; }
   color: var(--cian-acento);
 }
 
-.asistente__sujeto { color: var(--ambar-seleccion); font-weight: 600; }
+.curiosidades__sujeto { color: var(--ambar-seleccion); font-weight: 600; }
 
-.asistente__ultimo { color: var(--texto-tenue); font-style: italic; }
+.curiosidades__ultimo { color: var(--texto-tenue); font-style: italic; }
 
-.asistente__pie {
+.curiosidades__pie {
   margin: 0;
   font-family: var(--fuente-datos);
   font-size: var(--t-menor);
@@ -633,7 +639,7 @@ body[data-modulo="sistema"] .panel--asistente { display: none; }
 
 /* Un enlace de texto y no un botón con caja: es una acción secundaria y no
    compite con las diecinueve preguntas, que son lo que se ha venido a hacer. */
-.asistente__enlace {
+.curiosidades__enlace {
   justify-self: start;
   min-height: 24px;
   padding: 0;
@@ -645,12 +651,12 @@ body[data-modulo="sistema"] .panel--asistente { display: none; }
   font-size: var(--t-menor);
   cursor: pointer;
 }
-.asistente__enlace:hover,
-.asistente__enlace:focus-visible { color: var(--cian-brillante); border-bottom-color: var(--panel-borde-vivo); }
+.curiosidades__enlace:hover,
+.curiosidades__enlace:focus-visible { color: var(--cian-brillante); border-bottom-color: var(--panel-borde-vivo); }
 
-.asistente__preguntas { display: flex; flex-wrap: wrap; gap: var(--e-1) 6px; }
+.curiosidades__preguntas { display: flex; flex-wrap: wrap; gap: var(--e-1) 6px; }
 
-.asistente__pregunta {
+.curiosidades__pregunta {
   min-height: 24px;
   padding: 3px 8px;
   background: rgba(79, 195, 247, 0.07);
@@ -661,15 +667,15 @@ body[data-modulo="sistema"] .panel--asistente { display: none; }
   cursor: pointer;
   transition: background-color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
 }
-.asistente__pregunta:hover,
-.asistente__pregunta:focus-visible {
+.curiosidades__pregunta:hover,
+.curiosidades__pregunta:focus-visible {
   background: rgba(0, 229, 255, 0.16);
   border-color: var(--panel-borde-vivo);
 }
 
 @media (pointer: coarse) {
-  .asistente__pregunta, .asistente__enlace { min-height: 44px; }
-  .asistente__pregunta { padding: 3px var(--e-2); }
+  .curiosidades__pregunta, .curiosidades__enlace { min-height: 44px; }
+  .curiosidades__pregunta { padding: 3px var(--e-2); }
 }
 
 /* ==========================================================================
@@ -1618,4 +1624,139 @@ body[data-vista="sistema"] .arco { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   /* Sin desplazamiento: aparece donde va a quedarse. */
   .aviso { animation: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Panel de conversación: el asistente con el que se habla.
+
+   Se distingue de las fichas de datos a propósito. Aquellas son una lectura
+   —etiqueta y cifra, densas, para repasar de un vistazo—; esto es un diálogo, y
+   un diálogo pide renglones anchos, aire entre turnos y saber de un golpe quién
+   dijo qué. Por eso los turnos se alinean a lados distintos: es la convención
+   que todo el mundo ya conoce y no hay que explicarla.
+   -------------------------------------------------------------------------- */
+.charla__hilo {
+  display: grid;
+  gap: var(--e-2);
+  /* Alto acotado y desplazamiento propio: sin esto, una conversación larga
+     empujaría el campo de escritura fuera de la columna y habría que buscarlo
+     desplazando el panel entero. */
+  max-height: min(48vh, 420px);
+  overflow-y: auto;
+  margin: var(--e-2) 0;
+  padding-right: var(--e-1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel-borde) transparent;
+}
+
+.charla__turno {
+  max-width: 92%;
+  padding: var(--e-2);
+  border: 1px solid var(--panel-borde);
+  border-left-width: 3px;
+}
+
+.charla__turno[data-rol="usuario"] {
+  justify-self: end;
+  border-left-color: var(--ambar-seleccion);
+}
+.charla__turno[data-rol="asistente"] {
+  justify-self: start;
+  border-left-color: var(--cian-acento);
+}
+/* Mientras se espera. No es un turno de nadie: no lleva color de lado. */
+.charla__turno[data-rol="esperando"] {
+  justify-self: start;
+  border-left-color: var(--texto-apagado);
+  opacity: 0.7;
+}
+
+.charla__texto {
+  margin: 0;
+  font-family: var(--fuente-datos);
+  font-size: var(--t-base);
+  line-height: 1.5;
+  color: var(--texto);
+}
+
+.charla__fuente {
+  margin: var(--e-1) 0 0;
+  font-family: var(--fuente-datos);
+  font-size: var(--t-menor);
+  line-height: 1.35;
+  color: var(--texto-apagado);
+}
+
+/* Envuelve. La columna derecha mide 286 px como mucho, y el campo más los dos
+   botones en una sola línea piden bastante más: sin envolver, el panel se salía
+   por el borde derecho de la pantalla y el botón de preguntar quedaba fuera. */
+.charla__entrada { display: flex; flex-wrap: wrap; gap: var(--e-2); align-items: stretch; }
+
+.charla__campo {
+  flex: 1 1 100%;
+  min-width: 0;
+  min-height: 32px;
+  padding: var(--e-1) var(--e-2);
+  background: rgba(5, 11, 24, 0.6);
+  border: 1px solid var(--panel-borde);
+  color: var(--texto);
+  font-family: var(--fuente-datos);
+  font-size: var(--t-base);
+}
+.charla__campo::placeholder { color: var(--texto-apagado); }
+.charla__campo:focus-visible { outline: 2px solid var(--cian-brillante); outline-offset: 1px; }
+.charla__campo:disabled { opacity: 0.5; }
+
+.charla__enviar,
+.charla__dictar {
+  min-height: 32px;
+  padding: var(--e-1) var(--e-2);
+  background: rgba(79, 195, 247, 0.1);
+  border: 1px solid var(--panel-borde);
+  color: var(--texto);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color var(--dur-corta) var(--curva), border-color var(--dur-corta) var(--curva);
+}
+.charla__dictar { flex: 0 0 auto; min-width: 32px; }
+.charla__enviar { flex: 1 1 auto; }
+.charla__enviar:hover, .charla__dictar:hover,
+.charla__enviar:focus-visible, .charla__dictar:focus-visible {
+  background: rgba(0, 229, 255, 0.16);
+  border-color: var(--panel-borde-vivo);
+}
+.charla__enviar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Escuchando: el borde se refuerza además del color, porque el color por sí
+   solo no puede ser lo único que distinga dos estados. */
+.charla__dictar[aria-pressed="true"] {
+  border-width: 2px;
+  border-color: var(--verde-estado);
+  color: var(--verde-estado);
+}
+
+.charla__aviso {
+  margin: 0 0 var(--e-2);
+  font-family: var(--fuente-datos);
+  font-size: var(--t-menor);
+  line-height: 1.4;
+  color: var(--texto-tenue);
+}
+.charla__aviso[data-tono="aviso"]  { color: var(--ambar-seleccion); }
+.charla__aviso[data-tono="alerta"] { color: var(--rojo-alerta); }
+
+.charla__pie {
+  margin: var(--e-2) 0 0;
+  font-family: var(--fuente-datos);
+  font-size: var(--t-menor);
+  line-height: 1.4;
+  color: var(--texto-apagado);
+}
+
+@media (pointer: coarse) {
+  .charla__campo, .charla__enviar, .charla__dictar { min-height: 44px; }
+  .charla__dictar { min-width: 44px; }
 }

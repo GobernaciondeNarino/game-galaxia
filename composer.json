@@ -1,0 +1,13 @@
+{
+  "name": "orbis/sistema-solar",
+  "description": "ORBIS — interfaz 3D del Sistema Solar. El SDK de Anthropic se vendoriza en api/vendor y SE VERSIONA, por el mismo motivo que three.js y los modelos de MediaPipe: el hosting de destino es un Plesk sin Composer, y el despliegue tiene que seguir siendo un «git pull» y nada más.",
+  "type": "project",
+  "require": {
+    "php": ">=8.1",
+    "anthropic-ai/sdk": "*"
+  },
+  "config": {
+    "vendor-dir": "api/vendor",
+    "optimize-autoloader": true
+  }
+}

@@ -12,25 +12,28 @@ import { crear, $ } from '../../utils/dom.js';
 import { App } from '../../core/App.js';
 
 /**
- * Pestañas de módulo del pliego. Las tres primeras filtran la columna derecha;
- * las dos últimas no existen y se declaran como tales, desactivadas y con el
- * motivo en el título. Una pestaña que se puede pulsar y no hace nada es peor
- * que una pestaña apagada que explica por qué.
+ * Pestañas de módulo. Todas filtran la columna derecha y todas hacen algo: no
+ * queda ninguna apagada.
  *
- * La nota decía «llega en la fase 7» y «llega en la fase 8», y ambas fases ya
- * están cerradas sin que estos dos módulos entraran en el alcance: la promesa
- * había caducado y seguía en pantalla.
+ * TECNOLOGÍA se ha eliminado. Llevaba desde la fase 4 desactivada prometiendo
+ * un módulo que nunca entró en el alcance, y no había con qué llenarlo: en el
+ * catálogo no hay ni un dato de misiones ni de sondas. Una pestaña que no va a
+ * existir ocupa sitio y promete algo que no llega.
  *
- * ASISTENTE ya existe: PanelAsistente. TECNOLOGÍA sigue apagada, y su nota dice
- * exactamente por qué —no hay ni un dato de misiones ni de sondas en el
- * catálogo—, que es más honesto que una fecha que nadie va a cumplir.
+ * CURIOSIDADES es lo que antes se llamaba «Asistente»: la lista de lo que se
+ * puede preguntar sobre el cuerpo que se está mirando, con las preguntas ya
+ * escritas. Sigue siendo útil precisamente por eso: enseña qué hay.
+ *
+ * ASISTENTE es ahora otra cosa: una conversación de verdad, donde se pregunta
+ * lo que sea. Son dos formas distintas de lo mismo —explorar sin saber qué
+ * pedir, o pedir lo que ya se sabe— y por eso conviven.
  */
 const MODULOS = [
   { id: 'sistema', etiqueta: 'Sistema', activo: true, nota: 'todos los paneles' },
   { id: 'sensores', etiqueta: 'Sensores', activo: true, nota: 'atmósfera, geología y magnetosfera' },
   { id: 'analitica', etiqueta: 'Analítica', activo: true, nota: 'mapa orbital y datos comparados' },
-  { id: 'asistente', etiqueta: 'Asistente', activo: true, nota: 'qué puedes preguntarme, y a quién' },
-  { id: 'tecnologia', etiqueta: 'Tecnología', activo: false, nota: 'sin datos de misiones ni sondas en el catálogo' },
+  { id: 'curiosidades', etiqueta: 'Curiosidades', activo: true, nota: 'qué puedes preguntarme sobre este cuerpo' },
+  { id: 'asistente', etiqueta: 'Asistente', activo: true, nota: 'habla con ORBIS: pregúntale cualquier cosa' },
 ];
 
 /**

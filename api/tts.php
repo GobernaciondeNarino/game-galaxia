@@ -61,6 +61,7 @@ if ($metodo === 'GET') {
         'nombre' => $_GET['nombre'] ?? null,
         'voiceId' => $_GET['voiceId'] ?? null,
         'variante' => $_GET['variante'] ?? 0,
+        'respuesta' => $_GET['respuesta'] ?? null,
         'cuerpo' => $_GET['cuerpo'] ?? null,
         'soloCache' => isset($_GET['soloCache']) && $_GET['soloCache'] === '1',
     ];
@@ -132,6 +133,28 @@ if ($meteoros !== '') {
     }
     $texto = $resultado['texto'];
     $bodyId = 'respuesta-' . $bodyId . '-' . $atributo;
+} elseif (isset($peticion['respuesta']) && $peticion['respuesta'] !== null && $peticion['respuesta'] !== '') {
+    // Una respuesta de la conversación, pedida POR SU HASH.
+    //
+    // Es la única forma de que el asistente hable con la voz buena sin que este
+    // endpoint acepte texto del navegador. El texto lo escribió el servidor en
+    // api/chat.php y quedó guardado; aquí solo se busca por su huella. Quien no
+    // haya pasado por chat.php no tiene ningún hash válido que pedir, y un hash
+    // inventado no encuentra archivo: no hay forma de colar texto propio.
+    $huella = (string) $peticion['respuesta'];
+    if (preg_match('/^[0-9a-f]{32}$/', $huella) !== 1) {
+        Respuesta::error(400, 'respuesta_invalida', 'La referencia de la respuesta no tiene un formato válido.');
+    }
+
+    $archivo = Config::raiz() . '/cache/respuestas/' . $huella . '.txt';
+    if (!is_readable($archivo)) {
+        Respuesta::error(404, 'respuesta_desconocida', 'Esa respuesta ya no está disponible.');
+    }
+    $texto = (string) file_get_contents($archivo);
+    if (trim($texto) === '') {
+        Respuesta::error(404, 'respuesta_vacia', 'Esa respuesta está vacía.');
+    }
+    $bodyId = 'conversacion-' . $huella;
 } elseif ($fraseId !== '') {
     if (preg_match('/^[a-z-]{1,32}$/', $fraseId) !== 1) {
         Respuesta::error(400, 'frase_invalida', 'El identificador de frase no tiene un formato válido.');

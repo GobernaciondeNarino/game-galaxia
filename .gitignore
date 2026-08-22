@@ -8,6 +8,9 @@ cache/limites/
 # Tablas de JPL Horizons: una por cuerpo y día, se rehacen solas
 cache/efemerides/
 
+# Respuestas del asistente, guardadas solo para poder decirlas en voz alta
+cache/respuestas/
+
 # Registros del backend
 api/logs/*
 !api/logs/.gitkeep

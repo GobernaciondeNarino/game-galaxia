@@ -24,7 +24,8 @@ import { NavegacionPlanetaria } from './panels/NavegacionPlanetaria.js';
 import { ProyeccionOrbital } from './panels/ProyeccionOrbital.js';
 import { EstadoEntradas } from './panels/EstadoEntradas.js';
 import { PanelGalactico } from './panels/PanelGalactico.js';
-import { PanelAsistente } from './panels/PanelAsistente.js';
+import { PanelCuriosidades } from './panels/PanelCuriosidades.js';
+import { PanelConversacion } from './panels/PanelConversacion.js';
 import { Anotaciones } from './Anotaciones.js';
 import { ArcoDatos } from './ArcoDatos.js';
 import { Reticula } from './Reticula.js';
@@ -64,13 +65,19 @@ export class HUD {
     this.magnetosfera = new DensidadMagnetosferica(derecha);
     this.adicionales = new DatosAdicionales(derecha);
 
-    // El panel del asistente vive en la misma columna, pero solo se ve con su
-    // pestaña puesta: en SISTEMA no aparece. Los otros cinco son fichas de
-    // datos del cuerpo y se leen juntas; este es una conversación y pide la
-    // columna entera.
-    this.asistente = new PanelAsistente(derecha, {
+    // Curiosidades vive en la misma columna, pero solo se ve con su pestaña
+    // puesta: en SISTEMA no aparece. Los otros cinco son fichas del cuerpo que
+    // se leen juntas; esta es una lista para explorar y pide la columna entera.
+    this.curiosidades = new PanelCuriosidades(derecha, {
       alPreguntar: (texto) => acciones.preguntar?.(texto) ?? Promise.resolve(false),
       alCambiarNombre: () => acciones.cambiarNombre?.(),
+    });
+
+    // La conversación. Comparte columna con las fichas y con curiosidades, y
+    // como ellas solo aparece con su pestaña puesta.
+    this.charla = new PanelConversacion(derecha, {
+      alPreguntar: (turnos) => acciones.conversar?.(turnos) ?? Promise.resolve(null),
+      alDictar: () => acciones.dictar?.(),
     });
 
     this.navegacion = new NavegacionPlanetaria($('#hud-navegacion-planetaria'), this.catalogo, {
@@ -271,8 +278,10 @@ export class HUD {
     anunciar(
       id === 'sistema'
         ? 'Módulo Sistema: se muestran todos los paneles.'
+        : id === 'curiosidades'
+          ? 'Módulo Curiosidades: qué puedes preguntarme, y sobre qué cuerpo.'
         : id === 'asistente'
-          ? 'Módulo Asistente: qué puedes preguntarme, y sobre qué cuerpo.'
+          ? 'Módulo Asistente: escribe o dicta una pregunta y ORBIS responde.'
           : `Módulo ${id}: ${visibles} panel${visibles === 1 ? '' : 'es'} a la vista.`,
     );
 
@@ -347,7 +356,7 @@ export class HUD {
     this.geologia.mostrar(cuerpo);
     this.magnetosfera.mostrar(cuerpo);
     this.adicionales.mostrar(cuerpo, this.tierra);
-    this.asistente.mostrar(cuerpo);
+    this.curiosidades.mostrar(cuerpo);
     this.proyeccion.destacar(cuerpo);
 
     this.barra.establecerSubtitulo(
@@ -577,7 +586,7 @@ export class HUD {
       this.barra, this.perfil, this.mapaOrbital, this.composicion, this.geologia,
       this.magnetosfera, this.adicionales, this.navegacion, this.proyeccion,
       this.entradas, this.panelGalactico, this.reticula, this.anotaciones, this.arco,
-      this.subtitulos, this.comparador, this.avisos, this.asistente,
+      this.subtitulos, this.comparador, this.avisos, this.curiosidades, this.charla,
     ]) {
       parte?.destruir?.();
     }
