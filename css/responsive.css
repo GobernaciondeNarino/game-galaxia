@@ -153,10 +153,47 @@
     flex: 0 0 auto;
     padding: var(--e-2);
   }
-  /* Las pestañas de módulo no caben en un teléfono y no son imprescindibles:
-     los cinco paneles de la derecha ya están ocultos a este ancho, así que
-     filtrarlos no filtraría nada. */
-  .barra__modulos { display: none; }
+  /* Las pestañas de módulo cabían mal en un teléfono y, sobre todo, no servían
+     de nada: los paneles de la derecha están ocultos a este ancho, así que
+     filtrarlos no filtraba nada. Ese razonamiento valía cuando todos los
+     módulos eran filtros de esos paneles.
+     
+     Ya no. ASISTENTE no filtra nada: es una conversación, y es en el móvil
+     donde más sentido tiene —hablarle al teléfono es lo natural, y allí no hay
+     ni teclado cómodo ni sitio para las fichas de datos—. Dejarlo inalcanzable
+     precisamente ahí era lo peor de los dos mundos.
+     
+     Así que la tira vuelve, pero SOLO con las dos pestañas que significan algo
+     aquí: la escena y el asistente. Sensores, Analítica y Curiosidades filtran
+     paneles que no se dibujan, y seguirían sin filtrar nada. */
+  .barra__modulos { display: flex; }
+  .barra__modulo:not([data-modulo="sistema"]):not([data-modulo="asistente"]) { display: none; }
+
+  /* Con el asistente abierto, la conversación ocupa el sitio del perfil: es la
+     única columna de contenido que hay, y una conversación a la que solo se le
+     ven tres renglones no es una conversación. */
+  body[data-modulo="asistente"] #hud-panel-izquierdo { display: none; }
+  body[data-modulo="asistente"] #hud-panel-derecho {
+    display: grid;
+    /* `grid-auto-flow: column` viene de la regla de 1280 px, donde la columna
+       derecha se convierte en una tira horizontal. Aquí solo hay un panel y
+       tiene que ocupar el ancho entero. */
+    grid-auto-flow: row;
+    grid-area: izquierda;
+    align-self: end;
+    max-height: min(62vh, 100%);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  /* El hilo se acota al alto de la pantalla, no a un número fijo: en un
+     teléfono en horizontal, 48vh son cuatro renglones. */
+  .charla__hilo { max-height: min(34vh, 260px); }
+
+  /* El panel de entradas se cuela debajo de la conversación porque vive en la
+     misma columna. Aquí sobra por partida doble: encender la cámara y el
+     micrófono ya se hace desde los indicadores de la barra, que están siempre
+     a la vista, y el sitio que ocupa se lo quita a la charla. */
+  body[data-modulo="asistente"] .panel--entradas { display: none; }
   .barra__marca { font-size: 1.05rem; letter-spacing: 0.22em; }
 
   /* La fila secundaria se queda solo con los indicadores, pegados al inicio.

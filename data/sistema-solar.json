@@ -1881,7 +1881,7 @@
       "padre": "marte",
       "fisica": {
         "radioMedioKm": 11.0584,
-        "masaKg": 1.08e+16,
+        "masaKg": 10800000000000000,
         "densidadGcm3": 1.9,
         "gravedadMs2": null,
         "periodoRotacionHoras": 7.65944,
@@ -1936,7 +1936,7 @@
         },
         "masaKg": {
           "fuente": "JPL Horizons",
-          "detalle": "Mass (10^20 kg )        =  1.08 (10^-4)   Geometric Albedo    =  0.06"
+          "detalle": "Mass (10^20 kg )        =  1.08 (10^-4)   Geometric Albedo    =  0.06  [multiplicador (10^-4) aplicado]"
         },
         "densidadGcm3": {
           "fuente": "JPL Horizons",
@@ -1968,7 +1968,7 @@
       "padre": "marte",
       "fisica": {
         "radioMedioKm": 6.20305,
-        "masaKg": 1800000000000000.0,
+        "masaKg": 1800000000000000,
         "densidadGcm3": 1.76,
         "gravedadMs2": null,
         "periodoRotacionHoras": 30.3021,
@@ -2023,7 +2023,7 @@
         },
         "masaKg": {
           "fuente": "JPL Horizons",
-          "detalle": "Mass (10^20 kg )        = 1.80 (10^-5)    Geometric Albedo    =  0.06"
+          "detalle": "Mass (10^20 kg )        = 1.80 (10^-5)    Geometric Albedo    =  0.06  [multiplicador (10^-5) aplicado]"
         },
         "densidadGcm3": {
           "fuente": "JPL Horizons",
@@ -2753,7 +2753,20 @@
         "epoca": "2000-01-01 TDB (elementos osculadores)"
       },
       "temperatura": null,
-      "atmosfera": null,
+      "atmosfera": {
+        "nota": "En la superficie la presión es un 60 % mayor que la terrestre: como estar quince metros bajo el mar. Es la única luna del Sistema Solar con una atmósfera densa.",
+        "componentes": [
+          {
+            "compuesto": "N₂",
+            "porcentaje": 95
+          },
+          {
+            "compuesto": "CH₄",
+            "porcentaje": 5
+          }
+        ],
+        "fuente": "NASA Science — Titan Facts (misión Cassini-Huygens)"
+      },
       "magnetosfera": {
         "tieneCampoGlobal": false,
         "campoSuperficieNt": null,
@@ -3428,7 +3441,20 @@
         "epoca": "2000-01-01 TDB (elementos osculadores)"
       },
       "temperatura": null,
-      "atmosfera": null,
+      "atmosfera": {
+        "nota": "Atmósfera muy tenue, medida por la Voyager 2 en su sobrevuelo de 1989, la única nave que ha pasado por allí. La fuente describe la composición pero no publica proporciones ni presión, así que aquí no aparecen.",
+        "componentes": [
+          {
+            "compuesto": "N₂",
+            "porcentaje": null
+          },
+          {
+            "compuesto": "CH₄",
+            "porcentaje": null
+          }
+        ],
+        "fuente": "NASA Science — Triton (Voyager 2, 1989)"
+      },
       "magnetosfera": null,
       "geologia": {
         "estado": "activa",

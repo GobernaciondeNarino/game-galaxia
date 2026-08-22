@@ -1211,7 +1211,20 @@
       "tipo": "satelite",
       "padre": "saturno",
       "temperatura": null,
-      "atmosfera": null,
+      "atmosfera": {
+        "nota": "En la superficie la presión es un 60 % mayor que la terrestre: como estar quince metros bajo el mar. Es la única luna del Sistema Solar con una atmósfera densa.",
+        "componentes": [
+          {
+            "compuesto": "N₂",
+            "porcentaje": 95
+          },
+          {
+            "compuesto": "CH₄",
+            "porcentaje": 5
+          }
+        ],
+        "fuente": "NASA Science — Titan Facts (misión Cassini-Huygens)"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": "assets/textures/titan.jpg",
@@ -1437,7 +1450,20 @@
       "tipo": "satelite",
       "padre": "neptuno",
       "temperatura": null,
-      "atmosfera": null,
+      "atmosfera": {
+        "nota": "Atmósfera muy tenue, medida por la Voyager 2 en su sobrevuelo de 1989, la única nave que ha pasado por allí. La fuente describe la composición pero no publica proporciones ni presión, así que aquí no aparecen.",
+        "componentes": [
+          {
+            "compuesto": "N₂",
+            "porcentaje": null
+          },
+          {
+            "compuesto": "CH₄",
+            "porcentaje": null
+          }
+        ],
+        "fuente": "NASA Science — Triton (Voyager 2, 1989)"
+      },
       "satelitesConocidos": null,
       "render": {
         "textura": "assets/textures/triton.jpg",

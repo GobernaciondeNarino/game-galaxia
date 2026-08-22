@@ -147,12 +147,27 @@ echo "\n▸ Las herramientas devuelven los datos REALES del catálogo\n";
 
 echo "\n▸ Un hueco del catálogo llega como hueco, no relleno\n";
 {
-    // Titán no tiene atmósfera registrada en el catálogo. El modelo TIENE que
-    // recibir ese null: si le llegara un texto vacío o un cero, lo contaría
-    // como un dato y estaría afirmando algo falso.
+    // La Luna no tiene atmósfera en el catálogo, y no por descuido: no la tiene.
+    // El modelo TIENE que recibir ese null; si le llegara un texto vacío o un
+    // cero, lo contaría como un dato y estaría afirmando algo falso.
+    $luna = interno('ejecutar', 'datos_del_cuerpo', ['id' => 'luna']);
+    comprobar('el campo existe', array_key_exists('atmosfera', $luna['datos']), true);
+    comprobar('y vale null', $luna['datos']['atmosfera'], null);
+
+    // Tritón es el caso intermedio y el más delicado: SÍ tiene atmósfera y la
+    // fuente dice de qué está hecha, pero no publica proporciones. Así que los
+    // compuestos llegan con su porcentaje en null. Rellenarlos con una cifra
+    // recordada sería inventar un dato con apariencia de medida.
+    $triton = interno('ejecutar', 'datos_del_cuerpo', ['id' => 'triton']);
+    comprobar('Tritón declara sus compuestos', count($triton['datos']['atmosfera']['componentes']), 2);
+    foreach ($triton['datos']['atmosfera']['componentes'] as $c) {
+        comprobar(sprintf('%s de Tritón llega sin porcentaje', $c['compuesto']), $c['porcentaje'], null);
+    }
+    comprobar('y con su fuente', str_contains((string) $triton['datos']['atmosfera']['fuente'], 'Voyager 2'), true);
+
+    // Y Titán, que sí tiene cifras publicadas, llega con ellas.
     $titan = interno('ejecutar', 'datos_del_cuerpo', ['id' => 'titan']);
-    comprobar('el campo existe', array_key_exists('atmosfera', $titan['datos']), true);
-    comprobar('y vale null', $titan['datos']['atmosfera'], null);
+    comprobar('Titán sí trae porcentajes', $titan['datos']['atmosfera']['componentes'][0]['porcentaje'], 95);
 }
 
 echo "\n▸ Un cuerpo que no existe se rechaza en vez de improvisarse\n";
