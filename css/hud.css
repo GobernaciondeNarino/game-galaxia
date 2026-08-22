@@ -1011,6 +1011,17 @@ body[data-modulo="sistema"] .panel--charla { display: none; }
 .panel--entradas { display: grid; gap: var(--e-2); }
 .entradas__vista { position: relative; aspect-ratio: 4 / 3; background: #04070d; }
 .entradas__video, .entradas__esqueleto { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* La vista previa va REFLEJADA, y faltaba: la cámara frontal entrega la imagen
+   sin invertir, así que levantar la mano derecha la sacaba por el lado
+   izquierdo del recuadro. Todo lo demás ya daba por hecho el espejo —el
+   esqueleto se dibuja con `1 - x`, el cursor gestual también, y el giro de la
+   escena invierte el desplazamiento— de modo que el esqueleto naranja aparecía
+   en el lado contrario a la mano que lo generaba.
+
+   Se refleja el VÍDEO y no el lienzo: el lienzo ya viene reflejado desde el
+   código, y darle la vuelta otra vez lo dejaría al revés. */
+.entradas__video { transform: scaleX(-1); }
 .entradas__boton {
   display: flex;
   align-items: center;
