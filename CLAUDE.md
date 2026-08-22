@@ -77,4 +77,7 @@ para cualquier decisión de diseño de la HUD.
 
 ## Estado
 
-Fases 0 a 8 completadas, salvo la verificación manual en Safari. Ver el plan de fases en `README.md`.
+Las nueve fases completadas. Queda por comprobar a mano, y no se puede hacer
+en este contenedor: la pasada en **Safari y iPad** (el WebKit de Playwright no
+arranca aquí) y los **60 fps en hardware real** (aquí solo hay render por
+software). Ver el plan de fases en `README.md`.

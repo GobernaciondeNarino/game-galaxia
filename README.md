@@ -5,17 +5,22 @@ Interfaz holográfica e inmersiva del Sistema Solar completo, con navegación po
 íntegramente en el navegador y se despliega como estáticos sobre Apache: **sin
 paso de compilación, sin Node.js en producción y sin procesos en segundo plano**.
 
-> **Estado: fases 0 a 4 completadas.** Escena tridimensional navegable con el
-> Sol, los ocho planetas, cinco planetas enanos, diecinueve satélites, anillos,
-> cinturones y entorno galáctico; catálogo cuyas cifras proceden de JPL
-> Horizons; HUD completa en DOM con sus dos vistas, transición interrumpible,
-> anotaciones ancladas a la superficie y arco de datos; narración por audio con
-> subtítulos sincronizados; control por gestos con MediaPipe; control por voz con
-> parser tolerante a errores de transcripción; y la fase 8 de optimización, con
-> las dos escalas, nivel de detalle de texturas y pruebas cruzadas.
-> **Pendiente: una pasada manual en Safari** (ver
-> [`docs/RENDIMIENTO-Y-NAVEGADORES.md`](docs/RENDIMIENTO-Y-NAVEGADORES.md)).
-> Consulta el [plan de fases](#plan-de-fases).
+> **Estado: las nueve fases completadas.** Escena tridimensional navegable con
+> el Sol, los ocho planetas, cinco planetas enanos, diecinueve satélites,
+> anillos, cinturones y entorno galáctico; catálogo cuyas cifras proceden de
+> JPL Horizons; HUD completa en DOM con sus dos vistas, transición
+> interrumpible, anotaciones ancladas a la superficie y arco de datos;
+> narración por audio con subtítulos sincronizados; control por gestos con
+> MediaPipe; control por voz con parser tolerante a errores de transcripción;
+> optimización con las dos escalas y nivel de detalle de texturas; y un
+> asistente conversacional que responde preguntas libres sin inventarse un solo
+> dato. Consulta el [plan de fases](#plan-de-fases).
+>
+> **Queda por comprobar a mano**, y no se puede hacer aquí:
+> una pasada en **Safari y iPad** —el WebKit de Playwright no arranca en el
+> contenedor de desarrollo— y la medición de los **60 fps en hardware real**,
+> porque aquí solo hay render por software. Ver
+> [`docs/RENDIMIENTO-Y-NAVEGADORES.md`](docs/RENDIMIENTO-Y-NAVEGADORES.md).
 
 ---
 
@@ -234,9 +239,17 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 | 3 | HUD en DOM: elementos persistentes, `VISTA DE SISTEMA`, gráficos y tira de navegación | ✅ Completada |
 | 4 | `VISTA DE CUERPO`, transición interrumpible, `CameraRig`, anotaciones y arco de datos | ✅ Completada |
 | 5 | `api/tts.php` con caché y límite de peticiones; `Narrator.js` con subtítulos | ✅ Completada |
-| 6 | Control por manos con MediaPipe y todos los gestos | Pendiente |
-| 7 | Control por voz con parser de intenciones y alternativa vía `stt.php` | Pendiente |
-| 8 | Optimización, pruebas cruzadas de navegador y guía de despliegue | Pendiente |
+| 6 | Control por manos con MediaPipe y todos los gestos | ✅ Completada |
+| 7 | Control por voz con parser de intenciones y alternativa vía `stt.php` | ✅ Completada |
+| 8 | Optimización, pruebas cruzadas de navegador y guía de despliegue | ✅ Completada, salvo la pasada manual en Safari |
+| 9 | Asistente conversacional con herramientas, posiciones en vivo de JPL Horizons y navegación adaptada al móvil | ✅ Completada |
+
+La fase 9 no estaba en el plan original. Salió de usar la interfaz: el
+«asistente» de la fase 7 respondía una lista cerrada de preguntas, y lo que
+hacía falta era poder preguntar cualquier cosa. Entró con ella la consulta de
+posiciones en vivo a JPL Horizons, el calendario de lluvias de meteoros, las
+texturas reales de diecisiete cuerpos más, la barra fija de navegación del móvil
+y la hoja de comandos plegable.
 
 ---
 
