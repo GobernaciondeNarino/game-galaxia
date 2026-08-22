@@ -137,6 +137,142 @@
       "licencia": "Public domain",
       "urlLicencia": null,
       "fuente": "https://commons.wikimedia.org/wiki/File:Triton%20map%20no%20grid.jpg"
+    },
+    {
+      "archivo": "pluton.jpg",
+      "obra": "Pluto-map-sept-16-2015.jpg",
+      "autor": "NASA/JPL/SwRI",
+      "licencia": "CC BY-SA 4.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by-sa/4.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Pluto-map-sept-16-2015.jpg"
+    },
+    {
+      "archivo": "ceres.png",
+      "obra": "Map of Ceres (PIA19625 cropped).png",
+      "autor": "NASA",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Map%20of%20Ceres%20(PIA19625%20cropped).png"
+    },
+    {
+      "archivo": "europa.jpg",
+      "obra": "Moon Europa color map.jpg",
+      "autor": "Seek9750",
+      "licencia": "CC0",
+      "urlLicencia": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Moon%20Europa%20color%20map.jpg"
+    },
+    {
+      "archivo": "ganimedes.jpg",
+      "obra": "Map of Ganymede by Björn Jónsson.jpg",
+      "autor": "NASA (original photographies)/Björn Jónsson",
+      "licencia": "Attribution",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Map%20of%20Ganymede%20by%20Bj%C3%B6rn%20J%C3%B3nsson.jpg"
+    },
+    {
+      "archivo": "calisto.jpg",
+      "obra": "Callisto map NASA JPL Voyager.jpg",
+      "autor": "Caltech/JPL/USGS",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Callisto%20map%20NASA%20JPL%20Voyager.jpg"
+    },
+    {
+      "archivo": "mimas.jpg",
+      "obra": "Map of Mimas colorized 2014-04 PIA18437.jpg",
+      "autor": "NASA/JPL-Caltech/Space Science Institute/Lunar and Planetary Institute",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Map%20of%20Mimas%20colorized%202014-04%20PIA18437.jpg"
+    },
+    {
+      "archivo": "encelado.jpg",
+      "obra": "Color map of Enceladus PIA18435 (modified).jpg",
+      "autor": "NASA",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Color%20map%20of%20Enceladus%20PIA18435%20(modified).jpg"
+    },
+    {
+      "archivo": "rea.jpg",
+      "obra": "Rhea map NASA JPL Voyager.jpg",
+      "autor": "Caltech/JPL/USGS",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Rhea%20map%20NASA%20JPL%20Voyager.jpg"
+    },
+    {
+      "archivo": "japeto.jpg",
+      "obra": "Iapetus May 2008 PIA11116 moon only.jpg",
+      "autor": "Iapetus_May_2008_PIA11116.jpg: NASA/JPL/Space Science Institute derivative work: Ysogo (talk)",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Iapetus%20May%202008%20PIA11116%20moon%20only.jpg"
+    },
+    {
+      "archivo": "ariel.jpg",
+      "obra": "Ariel map JPL USGS.jpg",
+      "autor": "Caltech/JPL/USGS",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Ariel%20map%20JPL%20USGS.jpg"
+    },
+    {
+      "archivo": "umbriel.jpg",
+      "obra": "Umbriel map JPL USGS.jpg",
+      "autor": "Caltech/JPL/USGS",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Umbriel%20map%20JPL%20USGS.jpg"
+    },
+    {
+      "archivo": "titania.jpg",
+      "obra": "Titania map JPL USGS.jpg",
+      "autor": "Caltech/JPL/USGS",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Titania%20map%20JPL%20USGS.jpg"
+    },
+    {
+      "archivo": "oberon.jpg",
+      "obra": "Oberon map JPL USGS.jpg",
+      "autor": "Caltech/JPL/USGS",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Oberon%20map%20JPL%20USGS.jpg"
+    },
+    {
+      "archivo": "miranda.jpg",
+      "obra": "Miranda map JPL USGS.jpg",
+      "autor": "Caltech/JPL/USGS",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Miranda%20map%20JPL%20USGS.jpg"
+    },
+    {
+      "archivo": "caronte.jpg",
+      "obra": "Charon map iau1803c.jpg",
+      "autor": "NASA/Johns Hopkins University Applied Physics Laboratory/Southwest Research Institute",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Charon%20map%20iau1803c.jpg"
+    },
+    {
+      "archivo": "fobos.jpg",
+      "obra": "Phobos Viking Mosaic DLRcontrol 7200.jpg",
+      "autor": "Planetary Data System / Phil Stooke",
+      "licencia": "Public domain",
+      "urlLicencia": null,
+      "fuente": "https://commons.wikimedia.org/wiki/File:Phobos%20Viking%20Mosaic%20DLRcontrol%207200.jpg"
+    },
+    {
+      "archivo": "deimos.jpg",
+      "obra": "Deimos color map.jpg",
+      "autor": "Oleg-Pluton",
+      "licencia": "CC BY-SA 3.0",
+      "urlLicencia": "https://creativecommons.org/licenses/by-sa/3.0",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Deimos%20color%20map.jpg"
     }
   ]
 }

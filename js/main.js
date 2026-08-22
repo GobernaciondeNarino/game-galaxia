@@ -536,12 +536,49 @@ async function arrancar() {
     return datos;
   }
 
+  /**
+   * ¿Esto es una PREGUNTA disfrazada de orden de navegación?
+   *
+   * EL FALLO QUE ESTO ARREGLA
+   * ─────────────────────────
+   * El parser tiene una regla de reserva razonable: una frase que solo nombra
+   * un cuerpo significa «llévame ahí». La reconoce con confianza 0,90, frente
+   * al 1,00 de las órdenes escritas de verdad.
+   *
+   * El problema es que esa regla se tragaba las preguntas, porque una pregunta
+   * también nombra un cuerpo. «¿Cuál es el tamaño del Sol?» viajaba al Sol y se
+   * ponía a narrarlo en lugar de responder; y estando en Marte, «¿cuál es la
+   * distancia de Marte al Sol?» se iba al Sol —el cuerpo equivocado, además—.
+   * Medido: las dos frases daban «ir_a» con confianza 0,90.
+   *
+   * La regla nueva es estrecha a propósito: solo se le quita el turno a la
+   * REGLA DE RESERVA, nunca a una orden reconocida al 100 %. «Háblame de
+   * Marte» y «llévame a Júpiter» marcan 1,00 y siguen navegando; ninguna de
+   * las dos resuelve un atributo, así que tampoco entrarían aquí.
+   */
+  function esPreguntaDisfrazada(intencion) {
+    const debil = (intencion.confianza ?? 1) < 1;
+    if (!debil || !preguntas) return false;
+
+    const texto = intencion.transcripcion;
+    if (!texto || !Preguntas.pareceProbable(texto)) return false;
+
+    return Boolean(preguntas.interpretar(texto, App.estado.cuerpoActivo).atributo);
+  }
+
   function ejecutarIntencion(intencion) {
     const { intencion: tipo, cuerpo, cuerpoB } = intencion;
 
     switch (tipo) {
       case 'ir_a':
       case 'hablame_de':
+        // Antes de viajar: comprobar que no era una pregunta. Ir al cuerpo y
+        // narrarlo cuando se ha preguntado un dato concreto no solo no
+        // responde, sino que además tapa la respuesta con la narración.
+        if (esPreguntaDisfrazada(intencion)) {
+          intentarResponder(intencion.transcripcion);
+          break;
+        }
         if (cuerpo) seleccionar(cuerpo, 'voz');
         break;
 

@@ -92,7 +92,9 @@
      separan el panel de lo que hay detrás; sin ellos, sobre una textura clara
      el texto se apoyaría directamente en el planeta. */
   background: transparent;
-  border: 1px solid var(--panel-borde);
+  /* Sin borde: lo único que separa el panel de la escena es el desenfoque de
+     fondo y el filo luminoso de arriba. */
+  border: none;
   -webkit-backdrop-filter: blur(var(--panel-desenfoque));
   backdrop-filter: blur(var(--panel-desenfoque));
   clip-path: polygon(

@@ -728,11 +728,10 @@
         "fuente": "JPL Solar System Dynamics"
       },
       "render": {
-        "textura": null,
+        "textura": "assets/textures/pluton.jpg",
         "color": "#C8B49B",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: se representa con un color plano y la interfaz lo marca como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [
         {
@@ -769,11 +768,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/ceres.png",
         "color": "#8F8B84",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin cartografía disponible de este cuerpo: se representa con un color plano y la interfaz lo marca como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -802,7 +800,7 @@
         "color": "#CFCFC8",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "No existe cartografía de Eris; en Wikimedia hay texturas de este cuerpo, pero son invenciones artísticas y ORBIS no las usa."
+        "nota": "No existe cartografía de este cuerpo: ni el Hubble lo resuelve como algo más que un punto de luz. Las texturas que circulan son invenciones artísticas y ORBIS no las usa: color plano, marcado como SIMULACIÓN."
       },
       "anotaciones": [],
       "satelites": [],
@@ -831,7 +829,7 @@
         "color": "#C3A08A",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "No existe cartografía de Makemake; las texturas que circulan de este cuerpo son invenciones artísticas y ORBIS no las usa."
+        "nota": "No existe cartografía de este cuerpo: ni el Hubble lo resuelve como algo más que un punto de luz. Las texturas que circulan son invenciones artísticas y ORBIS no las usa: color plano, marcado como SIMULACIÓN."
       },
       "anotaciones": [],
       "satelites": [],
@@ -860,7 +858,7 @@
         "color": "#DDD8D0",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "No existe cartografía de Haumea; las texturas que circulan de este cuerpo son invenciones artísticas y ORBIS no las usa."
+        "nota": "No existe cartografía de este cuerpo: ni el Hubble lo resuelve como algo más que un punto de luz. Las texturas que circulan son invenciones artísticas y ORBIS no las usa: color plano, marcado como SIMULACIÓN."
       },
       "anotaciones": [],
       "satelites": [],
@@ -928,11 +926,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/fobos.jpg",
         "color": "#7A6E63",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -957,11 +954,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/deimos.jpg",
         "color": "#8A7E70",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -990,7 +986,7 @@
         "color": "#E8D26A",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "nota": "Ío está cartografiado por las Voyager y Galileo, pero en Commons no hay ningún mapa suyo en proporción 2:1, que es la única que envuelve una esfera sin deformarla. Color plano hasta encontrar uno."
       },
       "anotaciones": [],
       "satelites": [],
@@ -1019,11 +1015,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/europa.jpg",
         "color": "#C9BCA5",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1052,11 +1047,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/ganimedes.jpg",
         "color": "#9E9384",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1086,11 +1080,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/calisto.jpg",
         "color": "#6E6459",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1119,11 +1112,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/mimas.jpg",
         "color": "#B8B3AC",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1152,11 +1144,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/encelado.jpg",
         "color": "#F2F2F0",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1185,11 +1176,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/rea.jpg",
         "color": "#C4BFB6",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1275,11 +1265,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/japeto.jpg",
         "color": "#9D9285",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1308,11 +1297,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/ariel.jpg",
         "color": "#B9B4AE",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1337,11 +1325,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/umbriel.jpg",
         "color": "#6F6A66",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1366,11 +1353,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/titania.jpg",
         "color": "#B0A79E",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1395,11 +1381,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/oberon.jpg",
         "color": "#8E8479",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1424,11 +1409,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/miranda.jpg",
         "color": "#A8A29B",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],
@@ -1504,11 +1488,10 @@
       "atmosfera": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/caronte.jpg",
         "color": "#A39A93",
         "colorEtiqueta": "#4FC3F7",
-        "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN."
+        "anillos": null
       },
       "anotaciones": [],
       "satelites": [],

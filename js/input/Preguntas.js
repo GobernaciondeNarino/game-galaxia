@@ -96,20 +96,22 @@ export class Preguntas {
       const expresion = new RegExp(`(^|\\s)${patron.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`);
       if (!candidatos.some((c) => expresion.test(c))) continue;
 
-      // Hay patrones que llevan dentro el nombre de un cuerpo: «a que
-      // distancia esta del sol», «a que distancia esta de la tierra». Si la
-      // pregunta nombra ADEMÁS otro cuerpo —«a qué distancia está de la Tierra
-      // Titán»— el buscador se quedaba con el primero que aparece, que es el
-      // del patrón, y contestaba sobre la Tierra en vez de sobre Titán.
-      // Reconocido ya el atributo, esas palabras son suyas: se retiran y se
-      // vuelve a buscar en lo que queda.
-      const sujeto = this._cuerpoFueraDelPatron(limpio, expresion) ?? cuerpo;
+      // Hay patrones que llevan dentro el nombre de un cuerpo: «a que distancia
+      // esta del sol», «a que distancia esta de la tierra». Ese cuerpo es parte
+      // de la PREGUNTA, no su sujeto, y confundirlos hacía que «la distancia de
+      // Marte al Sol» se contestara sobre el Sol.
+      // Si el único cuerpo nombrado es el que el atributo se reserva —«a qué
+      // distancia está del Sol» estando en Marte— el sujeto es el del CONTEXTO,
+      // no ese. Caer aquí en `cuerpo` sería volver al fallo: `cuerpo` ya vale
+      // «sol» porque se decidió antes de saber qué atributo era.
+      const sujeto = this._sujetoDeLaPregunta(limpio, patron, datos.cuerpoImplicito ?? null)
+        ?? contexto;
 
       return {
         atributo,
         cuerpo: sujeto,
         etiqueta: datos.etiqueta,
-        porContexto: sujeto === contexto && porContexto,
+        porContexto: sujeto !== null && sujeto === contexto,
         confianza: 1,
         texto: limpio,
       };
@@ -141,16 +143,57 @@ export class Preguntas {
   }
 
   /**
-   * Busca un cuerpo en lo que queda de la frase al quitarle el patrón.
+   * Busca el SUJETO de la pregunta, saltando los cuerpos que nombra el patrón.
    *
-   * Devuelve null si ahí no hay ninguno, y entonces manda lo que se hubiera
-   * decidido antes: el cuerpo nombrado al principio o el del contexto.
+   * EL FALLO QUE ESTO ARREGLA
+   * ─────────────────────────
+   * «¿Cuál es la distancia de Marte al Sol?» contestaba sobre el SOL. El
+   * buscador se queda con el último cuerpo nombrado, y ahí el último es el Sol
+   * —pero el Sol no es el sujeto: es parte de la pregunta, porque «distancia»
+   * significa precisamente «distancia al Sol». Lo mismo pasaba con «a qué
+   * distancia está de la Tierra Titán».
+   *
+   * La regla es sencilla de decir: un cuerpo que ya está DENTRO del patrón
+   * reconocido no puede ser además el sujeto. Así que se mira qué cuerpos
+   * nombra el patrón y se busca entre los demás, aprovechando el `resto` que
+   * devuelve el propio buscador —la frase sin el cuerpo que acaba de encontrar—
+   * para seguir buscando hacia atrás.
+   *
+   * @param {string} texto     la frase normalizada
+   * @param {string} patron    el patrón del atributo que ha casado
+   * @param {string|null} implicito  cuerpo que el atributo lleva dentro
+   * @returns {string|null} el sujeto, o null si el patrón se los lleva todos
    */
-  _cuerpoFueraDelPatron(texto, expresion) {
-    const resto = texto.replace(expresion, ' ').replace(/\s+/g, ' ').trim();
-    if (!resto || !this.parser) return null;
-    const hallado = this.parser.buscarCuerpo(resto);
-    return hallado && hallado.confianza >= 0.72 ? hallado.id : null;
+  _sujetoDeLaPregunta(texto, patron, implicito = null) {
+    if (!this.parser) return null;
+
+    // Qué cuerpos NO pueden ser el sujeto. Dos procedencias:
+    //
+    //   · Los que nombra el patrón que ha casado. «a que distancia esta del
+    //     sol» se lleva el Sol.
+    //   · El que el atributo declara como implícito en data/preguntas.json.
+    //     Hace falta porque el patrón que casa muchas veces es el corto
+    //     —«distancia» a secas— y ese no nombra a nadie, aunque el atributo
+    //     signifique «distancia AL SOL». Sin esto, «la distancia de Marte al
+    //     Sol» se contestaba sobre el Sol.
+    const delPatron = new Set();
+    if (implicito) delPatron.add(implicito);
+
+    let enPatron = this.parser.buscarCuerpo(patron);
+    let vueltas = 0;
+    while (enPatron && enPatron.confianza >= 0.72 && vueltas++ < 3) {
+      delPatron.add(enPatron.id);
+      enPatron = enPatron.resto ? this.parser.buscarCuerpo(enPatron.resto) : null;
+    }
+
+    let hallado = this.parser.buscarCuerpo(texto);
+    vueltas = 0;
+    while (hallado && hallado.confianza >= 0.72 && vueltas++ < 4) {
+      if (!delPatron.has(hallado.id)) return hallado.id;
+      // Ese lo reclama el patrón: se sigue buscando en lo que queda.
+      hallado = hallado.resto ? this.parser.buscarCuerpo(hallado.resto) : null;
+    }
+    return null;
   }
 
   /**

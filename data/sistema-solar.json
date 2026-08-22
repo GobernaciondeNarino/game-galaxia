@@ -1361,14 +1361,13 @@
         "fuente": "JPL Solar System Dynamics"
       },
       "render": {
-        "textura": null,
+        "textura": "assets/textures/pluton.jpg",
         "color": "#C8B49B",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: se representa con un color plano y la interfaz lo marca como SIMULACIÓN.",
         "radioEscalado": 0.43188,
         "distanciaEscalada": 226.6,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [
         {
@@ -1459,14 +1458,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/ceres.png",
         "color": "#8F8B84",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin cartografía disponible de este cuerpo: se representa con un color plano y la interfaz lo marca como SIMULACIÓN.",
         "radioEscalado": 0.27152,
         "distanciaEscalada": 52.503,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -1553,7 +1551,7 @@
         "color": "#CFCFC8",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "No existe cartografía de Eris; en Wikimedia hay texturas de este cuerpo, pero son invenciones artísticas y ORBIS no las usa.",
+        "nota": "No existe cartografía de este cuerpo: ni el Hubble lo resuelve como algo más que un punto de luz. Las texturas que circulan son invenciones artísticas y ORBIS no las usa: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.42725,
         "distanciaEscalada": 305.84,
         "esSimulacion": true
@@ -1637,7 +1635,7 @@
         "color": "#C3A08A",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "No existe cartografía de Makemake; las texturas que circulan de este cuerpo son invenciones artísticas y ORBIS no las usa.",
+        "nota": "No existe cartografía de este cuerpo: ni el Hubble lo resuelve como algo más que un punto de luz. Las texturas que circulan son invenciones artísticas y ORBIS no las usa: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.335,
         "distanciaEscalada": 244.54,
         "esSimulacion": true
@@ -1717,7 +1715,7 @@
         "color": "#DDD8D0",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "No existe cartografía de Haumea; las texturas que circulan de este cuerpo son invenciones artísticas y ORBIS no las usa.",
+        "nota": "No existe cartografía de este cuerpo: ni el Hubble lo resuelve como algo más que un punto de luz. Las texturas que circulan son invenciones artísticas y ORBIS no las usa: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.35391,
         "distanciaEscalada": 237.15,
         "esSimulacion": true
@@ -1908,14 +1906,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/fobos.jpg",
         "color": "#7A6E63",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.06,
         "distanciaEscalada": 2.1428,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -1995,14 +1992,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/deimos.jpg",
         "color": "#8A7E70",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.06,
         "distanciaEscalada": 3.0134,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2090,7 +2086,7 @@
         "color": "#E8D26A",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
+        "nota": "Ío está cartografiado por las Voyager y Galileo, pero en Commons no hay ningún mapa suyo en proporción 2:1, que es la única que envuelve una esfera sin deformarla. Color plano hasta encontrar uno.",
         "radioEscalado": 0.29408,
         "distanciaEscalada": 13.005,
         "esSimulacion": true
@@ -2183,14 +2179,13 @@
       },
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/europa.jpg",
         "color": "#C9BCA5",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.27223,
         "distanciaEscalada": 15.428,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2281,14 +2276,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/ganimedes.jpg",
         "color": "#9E9384",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.35346,
         "distanciaEscalada": 18.153,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2378,14 +2372,13 @@
       },
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/calisto.jpg",
         "color": "#6E6459",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.33829,
         "distanciaEscalada": 21.732,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2475,14 +2468,13 @@
       },
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/mimas.jpg",
         "color": "#B8B3AC",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.097155,
         "distanciaEscalada": 9.3571,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2572,14 +2564,13 @@
       },
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/encelado.jpg",
         "color": "#F2F2F0",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.10945,
         "distanciaEscalada": 10.259,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2665,14 +2656,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/rea.jpg",
         "color": "#C4BFB6",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.19052,
         "distanciaEscalada": 13.786,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2888,14 +2878,13 @@
       },
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/japeto.jpg",
         "color": "#9D9285",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.18675,
         "distanciaEscalada": 24.907,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -2981,14 +2970,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/ariel.jpg",
         "color": "#B9B4AE",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.16579,
         "distanciaEscalada": 8.5037,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -3074,14 +3062,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/umbriel.jpg",
         "color": "#6F6A66",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.16662,
         "distanciaEscalada": 9.591,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -3167,14 +3154,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/titania.jpg",
         "color": "#B0A79E",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.19354,
         "distanciaEscalada": 11.364,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -3260,14 +3246,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/oberon.jpg",
         "color": "#8E8479",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.19014,
         "distanciaEscalada": 12.473,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -3353,14 +3338,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/miranda.jpg",
         "color": "#A8A29B",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.10578,
         "distanciaEscalada": 7.3638,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],
@@ -3561,14 +3545,13 @@
       "geologia": null,
       "satelitesConocidos": null,
       "render": {
-        "textura": null,
+        "textura": "assets/textures/caronte.jpg",
         "color": "#A39A93",
         "colorEtiqueta": "#4FC3F7",
         "anillos": null,
-        "nota": "Sin mapa fotográfico en el repositorio: color plano, marcado como SIMULACIÓN.",
         "radioEscalado": 0.16963,
         "distanciaEscalada": 2.4258,
-        "esSimulacion": true
+        "esSimulacion": false
       },
       "anotaciones": [],
       "satelites": [],

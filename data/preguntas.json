@@ -143,7 +143,8 @@
         "cuanto dista del sol",
         "distancia al sol",
         "distancia"
-      ]
+      ],
+      "cuerpoImplicito": "sol"
     },
     "inclinacion": {
       "etiqueta": "inclinación del eje",
@@ -273,7 +274,9 @@
         "posicion actual",
         "efemerides",
         "se acerca o se aleja"
-      ]
+      ],
+      "cuerpoImplicito": "tierra"
     }
-  }
+  },
+  "notaCuerpoImplicito": "Cuerpo que forma parte del significado del atributo y que, por tanto, nunca es el sujeto de la pregunta. Sin esto, «la distancia de Marte al Sol» se contestaba sobre el Sol, porque el buscador se queda con el último cuerpo nombrado."
 }

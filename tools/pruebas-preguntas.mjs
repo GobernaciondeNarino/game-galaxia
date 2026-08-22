@@ -114,6 +114,41 @@ console.log('\n▸ El nombre del cuerpo puede ir EN MEDIO de la pregunta');
   }
 }
 
+console.log('\n▸ El cuerpo que el atributo lleva DENTRO no es el sujeto');
+{
+  // Los dos casos que se reportaron desde la interfaz, tal cual:
+  //
+  //   «¿Cuál es el tamaño del Sol?» viajaba al Sol y se ponía a narrarlo.
+  //   «¿Cuál es la distancia de Marte al Sol?», estando en Marte, contestaba
+  //   sobre el SOL, que además es el cuerpo equivocado.
+  //
+  // El segundo es más sutil: «distancia» significa «distancia AL SOL», así que
+  // el Sol forma parte de la pregunta y no puede ser su sujeto. Igual pasa con
+  // «posicion», que es siempre respecto a la Tierra. Se declara en
+  // data/preguntas.json con «cuerpoImplicito» y se comprueba aquí.
+  const casos = [
+    ['cuál es el tamaño del sol', null, 'tamano', 'sol'],
+    ['cuál es la distancia de marte al sol', 'marte', 'distancia', 'marte'],
+    ['a qué distancia está del sol', 'marte', 'distancia', 'marte'],
+    ['a qué distancia está de la tierra', 'marte', 'posicion', 'marte'],
+    ['a qué distancia está del sol Neptuno', null, 'distancia', 'neptuno'],
+    ['a qué distancia está de la tierra Titán', null, 'posicion', 'titan'],
+    // Y sin contexto ni cuerpo propio, no hay sujeto: mejor null que el Sol.
+    ['a qué distancia está del sol', null, 'distancia', null],
+  ];
+  for (const [frase, ctx, atributo, cuerpo] of casos) {
+    const r = preguntas.interpretar(frase, ctx);
+    comprobar(`«${frase}»${ctx ? ` (en ${ctx})` : ''} → atributo`, r.atributo, atributo);
+    comprobar(`«${frase}»${ctx ? ` (en ${ctx})` : ''} → cuerpo`, r.cuerpo, cuerpo);
+  }
+
+  // El cuerpo implícito solo se descarta cuando hay alternativa: preguntar por
+  // el tamaño del Sol tiene que seguir contestando sobre el Sol.
+  comprobar('«cuánto pesa el sol» sigue siendo del Sol', preguntas.interpretar('cuánto pesa el sol').cuerpo, 'sol');
+  comprobar('«qué temperatura tiene la tierra» sigue siendo de la Tierra',
+    preguntas.interpretar('qué temperatura tiene la tierra').cuerpo, 'tierra');
+}
+
 console.log('\n▸ El cuerpo puede quedar implícito');
 {
   // «¿y su masa?» mirando Júpiter pregunta por Júpiter. Es como habla la gente.

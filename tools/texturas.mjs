@@ -55,6 +55,35 @@ const CATALOGO = [
   // automáticamente porque no envuelve correctamente una esfera.
   { archivo: 'titan.jpg',          titulo: 'Titan map April 2011 full.png',                    ancho: 2048 },
   { archivo: 'triton.jpg',         titulo: 'Triton map no grid.jpg',                           ancho: 2048 },
+
+  // Cuerpos que se dibujaban con un color plano por no tener aquí su mapa, no
+  // por no existir. La nota decía «sin mapa fotográfico EN EL REPOSITORIO», que
+  // es muy distinto de «no hay»: a Plutón lo cartografió New Horizons, a Ceres
+  // la sonda Dawn, a las lunas de Júpiter y Saturno las Voyager, Galileo y
+  // Cassini, y a las de Urano la Voyager 2. Se prefieren los archivos con
+  // atribución explícita de NASA, JPL, USGS o número PIA.
+  { archivo: 'pluton.jpg',         titulo: 'Pluto-map-sept-16-2015.jpg',                       ancho: 2048 },
+  { archivo: 'ceres.png',          titulo: 'Map of Ceres (PIA19625 cropped).png',              ancho: 2048 },
+  { archivo: 'europa.jpg',         titulo: 'Moon Europa color map.jpg',                        ancho: 2048 },
+  { archivo: 'ganimedes.jpg',      titulo: 'Map of Ganymede by Björn Jónsson.jpg',             ancho: 1800 },
+  { archivo: 'calisto.jpg',        titulo: 'Callisto map NASA JPL Voyager.jpg',                ancho: 1440 },
+  { archivo: 'mimas.jpg',          titulo: 'Map of Mimas colorized 2014-04 PIA18437.jpg',      ancho: 2048 },
+  { archivo: 'encelado.jpg',       titulo: 'Color map of Enceladus PIA18435 (modified).jpg',   ancho: 2048 },
+  { archivo: 'rea.jpg',            titulo: 'Rhea map NASA JPL Voyager.jpg',                    ancho: 1440 },
+  { archivo: 'japeto.jpg',         titulo: 'Iapetus May 2008 PIA11116 moon only.jpg',          ancho: 2048 },
+  { archivo: 'ariel.jpg',          titulo: 'Ariel map JPL USGS.jpg',                           ancho: 1440 },
+  { archivo: 'umbriel.jpg',        titulo: 'Umbriel map JPL USGS.jpg',                         ancho: 1440 },
+  { archivo: 'titania.jpg',        titulo: 'Titania map JPL USGS.jpg',                         ancho: 1440 },
+  { archivo: 'oberon.jpg',         titulo: 'Oberon map JPL USGS.jpg',                          ancho: 1440 },
+  { archivo: 'miranda.jpg',        titulo: 'Miranda map JPL USGS.jpg',                         ancho: 1440 },
+  { archivo: 'caronte.jpg',        titulo: 'Charon map iau1803c.jpg',                          ancho: 2048 },
+  { archivo: 'fobos.jpg',          titulo: 'Phobos Viking Mosaic DLRcontrol 7200.jpg',         ancho: 2048 },
+  { archivo: 'deimos.jpg',         titulo: 'Deimos color map.jpg',                             ancho: 1264 },
+
+  // NO se añaden: Eris, Makemake y Haumea, porque de esos NO existe
+  // cartografía —son puntos de luz incluso para el Hubble— y lo único que
+  // circula son invenciones artísticas. Tampoco Ío: se buscó y en Commons no
+  // hay ningún mapa suyo en proporción 2:1, que es la que envuelve una esfera.
 ];
 
 /** Descarga con reintentos: Commons devuelve 429 con facilidad. */
