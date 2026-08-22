@@ -246,7 +246,13 @@ async function principal() {
     // Derivarlo en local arregla las dos cosas de una vez: mide de verdad 512
     // px —0,79 MB entre todos, cuatro veces y media menos en la carga inicial—
     // y ahorra una segunda descarga por textura.
-    if (FORZAR || !(await existe(rutaPequena))) {
+    // Los anillos NO tienen nivel ligero, y no por olvido: su textura es una
+    // tira radial con canal ALFA —es a la vez `map` y `alphaMap`— y el JPEG no
+    // guarda transparencia, así que reducirla dejaría los anillos como un
+    // rectángulo opaco. Rings.js carga siempre la completa, que pesa 30 kB.
+    if (esAnillo) {
+      console.log('    · sin nivel ligero: lleva canal alfa y se carga entera');
+    } else if (FORZAR || !(await existe(rutaPequena))) {
       console.log(`    ✓ nivel ligero · ${await reducir(rutaGrande, rutaPequena)}`);
     }
   }
