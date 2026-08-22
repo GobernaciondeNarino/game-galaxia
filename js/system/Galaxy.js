@@ -130,6 +130,44 @@ export class Galaxy {
       }),
     );
 
+    /**
+     * Estrellas redondas y no cuadradas.
+     *
+     * Un `THREE.Points` dibuja cada partícula como un CUADRADO —es un sprite
+     * alineado a la pantalla— y a tamaños pequeños no se nota, pero en cuanto
+     * la cámara se acerca al disco se ven miles de cuadraditos. Ninguna
+     * estrella se ve así.
+     *
+     * Hay dos formas de arreglarlo. La habitual es darle una textura circular
+     * al material, pero eso significa otro archivo que servir, otra textura que
+     * liberar y una petición más en el arranque. La otra es descartar en el
+     * shader los píxeles que caen fuera del círculo, que es lo que se hace
+     * aquí: `gl_PointCoord` va de 0 a 1 dentro del sprite, así que la distancia
+     * a su centro dice si el píxel está dentro del disco o en la esquina.
+     *
+     * Y de paso el borde se difumina en lugar de cortarse en escalón: con
+     * `smoothstep` la estrella se apaga hacia fuera, que además de verse mejor
+     * evita el dentado de un recorte duro. Sin capa extra ni textura que cargar.
+     */
+    const ANCLA = '#include <premultiplied_alpha_fragment>';
+    material.onBeforeCompile = (parametros) => {
+      // Si un día three.js renombra ese fragmento, `replace` no encontraría
+      // nada, no fallaría, y las estrellas volverían a salir cuadradas sin que
+      // se rompiera absolutamente nada. Un fallo silencioso de manual. Por eso
+      // se comprueba y se deja constancia en userData: la prueba lo mira ahí.
+      if (!parametros.fragmentShader.includes(ANCLA)) {
+        material.userData.redondeado = false;
+        return;
+      }
+      parametros.fragmentShader = parametros.fragmentShader.replace(ANCLA, `
+        float distanciaAlCentro = length(gl_PointCoord - vec2(0.5));
+        if (distanciaAlCentro > 0.5) discard;
+        gl_FragColor.a *= smoothstep(0.5, 0.28, distanciaAlCentro);
+        ${ANCLA}
+      `);
+      material.userData.redondeado = true;
+    };
+
     const puntos = new THREE.Points(geometria, material);
     puntos.name = 'disco-galactico';
     // El Sistema Solar está en el brazo de Orión, a unos 26.000 años luz del
