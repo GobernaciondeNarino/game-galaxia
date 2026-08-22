@@ -183,11 +183,40 @@ const FRAGMENT_SUPERFICIE = /* glsl */ `
     vec3 pGirado = vPosicion;
     float ritmoLatitud = omega / OMEGA_A;
 
+    // --- Flujo del plasma ----------------------------------------------------
+    // Las celdas ya nacían y se deshacían en su sitio, pero no SE MOVÍAN: la
+    // superficie hervía sin correr. Al plasma real le pasan las dos cosas a la
+    // vez, porque el gas que sube en el centro de una celda se derrama hacia
+    // los lados y arrastra lo que tiene alrededor.
+    //
+    // Eso se consigue deformando el punto de muestreo con un campo de baja
+    // frecuencia —domain warping—: no se desplaza la textura, se dobla el
+    // espacio donde se evalúa el ruido. La diferencia importa, y es la misma
+    // razón por la que no se cizalla el mapa unas líneas más arriba: un
+    // desplazamiento acumula y acaba en cinta transportadora, mientras que este
+    // campo se genera con mezclaTemporal y por tanto también evoluciona EN SU
+    // SITIO. Por muy larga que sea la sesión, nada se arrastra sin límite.
+    //
+    // La amplitud es deliberadamente pequeña. A 0,12 los gránulos se estiran y
+    // se escurren unos sobre otros; subiéndola, la superficie empieza a
+    // ondularse como agua y deja de parecer una estrella.
+    float ritmoFlujo = tiempo * 0.006 * ritmoLatitud;
+    vec3 flujo = vec3(
+      mezclaTemporal(pGirado * 0.28 + vec3(5.2, 1.3, 0.0), ritmoFlujo, 1),
+      mezclaTemporal(pGirado * 0.28 + vec3(0.0, 5.2, 1.3), ritmoFlujo, 1),
+      mezclaTemporal(pGirado * 0.28 + vec3(1.3, 0.0, 5.2), ritmoFlujo, 1)
+    ) - 0.5;
+
+    // La supergranulación se deforma menos que la granulación: las celdas
+    // grandes son las que empujan, no las empujadas.
+    vec3 pSuper = pGirado + flujo * 0.05;
+    vec3 pGrano = pGirado + flujo * 0.12;
+
     // --- Dos escalas de convección ------------------------------------------
     // Supergranulación: grande y lenta.
-    float super_ = mezclaTemporal(pGirado * 0.45, tiempo * 0.012 * ritmoLatitud, 1);
+    float super_ = mezclaTemporal(pSuper * 0.45, tiempo * 0.012 * ritmoLatitud, 1);
     // Granulación: fina y bastante más rápida.
-    float grano = mezclaTemporal(pGirado * 3.1, tiempo * 0.09 * ritmoLatitud, 2);
+    float grano = mezclaTemporal(pGrano * 3.1, tiempo * 0.09 * ritmoLatitud, 2);
 
     // Los surcos entre celdas son estrechos y oscuros; los centros, anchos y
     // brillantes. Elevar a una potencia mayor que uno aprieta los oscuros
