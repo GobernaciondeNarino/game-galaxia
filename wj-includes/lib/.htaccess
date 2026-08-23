@@ -1,0 +1,7 @@
+# Clases internas del backend: se incluyen desde wj-includes/api/, nunca son
+# puntos de entrada HTTP.
+Require all denied
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

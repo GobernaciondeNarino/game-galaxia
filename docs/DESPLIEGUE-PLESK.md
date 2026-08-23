@@ -10,7 +10,7 @@ Node.js en el servidor, sin acceso root y sin procesos en segundo plano.
 | Requisito | Valor | Cómo comprobarlo |
 |---|---|---|
 | PHP | 8.1 o superior | Plesk → *Dominios* → **Configuración de PHP** |
-| Extensión `curl` | activada | `api/health.php` la comprueba |
+| Extensión `curl` | activada | `wj-includes/api/health.php` la comprueba |
 | Extensión `json` | activada | idem |
 | Extensión `openssl` | activada | idem |
 | `allow_url_fopen` | no es necesario | ORBIS usa `curl`, no `file_get_contents` remoto |
@@ -31,9 +31,9 @@ Las copias locales de las librerías y las tipografías se generan en tu equipo,
 no en el servidor. En una carpeta de trabajo con Node.js instalado:
 
 ```bash
-node tools/vendor.mjs three       # vendor/three/  (~450 kB)
-node tools/vendor.mjs fuentes     # assets/fonts/  (~140 kB) + css/fuentes.css
-node tools/vendor.mjs mediapipe   # vendor/mediapipe/ + assets/models/ (~15 MB)
+node tools/vendor.mjs three       # wj-includes/externos/three/  (~450 kB)
+node tools/vendor.mjs fuentes     # wj-content/assets/fonts/  (~140 kB) + css/fuentes.css
+node tools/vendor.mjs mediapipe   # wj-includes/externos/mediapipe/ + wj-content/assets/models/ (~15 MB)
 node tools/csp-hash.mjs           # sincroniza el hash CSP del importmap
 ```
 
@@ -59,7 +59,7 @@ Plesk → *Dominios* → **Git** → *Añadir repositorio*:
 - Ruta de despliegue: `httpdocs`
 - Modo: *Despliegue automático*
 
-`vendor/`, `assets/fonts/` y `assets/models/` están versionados, así que llegan
+`vendor/`, `wj-content/assets/fonts/` y `wj-content/assets/models/` están versionados, así que llegan
 con el repositorio: los dos modelos de MediaPipe —`hand_landmarker.task` (7,8 MB)
 y `face_landmarker.task` (3,8 MB)— incluidos. No hay que subir nada por FTP.
 
@@ -73,12 +73,12 @@ Sube **todo** el árbol respetando la estructura. Comprueba especialmente que
 llegan los archivos ocultos, que muchos clientes FTP esconden por omisión:
 
 ```
-.htaccess          config/.htaccess          cache/.htaccess
-api/lib/.htaccess  api/logs/.htaccess
+.htaccess          el .htaccess raíz          cache/.htaccess
+wj-includes/lib/.htaccess  wj-content/logs/.htaccess
 ```
 
 **Si `.htaccess` no llega, la página funciona pero queda sin HTTPS forzado, sin
-CSP y con `config/` accesible.** Es el error de despliegue más frecuente.
+CSP y con `wj-config.php` accesible.** Es el error de despliegue más frecuente.
 
 ---
 
@@ -141,7 +141,7 @@ El propietario debe ser el usuario del suscriptor de Plesk (habitualmente el
 mismo con el que corre PHP-FPM). Desde el *Administrador de archivos* de Plesk
 esto ya se respeta; por FTP con otro usuario, no siempre.
 
-Verificación rápida: `api/health.php` marca `cache_audio` en verde solo si la
+Verificación rápida: `wj-includes/api/health.php` marca `cache_audio` en verde solo si la
 carpeta es realmente escribible por PHP.
 
 ---
@@ -155,9 +155,9 @@ el navegador jamás**: los lee PHP en el servidor y ahí se quedan.
 ### 5.1 El archivo de configuración
 
 ```bash
-cp config/secrets.example.php config/secrets.php
-# edita config/secrets.php y rellena lo que necesites
-chmod 640 config/secrets.php
+cp wj-config-ejemplo.php wj-config.php
+# edita wj-config.php y rellena lo que necesites
+chmod 640 wj-config.php
 ```
 
 En el *Administrador de archivos* de Plesk: duplicar `secrets.example.php` y
@@ -174,7 +174,7 @@ https://tu-dominio/config/secrets.php   →  debe devolver 403
 ```
 
 Si devuelve una página en blanco o el contenido del archivo, detén el
-despliegue y revisa `config/.htaccess` y que `AllowOverride` esté habilitado.
+despliegue y revisa `el .htaccess raíz` y que `AllowOverride` esté habilitado.
 
 ### 5.2 Alternativa para las claves: variables de entorno
 
@@ -187,7 +187,7 @@ despliegue por FTP.
 
 > **La variable de entorno GANA al archivo.** Si defines las dos, el archivo se
 > ignora en silencio. Es la causa número uno de «he cambiado la voz y suena
-> igual»; `api/health.php` dice de dónde sale cada valor precisamente por eso.
+> igual»; `wj-includes/api/health.php` dice de dónde sale cada valor precisamente por eso.
 
 > Con PHP-FPM puede hacer falta reiniciar el *pool* del dominio para que las
 > variables se apliquen (Plesk lo ofrece en la misma pantalla).
@@ -199,7 +199,7 @@ despliegue por FTP.
 | `ELEVENLABS_API_KEY` | Narración hablada y dictado por voz | Narra la voz del navegador, bastante peor |
 | `ELEVENLABS_VOICE_ID` | **Código de la voz** de ORBIS | `lE5ZJB6jGeeuvSNxOvs2`, la voz de ORBIS |
 | `ELEVENLABS_MODEL_ID` | Modelo de síntesis | `eleven_multilingual_v2` |
-| `ELEVENLABS_VOCES_PERMITIDAS` | Voces que `api/tts.php` acepta, separadas por comas | Solo la voz activa |
+| `ELEVENLABS_VOCES_PERMITIDAS` | Voces que `wj-includes/api/tts.php` acepta, separadas por comas | Solo la voz activa |
 | `ELEVENLABS_STT_MODEL` | Modelo de transcripción | `scribe_v1` |
 | `ANTHROPIC_API_KEY` | **Asistente conversacional** | El asistente no conversa; las preguntas del catálogo se siguen respondiendo |
 | `ORBIS_MODELO` | Modelo del asistente | `claude-opus-5` |
@@ -231,7 +231,7 @@ presupuesto: revísalos con la factura de las dos APIs delante. Poner un cero
 desactiva ese techo.
 
 `ORBIS_SAL_LIMITES` merece un minuto: los topes cuentan por visitante y ORBIS
-guarda un **hash** de la IP en lugar de la IP, para que en `cache/limites/` no
+guarda un **hash** de la IP en lugar de la IP, para que en `wj-content/cache/limites/` no
 quede una lista de quién ha entrado. Un hash sin sal propia se puede deshacer
 probando —solo hay unos pocos miles de millones de direcciones—, así que ponle
 algo tuyo: `head -c 32 /dev/urandom | base64`.
@@ -248,10 +248,10 @@ catálogo. Lo que se pierde es la voz sintetizada y la conversación libre.
    curl -H "xi-api-key: TU_CLAVE" https://api.elevenlabs.io/v1/voices
    ```
 2. Ponlo en `ELEVENLABS_VOICE_ID`.
-3. **Borra `cache/audio/`.** Los MP3 ya generados siguen ahí con la voz vieja y
+3. **Borra `wj-content/cache/audio/`.** Los MP3 ya generados siguen ahí con la voz vieja y
    se seguirían sirviendo tal cual. Es la segunda causa de «he cambiado la voz
    y suena igual».
-4. Confirma en `api/health.php`: la comprobación `voz_elevenlabs` dice el
+4. Confirma en `wj-includes/api/health.php`: la comprobación `voz_elevenlabs` dice el
    código activo **y de dónde sale**.
 
 Un identificador de voz es público —sin la clave de API no sirve para nada— así
@@ -263,7 +263,7 @@ Si una clave se ha visto alguna vez fuera del servidor —un correo, una captura
 un mensaje— dala por comprometida:
 
 1. Genera una nueva en el panel del proveedor y **revoca la anterior**.
-2. Cámbiala en la variable de entorno o en `config/secrets.php`.
+2. Cámbiala en la variable de entorno o en `wj-config.php`.
 3. `https://tu-dominio/api/health.php?red=1` para confirmar que la nueva vale.
 
 No hay que tocar nada más: la caché de audio sigue sirviendo, porque lo que
@@ -296,10 +296,10 @@ En este orden:
    ```
    Debe devolver JSON con un campo `texto`. Un **503** con
    `asistente_no_configurado` significa que falta `ANTHROPIC_API_KEY` o la
-   carpeta `api/vendor`; `api/health.php` distingue cuál de las dos.
+   carpeta `wj-includes/vendor`; `wj-includes/api/health.php` distingue cuál de las dos.
 
    Y comprueba lo que de verdad importa: que la cifra que responda **coincida
-   con `data/sistema-solar.json`**. El asistente no responde de memoria, cada
+   con `wj-content/data/sistema-solar.json`**. El asistente no responde de memoria, cada
    dato se lo devuelve una herramienta leyendo el catálogo. Si alguna vez
    contesta algo que no está ahí, es un fallo grave, no un detalle.
 
@@ -326,26 +326,26 @@ En este orden:
 | Síntoma | Causa habitual | Solución |
 |---|---|---|
 | `Failed to load module script … MIME type of "text/plain"` | Apache no reconoce `.js` o `.mjs` | Falta `.htaccess`, o `AllowOverride None`. Pide a soporte `AllowOverride All` en el vhost |
-| `Failed to resolve module specifier "three"` | `vendor/three/` no llegó al servidor | Vuelve a subir la carpeta completa |
+| `Failed to resolve module specifier "three"` | `wj-includes/externos/three/` no llegó al servidor | Vuelve a subir la carpeta completa |
 | Todo devuelve 404 y las rutas apuntan al directorio *padre* | Se visitó la URL sin barra final y Apache no redirigió | Comprueba `DirectorySlash On` y que `.htaccess` llegó; entra con la barra final |
 | El `importmap` busca en `/vendor/` en vez de en el subdirectorio | Alguien cambió las rutas del `importmap` a absolutas | Vuelve a `./vendor/…` y ejecuta `node tools/csp-hash.mjs` |
-| La pantalla de arranque se queda en «Comprobando datos del sistema» | `data/sistema-solar.json` no legible o con JSON inválido | Revisa permisos (644) y valida el JSON |
-| `cache_audio: escritura denegada` | Propietario o permisos incorrectos | `chmod 775 cache/audio` con el propietario correcto |
+| La pantalla de arranque se queda en «Comprobando datos del sistema» | `wj-content/data/sistema-solar.json` no legible o con JSON inválido | Revisa permisos (644) y valida el JSON |
+| `cache_audio: escritura denegada` | Propietario o permisos incorrectos | `chmod 775 wj-content/cache/audio` con el propietario correcto |
 | El navegador bloquea el importmap (`Refused to execute inline script`) | El hash de la CSP no coincide con `index.html` | `node tools/csp-hash.mjs` y vuelve a subir `.htaccess` |
 | La cámara no arranca | Sin HTTPS, o falta `Permissions-Policy` | Activa el certificado; comprueba que `.htaccess` llegó |
-| Un modelo da 404 | `hand_landmarker.task` o `face_landmarker.task` no llegaron al servidor | `node tools/vendor.mjs mediapipe` y comprueba que `assets/models/` se desplegó entero |
+| Un modelo da 404 | `hand_landmarker.task` o `face_landmarker.task` no llegaron al servidor | `node tools/vendor.mjs mediapipe` y comprueba que `wj-content/assets/models/` se desplegó entero |
 | El guiño no funciona pero las manos sí | falta `face_landmarker.task`; se avisa en el panel de entradas | mismo remedio; entretanto, el puño y la voz siguen deteniendo la narración |
 | Error 500 en `api/*.php` | Versión de PHP o extensión ausente | Mira el registro de errores del dominio en Plesk |
-| El asistente responde 503 `asistente_no_configurado` | Falta `ANTHROPIC_API_KEY`, o falta `api/vendor/` | `api/health.php` dice cuál de las dos: mira `clave_anthropic` y `sdk_anthropic` |
-| Se cambió la voz y sigue sonando la anterior | Una variable de entorno gana al archivo, o la caché sirve los MP3 viejos | `api/health.php` → `voz_elevenlabs` dice el origen; luego borra `cache/audio/` |
-| El asistente responde por escrito pero no se le oye | `cache/respuestas/` no escribible | `api/health.php` → `cache_respuestas`; `chmod 775` con el propietario correcto |
-| Las preguntas de posición tardan mucho | `cache/efemerides/` no escribible: se llama a JPL en cada una | `api/health.php` → `cache_efemerides` |
-| Los topes de gasto no se aplican | `cache/limites/` no escribible: sin contadores no hay límite | `api/health.php` → `cache_limites`. **Revísalo antes de abrir al público** |
+| El asistente responde 503 `asistente_no_configurado` | Falta `ANTHROPIC_API_KEY`, o falta `wj-includes/vendor/` | `wj-includes/api/health.php` dice cuál de las dos: mira `clave_anthropic` y `sdk_anthropic` |
+| Se cambió la voz y sigue sonando la anterior | Una variable de entorno gana al archivo, o la caché sirve los MP3 viejos | `wj-includes/api/health.php` → `voz_elevenlabs` dice el origen; luego borra `wj-content/cache/audio/` |
+| El asistente responde por escrito pero no se le oye | `wj-content/cache/respuestas/` no escribible | `wj-includes/api/health.php` → `cache_respuestas`; `chmod 775` con el propietario correcto |
+| Las preguntas de posición tardan mucho | `wj-content/cache/efemerides/` no escribible: se llama a JPL en cada una | `wj-includes/api/health.php` → `cache_efemerides` |
+| Los topes de gasto no se aplican | `wj-content/cache/limites/` no escribible: sin contadores no hay límite | `wj-includes/api/health.php` → `cache_limites`. **Revísalo antes de abrir al público** |
 
 ### Registros
 
 - Errores de PHP: Plesk → *Dominios* → **Registros**.
-- Errores propios de ORBIS: `api/logs/` (no accesible por HTTP).
+- Errores propios de ORBIS: `wj-content/logs/` (no accesible por HTTP).
 
 ---
 
@@ -360,7 +360,7 @@ node tools/csp-hash.mjs        # si tocaste el importmap
 cambios se ven sin vaciar la caché del navegador. `vendor/` y `assets/` van con
 caché de un año: si cambias una textura, cambia también su nombre de archivo.
 
-**Nunca hace falta borrar `cache/audio/`** salvo que edites el texto de una
+**Nunca hace falta borrar `wj-content/cache/audio/`** salvo que edites el texto de una
 narración: el nombre de cada MP3 es el hash del texto, la voz y el modelo, de
 modo que un texto nuevo genera un archivo nuevo y el antiguo queda huérfano.
 Un borrado periódico de huérfanos es opcional.
@@ -369,7 +369,7 @@ Un borrado periódico de huérfanos es opcional.
 
 Las 33 narraciones suman unos 33.000 caracteres. Se generan **una sola vez**,
 la primera vez que alguien visita cada cuerpo, y a partir de ahí se sirven de
-`cache/audio/`. El gasto en ElevenLabs no crece con las visitas, solo con los
+`wj-content/cache/audio/`. El gasto en ElevenLabs no crece con las visitas, solo con los
 textos: si editas una narración, esa —y solo esa— se vuelve a generar.
 
 El límite por IP (`LIMITE_GENERACIONES_HORA`, 30 por omisión) solo cuenta las
@@ -382,7 +382,7 @@ Recomendable si esperas visitas simultáneas el primer día: así nadie espera a
 que se sintetice.
 
 ```bash
-for id in $(php -r 'require "api/lib/Catalogo.php"; echo implode(" ", Catalogo::identificadores());'); do
+for id in $(php -r 'require "wj-includes/lib/Catalogo.php"; echo implode(" ", Catalogo::identificadores());'); do
   curl -s -o /dev/null -w "%{http_code} $id\n" "https://tu-dominio/api/tts.php?bodyId=$id"
   sleep 2
 done

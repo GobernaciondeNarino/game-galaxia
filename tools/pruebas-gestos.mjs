@@ -19,7 +19,7 @@
  *
  *   node tools/pruebas-gestos.mjs
  */
-import { GestureRecognizer, GESTO, PUNTO } from '../js/input/GestureRecognizer.js';
+import { GestureRecognizer, GESTO, PUNTO } from '../wj-includes/js/input/GestureRecognizer.js';
 
 /** Construye una mano con los dedos en las posiciones pedidas. */
 function mano({ x = 0.5, y = 0.5, escala = 0.12, dedos, pulgarJunto = false, plana = true }) {

@@ -8,7 +8,7 @@ cd "$RAIZ"
 
 # Rutas realmente servidas como estáticos (vendor/ son copias íntegras de
 # terceros y assets/fonts son binarios: se excluyen para no generar ruido).
-RUTAS=(index.html js css data assets/orbis.svg)
+RUTAS=(index.html wj-includes/js wj-includes/css wj-content/data wj-content/assets/orbis.svg wj-admin)
 
 # Patrones de credencial. sk_… es el formato de las claves de ElevenLabs;
 # sk-ant-… el de Anthropic; ghp_/github_pat_ los tokens de GitHub.

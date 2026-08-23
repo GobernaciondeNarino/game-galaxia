@@ -7,7 +7,7 @@
     "anthropic-ai/sdk": "*"
   },
   "config": {
-    "vendor-dir": "api/vendor",
+    "vendor-dir": "wj-includes/vendor",
     "optimize-autoloader": true
   }
 }

@@ -1,6 +1,0 @@
-# Nunca accesible por HTTP: aquí viven las claves de API.
-Require all denied
-<IfModule !mod_authz_core.c>
-  Order allow,deny
-  Deny from all
-</IfModule>

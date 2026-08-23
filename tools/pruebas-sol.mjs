@@ -31,7 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
-const fuente = readFileSync(join(RAIZ, 'js/system/Sun.js'), 'utf8');
+const fuente = readFileSync(join(RAIZ, 'wj-includes/js/system/Sun.js'), 'utf8');
 
 let fallos = 0;
 const comprobar = (nombre, real, esperado) => {

@@ -151,7 +151,7 @@ Basadas en diferencias conocidas del motor, no en suposiciones:
   se usa: sin el prefijo, los paneles de Safari salen opacos.
 - `MediaRecorder` con lista de formatos: Safari solo graba `audio/mp4`, Firefox
   no lo admite. Se prueba `webm` → `ogg` → `mp4` → `mpeg` y se usa el primero
-  disponible; `api/stt.php` acepta los cuatro. Sin esto, la ruta alternativa de
+  disponible; `wj-includes/api/stt.php` acepta los cuatro. Sin esto, la ruta alternativa de
   voz —que existe **precisamente para Safari**— habría fallado en Safari.
 - `webkitSpeechRecognition` y `webkitAudioContext` ya estaban contemplados.
 
@@ -159,7 +159,7 @@ Basadas en diferencias conocidas del motor, no en suposiciones:
 
 1. Que la escena arranca y que el buffer de profundidad logarítmico funciona.
 2. Que los paneles con `backdrop-filter` se ven translúcidos.
-3. Que la grabación en `audio/mp4` llega a `api/stt.php` y se transcribe.
+3. Que la grabación en `audio/mp4` llega a `wj-includes/api/stt.php` y se transcribe.
 4. Que el `importmap` se resuelve (debería, tras la corrección).
 
 ---

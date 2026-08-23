@@ -59,7 +59,7 @@ function contraste(frente, fondo) {
 
 /** Lee las fichas de diseño de css/nucleo.css. */
 async function leerFichas() {
-  const css = await readFile(join(RAIZ, 'css/nucleo.css'), 'utf8');
+  const css = await readFile(join(RAIZ, 'wj-includes/css/nucleo.css'), 'utf8');
   const bloque = css.match(/:root\s*\{([\s\S]*?)\}/);
   if (!bloque) throw new Error('No se encontró el bloque :root en css/nucleo.css');
 

@@ -4,7 +4,7 @@
  *
  * POR QUÉ EXISTE
  * ──────────────
- * `config/secrets.example.php` es lo ÚNICO que ve quien despliega. Si el código
+ * `wj-config-ejemplo.php` es lo ÚNICO que ve quien despliega. Si el código
  * empieza a leer una variable nueva y la plantilla no la menciona, esa variable
  * es invisible: nadie la va a configurar, y el fallo no se parecerá en nada a
  * su causa.
@@ -45,7 +45,7 @@ function comprobar(string $nombre, $real, $esperado): void
 function fuentesDelBackend(string $raiz): array
 {
     $encontrados = [];
-    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz . '/api'));
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz . '/wj-includes'));
     foreach ($it as $archivo) {
         $ruta = $archivo->getPathname();
         if (substr($ruta, -4) !== '.php' || strpos($ruta, '/vendor/') !== false) {
@@ -59,7 +59,7 @@ function fuentesDelBackend(string $raiz): array
 
 echo "\n▸ Toda variable que el código lee está en la plantilla\n";
 
-$plantilla = file_get_contents($raiz . '/config/secrets.example.php');
+$plantilla = file_get_contents($raiz . '/wj-config-ejemplo.php');
 preg_match_all("/^\s*'([A-Z0-9_]+)'\s*=>/m", $plantilla, $m);
 $documentadas = array_values(array_unique($m[1]));
 sort($documentadas);
@@ -98,7 +98,7 @@ echo "\n▸ La plantilla se puede cargar y devuelve un array\n";
 {
     // Un error de sintaxis aquí no rompe nada al desplegar —Config lo ignora en
     // silencio— y por eso mismo se tarda muchísimo en encontrar.
-    $cargado = require $raiz . '/config/secrets.example.php';
+    $cargado = require $raiz . '/wj-config-ejemplo.php';
     comprobar('devuelve un array', is_array($cargado), true);
     comprobar('con todas las claves', count($cargado), count($documentadas));
 }
@@ -106,20 +106,36 @@ echo "\n▸ La plantilla se puede cargar y devuelve un array\n";
 echo "\n▸ El archivo real está protegido por partida doble\n";
 {
     $gitignore = (string) file_get_contents($raiz . '/.gitignore');
-    comprobar('config/secrets.php está en .gitignore', strpos($gitignore, 'config/secrets.php') !== false, true);
+    comprobar('wj-config.php está en .gitignore', strpos($gitignore, 'wj-config.php') !== false, true);
 
-    $htaccess = (string) @file_get_contents($raiz . '/config/.htaccess');
-    comprobar('config/ está denegado por Apache', strpos($htaccess, 'Require all denied') !== false, true);
+    $htaccess = (string) @file_get_contents($raiz . '/.htaccess');
+    comprobar('wj-config.php está denegado por Apache', strpos($htaccess, 'FilesMatch "^wj-config') !== false, true);
 
-    // El SDK de Anthropic vive bajo api/, que sí se sirve. Sin su propio
-    // .htaccess, sus 2.339 archivos quedan accesibles por HTTP.
-    $vendor = (string) @file_get_contents($raiz . '/api/vendor/.htaccess');
-    comprobar('api/vendor/ también', strpos($vendor, 'Require all denied') !== false, true);
+    // Las clases del backend y el SDK de Anthropic viven bajo wj-includes, que
+    // sí se sirve: de ahí salen js/, css/, externos/ y los endpoints. Sin su
+    // propio .htaccess, los más de dos mil .php del SDK quedan accesibles por
+    // HTTP, y enumerarlos revela la versión exacta de cada librería.
+    foreach (['lib', 'vendor'] as $privada) {
+        $h = (string) @file_get_contents($raiz . '/wj-includes/' . $privada . '/.htaccess');
+        comprobar(
+            sprintf('wj-includes/%s/ está denegado', $privada),
+            strpos($h, 'Require all denied') !== false,
+            true
+        );
+    }
+
+    // Y la regla del .htaccess raíz: la segunda cerradura, por si el hosting no
+    // honra los .htaccess de subdirectorio.
+    comprobar(
+        'y también desde la raíz',
+        strpos($htaccess, 'RewriteRule ^wj-includes/(lib|vendor)/') !== false,
+        true
+    );
 
     // cache/ guarda el audio ya pagado, las respuestas del asistente y los
     // contadores por IP. Apache hereda la directiva en los subdirectorios, así
     // que un solo .htaccess arriba los cubre a los cuatro.
-    $cache = (string) @file_get_contents($raiz . '/cache/.htaccess');
+    $cache = (string) @file_get_contents($raiz . '/wj-content/cache/.htaccess');
     comprobar('cache/ está denegado por Apache', strpos($cache, 'Require all denied') !== false, true);
 }
 
@@ -133,7 +149,7 @@ echo "\n▸ Los cuatro directorios de caché viajan en el repositorio\n";
     foreach (['audio', 'limites', 'efemerides', 'respuestas'] as $dir) {
         comprobar(
             sprintf('cache/%s existe y está marcado', $dir),
-            is_file($raiz . '/cache/' . $dir . '/.gitkeep'),
+            is_file($raiz . '/wj-content/cache/' . $dir . '/.gitkeep'),
             true
         );
     }
@@ -143,7 +159,7 @@ echo "\n▸ api/health.php informa de cada pieza configurable\n";
 {
     // Sin esto, el diagnóstico diría que todo está bien mientras el asistente
     // devuelve 503. Cada clave que se añada arriba tiene que verse aquí.
-    $salud = (string) file_get_contents($raiz . '/api/health.php');
+    $salud = (string) file_get_contents($raiz . '/wj-includes/api/health.php');
     foreach ([
         'clave_elevenlabs', 'voz_elevenlabs', 'clave_anthropic', 'sdk_anthropic',
         'modelo_asistente', 'cache_audio', 'cache_respuestas', 'cache_efemerides',
@@ -159,11 +175,11 @@ echo "\n▸ api/health.php NO filtra el valor de ninguna credencial\n";
     // esas claves en la salida. Es la única forma honesta de comprobarlo:
     // leyendo el código a ojo, un `var_dump` de depuración olvidado pasaría
     // desapercibido, y este diagnóstico es público.
-    $ruta = $raiz . '/config/secrets.php';
+    $ruta = $raiz . '/wj-config.php';
     if (is_file($ruta)) {
         // Nunca se pisa un archivo real: en un servidor, este archivo son LAS
         // claves de producción.
-        echo "  · omitida: ya existe un config/secrets.php y no se toca\n";
+        echo "  · omitida: ya existe un wj-config.php y no se toca\n";
     } else {
         $centinelas = [
             'ELEVENLABS_API_KEY' => 'CENTINELA-ELEVENLABS-NO-DEBE-SALIR',
@@ -172,7 +188,7 @@ echo "\n▸ api/health.php NO filtra el valor de ninguna credencial\n";
         ];
         file_put_contents($ruta, "<?php\nreturn " . var_export($centinelas, true) . ";\n");
 
-        $salida = (string) shell_exec(sprintf('php %s 2>&1', escapeshellarg($raiz . '/api/health.php')));
+        $salida = (string) shell_exec(sprintf('php %s 2>&1', escapeshellarg($raiz . '/wj-includes/api/health.php')));
         unlink($ruta);
 
         comprobar('la clave de ElevenLabs no aparece', strpos($salida, $centinelas['ELEVENLABS_API_KEY']) === false, true);

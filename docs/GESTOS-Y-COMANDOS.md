@@ -186,13 +186,13 @@ multiplicado la síntesis sin añadir nada.
 
 ### Una nota sobre la regla del texto
 
-`api/tts.php` nunca sintetiza texto que venga del navegador; el catálogo y las
+`wj-includes/api/tts.php` nunca sintetiza texto que venga del navegador; el catálogo y las
 frases los pone el servidor. El nombre es la única excepción, acotada a
 propósito: como mucho 24 caracteres, solo letras, espacios, apóstrofos y
 guiones, como mucho tres palabras, y siempre encajado dentro de una frase que
 escribe el servidor. Lo peor que se puede sintetizar así son veinticuatro letras
 dentro de una oración ajena, con el limitador por IP aplicándose igual. La
-validación está en `api/lib/Asistente.php` y `php tools/pruebas-asistente.php`
+validación está en `wj-includes/lib/Asistente.php` y `php tools/pruebas-asistente.php`
 comprueba todo lo que no debe colarse.
 
 ---

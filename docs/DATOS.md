@@ -1,4 +1,4 @@
-# Catálogo maestro · `data/sistema-solar.json`
+# Catálogo maestro · `wj-content/data/sistema-solar.json`
 
 Todo lo que la interfaz muestra como dato sale de este archivo. El código no
 contiene ni una sola cifra astronómica: así se pueden corregir los valores o
@@ -55,7 +55,7 @@ Es la regla más importante del proyecto.
   ],
 
   "render": {
-    "texturaDifusa": "assets/textures/jupiter.jpg",
+    "texturaDifusa": "wj-content/assets/textures/jupiter.jpg",
     "radioEscalado": 4.2,
     "anillos": null,
     "colorEtiqueta": "#E8A020"
@@ -76,7 +76,7 @@ Es la regla más importante del proyecto.
 
 | Campo | Obligatorio | Notas |
 |---|---|---|
-| `id` | sí | Minúsculas, sin tildes ni espacios. Es la clave en toda la aplicación y la valida `api/tts.php`. |
+| `id` | sí | Minúsculas, sin tildes ni espacios. Es la clave en toda la aplicación y la valida `wj-includes/api/tts.php`. |
 | `tipo` | sí | `estrella` · `planeta` · `planeta-enano` · `satelite` · `cinturon` |
 | `padre` | sí | `id` del cuerpo alrededor del que orbita. Los satélites orbitan su planeta, no el Sol. |
 | `fisica.*` | sí, con `null` donde falte | Unidades explícitas en el nombre del campo. |

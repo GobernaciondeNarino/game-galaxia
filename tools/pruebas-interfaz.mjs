@@ -38,10 +38,10 @@ const comprobar = (nombre, real, esperado) => {
   console.log(`  ${ok ? '✔' : '✘'} ${nombre}${ok ? '' : ` — esperado ${JSON.stringify(esperado)}, obtenido ${JSON.stringify(real)}`}`);
 };
 
-const hud = leer('js/ui/HUD.js');
-const main = leer('js/main.js');
-const cssHud = leer('css/hud.css');
-const cssResp = leer('css/responsive.css');
+const hud = leer('wj-includes/js/ui/HUD.js');
+const main = leer('wj-includes/js/main.js');
+const cssHud = leer('wj-includes/css/hud.css');
+const cssResp = leer('wj-includes/css/responsive.css');
 
 console.log('\n▸ Todo mando de la HUD llama a una acción que existe');
 {
@@ -69,7 +69,7 @@ console.log('\n▸ La escala se pide y se responde');
   // «modo real», el teclado también—: si no, afirma lo contrario de lo que pasa.
   comprobar('y se sincroniza con escena:escala', /escena:escala.*\n.*\n.*\n.*\n.*interruptorEscala\.checked = modo === 'real'/.test(hud), true);
   comprobar('el modo real cambia radios y semiejes de verdad',
-    /radioMedioKm \/ KM_POR_UNIDAD_REAL/.test(leer('js/system/SolarSystem.js')), true);
+    /radioMedioKm \/ KM_POR_UNIDAD_REAL/.test(leer('wj-includes/js/system/SolarSystem.js')), true);
 }
 
 console.log('\n▸ La vista previa de la cámara va reflejada, y solo una vez');
@@ -82,8 +82,8 @@ console.log('\n▸ La vista previa de la cámara va reflejada, y solo una vez');
   // dos veces lo devolvería a su sitio y volveríamos al fallo de partida.
   const reglasLienzo = [...cssHud.matchAll(/^[^\n{]*entradas__esqueleto[^\n{]*\{([^}]*)\}/gm)].map((m) => m[1]);
   comprobar('el lienzo no se refleja también', reglasLienzo.some((r) => /scaleX/.test(r)), false);
-  comprobar('el lienzo se dibuja ya reflejado', /const x = \(p\) => \(1 - p\.x\) \* ancho;/.test(leer('js/input/HandTracking.js')), true);
-  comprobar('y el cursor gestual, igual', /\(1 - estado\.cursor\.x\)/.test(leer('js/ui/CursorGestual.js')), true);
+  comprobar('el lienzo se dibuja ya reflejado', /const x = \(p\) => \(1 - p\.x\) \* ancho;/.test(leer('wj-includes/js/input/HandTracking.js')), true);
+  comprobar('y el cursor gestual, igual', /\(1 - estado\.cursor\.x\)/.test(leer('wj-includes/js/ui/CursorGestual.js')), true);
 }
 
 console.log('\n▸ La hoja de comandos existe solo en móvil');

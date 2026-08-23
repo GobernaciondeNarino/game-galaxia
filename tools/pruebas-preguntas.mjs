@@ -19,15 +19,15 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { Preguntas } from '../js/input/Preguntas.js';
-import { ParserIntenciones } from '../js/input/ParserIntenciones.js';
+import { Preguntas } from '../wj-includes/js/input/Preguntas.js';
+import { ParserIntenciones } from '../wj-includes/js/input/ParserIntenciones.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const leer = (r) => JSON.parse(readFileSync(join(RAIZ, r), 'utf8'));
 
-const catalogo = leer('data/sistema-solar.json').cuerpos;
-const parser = new ParserIntenciones(leer('data/comandos-voz.json'));
-const preguntas = new Preguntas(leer('data/preguntas.json'), catalogo, parser);
+const catalogo = leer('wj-content/data/sistema-solar.json').cuerpos;
+const parser = new ParserIntenciones(leer('wj-content/data/comandos-voz.json'));
+const preguntas = new Preguntas(leer('wj-content/data/preguntas.json'), catalogo, parser);
 
 let fallos = 0;
 const comprobar = (nombre, real, esperado) => {
@@ -199,7 +199,7 @@ console.log('\n▸ Cada atributo apunta a un campo que existe de verdad');
   const tierra = catalogo.find((c) => c.id === 'tierra');
   const leerRuta = (o, ruta) => ruta.split('.').reduce((v, k) => (v == null ? v : v[k]), o);
 
-  for (const [id, datos] of Object.entries(leer('data/preguntas.json').atributos)) {
+  for (const [id, datos] of Object.entries(leer('wj-content/data/preguntas.json').atributos)) {
     // Los campos con «$» no son rutas del catálogo: «$fuente» es del cuerpo
     // entero y «$horizons» no está en ningún archivo, se consulta en vivo.
     if (datos.campo.startsWith('$')) continue;

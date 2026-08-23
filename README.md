@@ -68,36 +68,59 @@ imports internos de cada addon de Three.js.
 
 ## Arquitectura
 
+Tres carpetas y una raíz limpia. La regla es la de WordPress y sirve por lo
+mismo: quien abre el proyecto sabe a la primera si lo que busca es **motor**,
+**contenido** o **administración**, sin conocer el proyecto.
+
 ```
-index.html          Cáscara: importmap, precargas y contenedores de la HUD
-.htaccess           HTTPS, MIME, compresión, caché, CSP y rutas privadas
-css/                fuentes · nucleo (reinicio + fichas de diseño) · hud
-                    animaciones · responsive
-js/
-  main.js           Arranque
-  core/             App (estado y bus) · Diagnostico · SceneManager · PostFX
-                    CameraRig · Loop
-  system/           SolarSystem · CelestialBody · Orbit · Sun · Rings
-                    AsteroidBelt · Galaxy
-  ui/               HUD · panels/ · Reticle · Subtitles
-  input/            HandTracking · GestureRecognizer · VoiceCommands
-                    FallbackControls
-  audio/            Narrator · SFX
-  utils/            dom · storage (memoria) · debug · math
-data/               sistema-solar.json (GENERADO, catálogo maestro)
-                    fisica-jpl.json (GENERADO desde Horizons)
-                    complementos.json · textos.json · comandos-voz.json
-assets/             textures · skybox · models · fonts · sfx
-api/                health.php · tts.php · stt.php · lib/
-config/             secrets.example.php (la copia real nunca se versiona)
-cache/audio/        MP3 generados, con nombre por hash
-vendor/             Three.js y MediaPipe, versión fijada
-tools/              vendor.mjs · texturas.mjs · datos-jpl.mjs
-                    construir-datos.mjs · contraste.mjs · csp-hash.mjs
-                    comprobar-secretos.sh · pruebas-gestos.mjs
-                    pruebas-voz.mjs
-docs/               Despliegue, gestos y comandos, notas técnicas
+index.html            Cáscara: importmap, precargas y contenedores de la HUD
+wj-config.php         Claves y ajustes del servidor. NUNCA se versiona
+wj-config-ejemplo.php La plantilla comentada de lo anterior
+.htaccess             HTTPS, MIME, compresión, caché, CSP y rutas privadas
+
+wj-admin/             Panel de configuración: https://dominio/wj-admin
+
+wj-includes/          EL MOTOR — nada de aquí es contenido
+  api/                Endpoints: health · tts · stt · chat · frase ·
+                      respuesta · meteoros
+  lib/                Clases PHP: Config · Cache · RateLimiter · Catalogo ·
+                      Respuestas · Asistente · Conversacion · Horizons ·
+                      Meteoros · Respuesta          (no se sirven por HTTP)
+  vendor/             Composer: SDK de Anthropic    (no se sirve por HTTP)
+  externos/           Three.js y MediaPipe, versión fijada
+  css/                fuentes · nucleo (reinicio + fichas) · hud ·
+                      animaciones · responsive
+  js/
+    main.js           Arranque
+    core/             App (estado y bus) · Diagnostico · SceneManager ·
+                      PostFX · CameraRig · Loop
+    system/           SolarSystem · CelestialBody · Orbit · Sun · Rings ·
+                      AsteroidBelt · Galaxy
+    ui/               HUD · panels/ · Reticula · Subtitulos
+    input/            HandTracking · GestureRecognizer · VoiceCommands ·
+                      Preguntas · FallbackControls
+    audio/            Narrator · SFX
+    utils/            dom · rutas · storage (memoria) · debug · math
+
+wj-content/           LO QUE EL SITIO TIENE Y GENERA
+  data/               sistema-solar.json (GENERADO, catálogo maestro)
+                      fisica-jpl.json (GENERADO desde Horizons)
+                      complementos.json · textos.json · comandos-voz.json ·
+                      preguntas.json · meteoros.json · asistente.json
+  assets/             textures · skybox · models · fonts · sfx
+  cache/              audio · efemerides · respuestas · limites
+  logs/               Registro propio del backend
+
+tools/                Solo desarrollo. Nunca se sirve
+docs/                 Despliegue, gestos y comandos, notas técnicas
 ```
+
+**Dónde vive cada ruta, y por qué solo ahí.** El mapa de carpetas está en dos
+sitios y en ninguno más: `Config::contenido()` e `Config::includes()` en el
+backend, y `rutaApi()`, `rutaDatos()`, `rutaMedios()` y `rutaExterna()` en el
+frontend. Ningún otro módulo escribe `wj-content/…` a mano. Antes había
+literales `'/data/…'` y `'/cache/…'` repartidos por todo el código, y mover una
+carpeta obligaba a buscarlos uno por uno con la garantía de dejarse alguno.
 
 ### Decisiones técnicas
 
@@ -196,22 +219,22 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 
 - **Ninguna credencial llega al navegador.** Las dos claves —`ELEVENLABS_API_KEY`
   para la voz y `ANTHROPIC_API_KEY` para el asistente— se leen de las variables
-  de entorno de Plesk o, en su defecto, de `config/secrets.php`, que está en
+  de entorno de Plesk o, en su defecto, de `wj-config.php`, que está en
   `.gitignore` y bloqueado por `.htaccess`. La plantilla comentada de los diez
-  valores configurables es [`config/secrets.example.php`](config/secrets.example.php);
+  valores configurables es [`wj-config-ejemplo.php`](wj-config-ejemplo.php);
   el procedimiento está en
   [`docs/DESPLIEGUE-PLESK.md` §5](docs/DESPLIEGUE-PLESK.md).
-- **`api/health.php` dice qué está configurado y de dónde sale**, nunca su
+- **`wj-includes/api/health.php` dice qué está configurado y de dónde sale**, nunca su
   valor. Existe porque el fallo más común no es una clave ausente sino una
   variable de entorno antigua ganándole en silencio al archivo que se acaba de
   editar.
-- **`api/tts.php` no acepta texto del cliente.** Recibe un `bodyId`, y el texto
-  que sintetiza lo toma de su propia copia de `data/sistema-solar.json`. Un
+- **`wj-includes/api/tts.php` no acepta texto del cliente.** Recibe un `bodyId`, y el texto
+  que sintetiza lo toma de su propia copia de `wj-content/data/sistema-solar.json`. Un
   endpoint que sintetizara el texto recibido sería una pasarela gratuita hacia
   una API de pago a costa del titular de la cuenta; así, el conjunto de textos
   posibles es finito, conocido y cacheable, y el gasto está acotado.
-- **`api/chat.php` tampoco sintetiza texto del cliente.** La respuesta del
-  asistente se guarda bajo un hash en `cache/respuestas/` y `api/tts.php` solo
+- **`wj-includes/api/chat.php` tampoco sintetiza texto del cliente.** La respuesta del
+  asistente se guarda bajo un hash en `wj-content/cache/respuestas/` y `wj-includes/api/tts.php` solo
   acepta ese hash: el endpoint de voz nunca dice lo que le manden.
 - **Dos límites en los tres endpoints de pago** —narración, transcripción y
   conversación—: uno por IP y hora, y un techo diario del sitio entero. El
@@ -237,12 +260,12 @@ carga se ha diseñado como un requisito, no como un ajuste posterior:
 
 | Fase | Entregable | Estado |
 |---|---|---|
-| 0 | Estructura, `index.html` con importmap, `.htaccess`, `api/health.php`, documentación inicial | ✅ Completada |
+| 0 | Estructura, `index.html` con importmap, `.htaccess`, `wj-includes/api/health.php`, documentación inicial | ✅ Completada |
 | 1 | Escena Three.js: Sol, ocho planetas, órbitas, skybox, controles de ratón, bloom | ✅ Completada |
 | 2 | `sistema-solar.json` con datos verificados, satélites, anillos y cinturón de asteroides | ✅ Completada |
 | 3 | HUD en DOM: elementos persistentes, `VISTA DE SISTEMA`, gráficos y tira de navegación | ✅ Completada |
 | 4 | `VISTA DE CUERPO`, transición interrumpible, `CameraRig`, anotaciones y arco de datos | ✅ Completada |
-| 5 | `api/tts.php` con caché y límite de peticiones; `Narrator.js` con subtítulos | ✅ Completada |
+| 5 | `wj-includes/api/tts.php` con caché y límite de peticiones; `Narrator.js` con subtítulos | ✅ Completada |
 | 6 | Control por manos con MediaPipe y todos los gestos | ✅ Completada |
 | 7 | Control por voz con parser de intenciones y alternativa vía `stt.php` | ✅ Completada |
 | 8 | Optimización, pruebas cruzadas de navegador y guía de despliegue | ✅ Completada, salvo la pasada manual en Safari |
@@ -273,4 +296,4 @@ y la hoja de comandos plegable.
 Código de ORBIS: Gobernación de Nariño.
 Three.js (MIT), MediaPipe Tasks Vision (Apache-2.0), Oswald y Hind Madurai
 (SIL OFL 1.1) y la skill `ui-ux-pro-max` (MIT) conservan sus respectivas
-licencias en `vendor/`, `assets/fonts/` y `.claude/skills/`.
+licencias en `vendor/`, `wj-content/assets/fonts/` y `.claude/skills/`.

@@ -29,7 +29,7 @@ import { fileURLToPath } from 'node:url';
 const ejecutar = promisify(execFile);
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
-const DESTINO = join(RAIZ, 'assets/textures');
+const DESTINO = join(RAIZ, 'wj-content/assets/textures');
 const FORZAR = process.argv.includes('--forzar');
 
 // Wikimedia exige un User-Agent identificable en su política de uso de la API.

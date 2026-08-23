@@ -12,7 +12,7 @@
  *
  *   node tools/pruebas-guino.mjs
  */
-import { ReconocedorGuino, ojosDesdeResultado, AJUSTES_GUINO } from '../js/input/ReconocedorGuino.js';
+import { ReconocedorGuino, ojosDesdeResultado, AJUSTES_GUINO } from '../wj-includes/js/input/ReconocedorGuino.js';
 
 let fallos = 0;
 const comprobar = (nombre, real, esperado) => {

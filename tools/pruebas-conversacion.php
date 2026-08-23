@@ -22,7 +22,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../api/lib/Conversacion.php';
+require_once __DIR__ . '/../wj-includes/lib/Conversacion.php';
 
 $fallos = 0;
 
@@ -127,7 +127,7 @@ echo "\n▸ Las herramientas devuelven los datos REALES del catálogo\n";
 {
     // El número sale del catálogo, no escrito a mano: si mañana se añade un
     // cuerpo, esta prueba tiene que seguir valiendo sin tocarla.
-    require_once __DIR__ . '/../api/lib/Catalogo.php';
+    require_once __DIR__ . '/../wj-includes/lib/Catalogo.php';
     $cuantos = count(Catalogo::identificadores());
     $lista = interno('ejecutar', 'listar_cuerpos', []);
     comprobar(sprintf('listar_cuerpos trae los %d del catálogo', $cuantos), count($lista['datos']), $cuantos);

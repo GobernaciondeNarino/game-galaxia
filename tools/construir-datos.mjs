@@ -146,9 +146,9 @@ const CINTURONES = [
 // ---------------------------------------------------------------------------
 
 async function principal() {
-  const fisicaJpl = await leerJson('data/fisica-jpl.json');
-  const complementos = await leerJson('data/complementos.json');
-  const textos = await leerJson('data/textos.json');
+  const fisicaJpl = await leerJson('wj-content/data/fisica-jpl.json');
+  const complementos = await leerJson('wj-content/data/complementos.json');
+  const textos = await leerJson('wj-content/data/textos.json');
 
   const cuerpos = [];
   const avisos = [];
@@ -263,7 +263,7 @@ async function principal() {
     fuentes: {
       'jpl-horizons': 'https://ssd.jpl.nasa.gov/api/horizons.api',
       'nasa-fact-sheet': 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/',
-      texturas: 'assets/textures/CREDITOS.json',
+      texturas: 'wj-content/assets/textures/CREDITOS.json',
     },
     escala: {
       unidad: 'El radio de la Tierra vale 1 unidad de escena; su órbita, 30.',
@@ -278,7 +278,7 @@ async function principal() {
     cuerpos: [...orden, ...cuerpos],
   };
 
-  await writeFile(join(RAIZ, 'data/sistema-solar.json'), JSON.stringify(salida, null, 2) + '\n');
+  await writeFile(join(RAIZ, 'wj-content/data/sistema-solar.json'), JSON.stringify(salida, null, 2) + '\n');
 
   const sinDatos = orden.flatMap((c) =>
     Object.entries(c.procedencia)

@@ -1,37 +1,37 @@
 # Audio generado por ElevenLabs (se regenera solo; nunca al repositorio)
-cache/audio/*
-!cache/audio/.gitkeep
+wj-content/cache/audio/*
+!wj-content/cache/audio/.gitkeep
 
 # Contadores del limitador de peticiones.
 # El directorio SÍ se versiona (con su .gitkeep) y su contenido no: es el mismo
-# trato que cache/audio. Un «cache/limites/» a secas excluía la carpeta entera,
+# trato que wj-content/cache/audio. Un «wj-content/cache/limites/» a secas excluía la carpeta entera,
 # así que en un despliegue por FTP no llegaba y había que acordarse de crearla a
 # mano. Aquí el olvido es caro: sin poder escribir los contadores, los topes de
 # gasto por IP no se aplican y nadie se entera hasta que llega la factura.
-cache/limites/*
-!cache/limites/.gitkeep
+wj-content/cache/limites/*
+!wj-content/cache/limites/.gitkeep
 
 # Tablas de JPL Horizons: una por cuerpo y día, se rehacen solas
-cache/efemerides/*
-!cache/efemerides/.gitkeep
+wj-content/cache/efemerides/*
+!wj-content/cache/efemerides/.gitkeep
 
 # Respuestas del asistente, guardadas solo para poder decirlas en voz alta
-cache/respuestas/*
-!cache/respuestas/.gitkeep
+wj-content/cache/respuestas/*
+!wj-content/cache/respuestas/.gitkeep
 
 # Registros del backend
-api/logs/*
-!api/logs/.gitkeep
-!api/logs/.htaccess
+wj-content/logs/*
+!wj-content/logs/.gitkeep
+!wj-content/logs/.htaccess
 
-# Claves reales: solo se versiona la plantilla secrets.example.php
-config/secrets.php
+# Claves reales: solo se versiona la plantilla wj-config-ejemplo.php
+wj-config.php
 
 # Las texturas SÍ se versionan: 13 MB que permiten desplegar en Plesk con un
 # solo «git pull», sin subir nada aparte. Licencias en CREDITOS.json.
 # Se descargan y actualizan con: node tools/texturas.mjs
-assets/skybox/*
-!assets/skybox/.gitkeep
+wj-content/assets/skybox/*
+!wj-content/assets/skybox/.gitkeep
 
 # Respuestas crudas de JPL Horizons: caché local de tools/datos-jpl.mjs
 .cache-horizons/

@@ -1,14 +1,21 @@
 # ============================================================================
 #  ORBIS — Interfaz holográfica del Sistema Solar
 #  Configuración de Apache para hosting Plesk (PHP 8.1+, sin Node.js).
-#  Todo el frontend se sirve como estático; /api son los únicos scripts PHP.
+#
+#  ORGANIZACIÓN
+#    wj-includes/  el motor: PHP, JS, CSS y librerías de terceros.
+#    wj-content/   lo que el sitio tiene y genera: datos, medios, caché, logs.
+#    wj-admin/     el panel de configuración.
+#    raíz          index.html y wj-config.php, y nada más.
 # ============================================================================
 
 Options -Indexes
-DirectoryIndex index.html
+# index.php al final: lo necesita /wj-admin/, que es lo único con PHP servido
+# como página. El resto del sitio sigue siendo index.html estático.
+DirectoryIndex index.html index.php
 
 # Redirige «…/orbis» a «…/orbis/». Sin la barra final, el navegador resolvería
-# css/, js/ y vendor/ contra el directorio padre y todo devolvería 404.
+# wj-includes/ y wj-content/ contra el directorio padre y todo devolvería 404.
 # Es el comportamiento por omisión de Apache, pero se deja explícito porque de
 # él depende que la aplicación funcione en un subdirectorio.
 <IfModule mod_dir.c>
@@ -66,7 +73,7 @@ DirectoryIndex index.html
 
 # ---------------------------------------------------------------------------
 # 4. Caché
-#    - vendor/ y assets/: inmutables durante un año (se versionan por ruta).
+#    - wj-includes/externos/ y wj-content/assets/: inmutables durante un año.
 #    - js/, css/ y data/: revalidación obligatoria, para poder desplegar
 #      correcciones sin pedir al usuario que vacíe la caché.
 # ---------------------------------------------------------------------------
@@ -84,11 +91,11 @@ DirectoryIndex index.html
   </FilesMatch>
 </IfModule>
 
-# vendor/ contiene copias con versión fijada: nunca cambian sin cambiar de ruta.
-# El patrón no lleva ancla inicial para que funcione también cuando ORBIS se
-# despliega en un subdirectorio (…/juegos/orbis/vendor/…).
+# wj-includes/externos/ son copias con versión fijada de Three.js y MediaPipe:
+# nunca cambian sin cambiar de ruta. El patrón no lleva ancla inicial para que
+# funcione también en un subdirectorio (…/juegos/orbis/wj-includes/externos/…).
 <IfModule mod_headers.c>
-  <If "%{REQUEST_URI} =~ m#/vendor/#">
+  <If "%{REQUEST_URI} =~ m#/wj-includes/externos/#">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </If>
 </IfModule>
@@ -110,28 +117,38 @@ DirectoryIndex index.html
   # imprescindibles para el WASM y el worker de MediaPipe.
   # El hash corresponde al <script type="importmap"> de index.html; si se
   # modifica ese bloque hay que regenerarlo con:  node tools/csp-hash.mjs
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob: 'sha256-YCCu03F1ixcvn8W0yQCzeR4w+4P+xDXzUcZ7u6ZtnnM='; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob: 'sha256-LazbYOg/UPr5ZnMItKyhIRL4Ldh0IdTtMS781fiC3+g='; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 </IfModule>
 
 # ---------------------------------------------------------------------------
 # 6. Rutas privadas
-#    config/ y cache/ tienen además su propio .htaccess (defensa en profundidad).
+#
+#    De wj-includes solo se sirve lo que el navegador pide de verdad: js/, css/,
+#    externos/ y los endpoints de api/. Las clases PHP (lib/) y las
+#    dependencias de Composer (vendor/) se INCLUYEN desde el servidor, nunca se
+#    piden por URL; sin esto, los más de dos mil .php del SDK se podían
+#    enumerar, y enumerarlos revela la versión exacta de cada librería.
+#
+#    De wj-content solo se sirven data/ y assets/. La caché guarda audio ya
+#    pagado y respuestas del asistente, y los registros pueden llevar detalles
+#    de errores: ninguna de las dos cosas se publica.
+#
+#    Cada una de estas carpetas lleva además su propio .htaccess. Esto es la
+#    segunda cerradura, por si el hosting no honra los de subdirectorio.
 # ---------------------------------------------------------------------------
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  # api/vendor son las dependencias de Composer: código que se incluye desde
-  # api/lib, nunca un punto de entrada. Sin esto, sus más de dos mil .php se
-  # podían pedir por URL y enumerarlos revelaba la versión exacta de cada
-  # librería. Tienen además su propio .htaccess; esto es la segunda cerradura,
-  # por si el hosting no honra los .htaccess de subdirectorio.
-  RewriteRule ^(config|cache|api/lib|api/logs|api/vendor|tools|docs/borradores)/ - [F,L]
+  RewriteRule ^wj-includes/(lib|vendor)/ - [F,L]
+  RewriteRule ^wj-content/(cache|logs)/ - [F,L]
+  RewriteRule ^(tools|docs/borradores)/ - [F,L]
 </IfModule>
+
+# wj-config.php son LAS CLAVES. Se deniega por nombre, esté donde esté: en la
+# raíz no hay una carpeta que aislar, así que la cerradura es esta.
+<FilesMatch "^wj-config(-ejemplo)?\.php$">
+  Require all denied
+</FilesMatch>
 
 <FilesMatch "^(\.htaccess|\.gitignore|\.env|composer\.(json|lock)|package(-lock)?\.json|.*\.md)$">
   Require all denied
 </FilesMatch>
-
-# El audio cacheado se entrega únicamente a través de api/tts.php.
-<IfModule mod_rewrite.c>
-  RewriteRule ^cache/ - [F,L]
-</IfModule>

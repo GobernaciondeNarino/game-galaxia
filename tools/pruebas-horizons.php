@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../api/lib/Horizons.php';
+require_once __DIR__ . '/../wj-includes/lib/Horizons.php';
 
 $fallos = 0;
 

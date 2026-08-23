@@ -27,7 +27,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../api/lib/RateLimiter.php';
+require_once __DIR__ . '/../wj-includes/lib/RateLimiter.php';
 
 $fallos = 0;
 
@@ -46,7 +46,7 @@ function comprobar(string $nombre, $real, $esperado): void
     );
 }
 
-$directorio = dirname(__DIR__) . '/cache/limites';
+$directorio = dirname(__DIR__) . '/wj-content/cache/limites';
 
 /** Deja el directorio como estaba: estas pruebas escriben contadores de verdad. */
 function limpiarTodo(string $directorio): void
@@ -108,12 +108,17 @@ echo "\n▸ Cada ámbito lleva su propia cuenta\n";
 {
     // La narración y la conversación cuestan cosas distintas: gastar el cupo de
     // una no puede dejar sin voz a la otra.
+    //
+    // Los ámbitos llevan sufijo de prueba a propósito. Con los nombres reales,
+    // ejecutar esto dejaba un «tope-narracion.json» con el límite puesto a UNO,
+    // y el sitio se quedaba sin narrar hasta el día siguiente. Una prueba no
+    // puede apagar lo que prueba.
     $_SERVER['REMOTE_ADDR'] = '198.51.100.77';
-    $narracion = new RateLimiter(1000, 3600, 'narracion', 1);
+    $narracion = new RateLimiter(1000, 3600, 'pruebanarracion', 1);
     comprobar('la primera de narración pasa', $narracion->consumir()['permitido'], true);
     comprobar('la segunda ya no', $narracion->consumir()['permitido'], false);
 
-    $conversacion = new RateLimiter(1000, 3600, 'conversacion', 1);
+    $conversacion = new RateLimiter(1000, 3600, 'pruebaconversacion', 1);
     comprobar('la de conversación no se ve afectada', $conversacion->consumir()['permitido'], true);
 }
 

@@ -12,10 +12,10 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ParserIntenciones, levenshtein, normalizar } from '../js/input/ParserIntenciones.js';
+import { ParserIntenciones, levenshtein, normalizar } from '../wj-includes/js/input/ParserIntenciones.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
-const vocabulario = JSON.parse(readFileSync(join(RAIZ, 'data/comandos-voz.json'), 'utf8'));
+const vocabulario = JSON.parse(readFileSync(join(RAIZ, 'wj-content/data/comandos-voz.json'), 'utf8'));
 const parser = new ParserIntenciones(vocabulario);
 
 let fallos = 0;

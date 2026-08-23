@@ -15,7 +15,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../api/lib/Asistente.php';
+require_once __DIR__ . '/../wj-includes/lib/Asistente.php';
 
 $fallos = 0;
 
@@ -199,7 +199,7 @@ echo "\n▸ Dos cuerpos seguidos no se presentan igual\n";
 {
     // Se recorre el catálogo entero como lo haría quien va pulsando cuerpos, con
     // el mismo contador por tipo que lleva el Narrator.
-    require_once __DIR__ . '/../api/lib/Catalogo.php';
+    require_once __DIR__ . '/../wj-includes/lib/Catalogo.php';
     $turnos = [];
     $anterior = null;
     $repetidasSeguidas = 0;

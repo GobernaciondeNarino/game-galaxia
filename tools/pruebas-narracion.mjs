@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
-const catalogo = JSON.parse(readFileSync(join(RAIZ, 'data/sistema-solar.json'), 'utf8'));
+const catalogo = JSON.parse(readFileSync(join(RAIZ, 'wj-content/data/sistema-solar.json'), 'utf8'));
 const cuerpos = catalogo.cuerpos;
 
 /** El mismo tope que aplica api/tts.php antes de llamar a ElevenLabs. */

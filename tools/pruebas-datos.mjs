@@ -45,7 +45,7 @@ const comprobar = (nombre, real, esperado) => {
   console.log(`  ${ok ? '✔' : '✘'} ${nombre}${ok ? '' : ` — esperado «${esperado}», obtenido «${real}»`}`);
 };
 
-const catalogo = leer('data/sistema-solar.json').cuerpos;
+const catalogo = leer('wj-content/data/sistema-solar.json').cuerpos;
 
 /** Margen: por debajo de esto la discrepancia es redondeo, no un error. */
 const TOLERANCIA = 0.25;

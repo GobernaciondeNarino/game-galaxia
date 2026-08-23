@@ -19,7 +19,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../api/lib/Meteoros.php';
+require_once __DIR__ . '/../wj-includes/lib/Meteoros.php';
 
 $fallos = 0;
 

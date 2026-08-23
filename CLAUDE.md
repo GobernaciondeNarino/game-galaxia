@@ -19,8 +19,8 @@ API de Three.js (`SceneManager.js`, `CameraRig.js`); el resto, en español.
    `/vendor` y `/assets`. `tools/vendor.mjs` genera esas copias.
 3. **Ninguna credencial en el cliente.** Ni en HTML, ni en JS, ni en JSON, ni
    versionada. La clave de ElevenLabs se lee de una variable de entorno o de
-   `config/secrets.php`. Antes de cada commit: `bash tools/comprobar-secretos.sh`.
-4. **Ningún dato astronómico inventado.** Todo sale de `data/sistema-solar.json`
+   `wj-config.php`. Antes de cada commit: `bash tools/comprobar-secretos.sh`.
+4. **Ningún dato astronómico inventado.** Todo sale de `wj-content/data/sistema-solar.json`
    con su campo `fuente`. Lo que falte va a `null` y se muestra como
    `SIN DATOS`. Lo decorativo se etiqueta `SIMULACIÓN`. Nunca `Math.random()`
    presentado como información real.
@@ -70,7 +70,7 @@ php tools/verificar-horizons.php           # contrasta el catálogo con JPL en v
 
 ## Fichas de diseño
 
-Están en `css/nucleo.css`. Usa siempre las variables, nunca un color literal:
+Están en `wj-includes/css/nucleo.css`. Usa siempre las variables, nunca un color literal:
 `--cian-brillante`, `--ambar-seleccion`, `--panel-fondo`, `--curva`…
 
 La skill `ui-ux-pro-max` está vendorizada en `.claude/skills/` y debe usarse

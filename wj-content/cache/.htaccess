@@ -1,0 +1,7 @@
+# Audio ya pagado, respuestas del asistente y contadores por IP. El audio se
+# entrega únicamente a través de wj-includes/api/tts.php; lo demás, nunca.
+Require all denied
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

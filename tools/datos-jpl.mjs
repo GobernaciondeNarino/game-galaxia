@@ -505,7 +505,7 @@ async function principal() {
   }
 
   await writeFile(
-    join(RAIZ, 'data/fisica-jpl.json'),
+    join(RAIZ, 'wj-content/data/fisica-jpl.json'),
     JSON.stringify(
       {
         $esquema: 'orbis/fisica-jpl/1',

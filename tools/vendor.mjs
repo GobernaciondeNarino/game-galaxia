@@ -105,14 +105,14 @@ async function vendorMediapipe() {
   // Modelos, alojados localmente (nunca desde el CDN de Google en producción).
   await bajar(
     'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
-    join(RAIZ, 'assets/models/hand_landmarker.task'),
+    join(RAIZ, 'wj-content/assets/models/hand_landmarker.task'),
   );
   // El de rostro solo se usa para una cosa: distinguir un guiño de un parpadeo,
   // y para eso hacen falta sus «blendshapes». Se descarga cuando se enciende la
   // cámara, no al abrir la página.
   await bajar(
     'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
-    join(RAIZ, 'assets/models/face_landmarker.task'),
+    join(RAIZ, 'wj-content/assets/models/face_landmarker.task'),
   );
 }
 
@@ -143,13 +143,13 @@ async function vendorFuentes() {
     const nombre = regla.match(/font-family:\s*'([^']+)'/)[1].replace(/\s+/g, '');
     const peso = (regla.match(/font-weight:\s*([\d\s]+)/) || [, 'var'])[1].trim().replace(/\s+/g, '-');
     const archivo = `${nombre}-${peso}-${subconjunto}.woff2`;
-    await bajar(remoto[0], join(RAIZ, 'assets/fonts', archivo));
+    await bajar(remoto[0], join(RAIZ, 'wj-content/assets/fonts', archivo));
     salida.push(regla.replace(remoto[0], `../assets/fonts/${archivo}`).trim());
   }
   const cabecera =
     '/* Generado por tools/vendor.mjs — no editar a mano. */\n' +
     '/* Oswald y Hind Madurai — SIL Open Font License 1.1 */\n\n';
-  await writeFile(join(RAIZ, 'css/fuentes.css'), cabecera + salida.join('\n\n') + '\n');
+  await writeFile(join(RAIZ, 'wj-includes/css/fuentes.css'), cabecera + salida.join('\n\n') + '\n');
   console.log('  ✓ css/fuentes.css');
 }
 
