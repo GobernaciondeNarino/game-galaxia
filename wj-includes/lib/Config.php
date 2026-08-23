@@ -4,7 +4,13 @@
  *
  * Orden de búsqueda de cada valor:
  *   1. variable de entorno (recomendado en Plesk: la clave no toca el disco),
- *   2. wj-config.php, en la raíz.
+ *   2. wj-config.php, en la raíz,
+ *   3. lo guardado desde el panel de wj-admin.
+ *
+ * El panel va el ÚLTIMO a propósito: es la capa cómoda, no la que manda. Quien
+ * tiene acceso al servidor puede fijar un valor y saber que ningún panel se lo
+ * va a cambiar. Y el panel, en vez de dejar escribir algo que luego no tendría
+ * efecto, enseña esos valores bloqueados y dice de dónde salen.
  *
  * Aquí viven también las dos rutas base del proyecto. Estaban repartidas en
  * literales por todo el backend —'/data/…', '/cache/…', '/api/vendor/…'— y
@@ -62,11 +68,19 @@ final class Config
             return (string) self::$secretos[$clave];
         }
 
+        // Tercera fuente: el panel. Se carga aquí y no arriba para no leer un
+        // archivo más en cada petición cuando el valor ya venía del entorno.
+        require_once __DIR__ . '/Ajustes.php';
+        $delPanel = Ajustes::obtener($clave);
+        if ($delPanel !== null) {
+            return $delPanel;
+        }
+
         return $predeterminado;
     }
 
     /**
-     * De dónde sale un valor: 'entorno', 'wj-config.php' o null.
+     * De dónde sale un valor: 'entorno', 'wj-config.php', 'panel' o null.
      *
      * Existe para api/health.php, que tiene que poder decir POR QUÉ está
      * ganando un valor y no otro. Es la respuesta a «he cambiado la voz y
@@ -86,6 +100,11 @@ final class Config
         self::cargarSecretos();
         if (isset(self::$secretos[$clave]) && self::$secretos[$clave] !== '') {
             return 'wj-config.php';
+        }
+
+        require_once __DIR__ . '/Ajustes.php';
+        if (Ajustes::obtener($clave) !== null) {
+            return 'panel';
         }
 
         return null;

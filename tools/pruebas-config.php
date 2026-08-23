@@ -72,6 +72,17 @@ foreach (fuentesDelBackend($raiz) as $archivo) {
         $leidas[$clave] = true;
     }
 }
+// Hay una que NO pasa por Config, y es a propósito: la clave del panel la lee
+// SesionAdmin directamente del entorno y de wj-config.php, saltándose la capa
+// del panel. Si pasara por Config, el panel podría cambiarse su propia
+// cerradura, y quien entrase una vez con la clave por omisión dejaría fuera al
+// administrador. Se declara aquí para que el rastreo no la dé por inútil, y
+// para que quede escrito el motivo.
+$fueraDeConfig = ['WJ_ADMIN_CLAVE' => 'la lee SesionAdmin, que no consulta el panel a propósito'];
+foreach ($fueraDeConfig as $clave => $porque) {
+    $leidas[$clave] = true;
+}
+
 $leidas = array_keys($leidas);
 sort($leidas);
 
@@ -79,6 +90,20 @@ printf("     %d leídas por el código · %d documentadas en la plantilla\n", co
 comprobar('el código lee alguna variable', count($leidas) > 0, true);
 comprobar('ninguna variable del código falta en la plantilla', array_values(array_diff($leidas, $documentadas)), []);
 comprobar('ninguna variable de la plantilla es ya inútil', array_values(array_diff($documentadas, $leidas)), []);
+
+// La clave del panel tiene que seguir SIN pasar por Config: es lo que impide
+// que el panel se cambie su propia cerradura.
+$config = (string) file_get_contents($raiz . '/wj-includes/lib/SesionAdmin.php');
+comprobar(
+    'la clave del panel NO se lee con Config::obtener',
+    strpos($config, "Config::obtener('WJ_ADMIN_CLAVE')") === false,
+    true
+);
+comprobar(
+    'y sí del entorno y de wj-config.php',
+    strpos($config, "getenv(self::AJUSTE)") !== false && strpos($config, 'deWjConfig') !== false,
+    true
+);
 
 echo "\n▸ La plantilla no lleva ninguna credencial rellenada\n";
 {

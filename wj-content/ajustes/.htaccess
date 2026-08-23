@@ -1,0 +1,7 @@
+# Lo que se guarda desde wj-admin, incluidas claves de API. Lo lee PHP desde el
+# servidor; por HTTP no se sirve nunca.
+Require all denied
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

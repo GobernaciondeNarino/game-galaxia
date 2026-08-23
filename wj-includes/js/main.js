@@ -4,9 +4,12 @@
  * Arranca la aplicación: diagnostica el entorno, carga el catálogo, construye
  * la escena tridimensional y pone en marcha el bucle de render.
  *
- * Fases 1 a 7 implementadas: escena tridimensional con órbitas keplerianas
+ * Fases 1 a 9 implementadas: escena tridimensional con órbitas keplerianas
  * reales, HUD en DOM con paneles persistentes, las dos vistas con transición
- * interrumpible, narración con subtítulos, control por gestos y por voz.
+ * interrumpible, narración con subtítulos, control por gestos y por voz, y un
+ * asistente conversacional que responde sin inventarse un dato.
+ *
+ * Idea original y diseño: Jonnathan Bucheli Galindo.
  */
 
 import { App } from './core/App.js';

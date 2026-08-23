@@ -1,5 +1,7 @@
 # ORBIS — Instrucciones del proyecto
 
+**Idea original y diseño: Jonnathan Bucheli Galindo.**
+
 Interfaz web 3D del Sistema Solar con control por gestos y voz. Se despliega en
 un hosting **Plesk (Apache + PHP)**: sin Node.js en producción, sin procesos en
 segundo plano, sin acceso root.
@@ -54,6 +56,7 @@ node tools/pruebas-interfaz.mjs            # mandos, espejo de la cámara y hoja
 php  tools/pruebas-horizons.php            # parseo de las tablas de JPL (sin red)
 php  tools/pruebas-conversacion.php        # herramientas del asistente (sin red)
 php  tools/pruebas-config.php              # claves documentadas, y ninguna filtrada
+php  tools/pruebas-admin.php               # panel: lista cerrada, precedencia y cerradura
 php  tools/pruebas-limites.php             # cupo por IP y techo diario del sitio
 php  tools/pruebas-meteoros.php            # calendario de lluvias de meteoros
 node tools/pruebas-voz.mjs                 # parser de intenciones de voz

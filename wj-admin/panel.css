@@ -1,0 +1,206 @@
+/* ==========================================================================
+   ORBIS — Panel de administración.
+
+   Usa las mismas fichas de diseño que la HUD (css/nucleo.css) para que se
+   reconozca como parte del proyecto, pero NO su maquetación: la HUD es una
+   capa flotante sobre una escena en tres dimensiones y esto es un formulario.
+   Un formulario se lee de arriba abajo, en una columna, con las etiquetas
+   visibles y el error pegado a su campo.
+
+   Sin JavaScript: la CSP no admite scripts en línea y un formulario no los
+   necesita.
+   ========================================================================== */
+
+.admin {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(26, 82, 118, 0.35), transparent 70%),
+    var(--fondo-profundo);
+  color: var(--texto);
+  font-family: var(--fuente-datos);
+  font-size: var(--t-base);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------- Cabecera */
+.admin__cabecera {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+  padding: var(--e-5) var(--e-5) var(--e-4);
+  border-bottom: 1px solid var(--panel-borde);
+}
+.admin__marca {
+  font-family: var(--fuente-titulos);
+  font-weight: 600;
+  font-size: var(--t-titulo);
+  letter-spacing: 0.3em;
+  color: var(--cian-brillante);
+  text-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+}
+.admin__subtitulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+}
+.admin__salir { margin-left: auto; }
+
+/* ------------------------------------------------------------------ Cuerpo */
+.admin__cuerpo {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: var(--e-5) var(--e-4) var(--e-6);
+  display: grid;
+  gap: var(--e-4);
+  align-content: start;
+}
+
+/* ---------------------------------------------------------------- Tarjetas */
+.tarjeta {
+  padding: var(--e-4);
+  background: var(--panel-fondo);
+  border: 1px solid var(--panel-borde);
+  display: grid;
+  gap: var(--e-3);
+}
+.tarjeta--entrada { max-width: 420px; }
+.tarjeta__titulo {
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-mayor);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cian-acento);
+}
+
+/* ------------------------------------------------------------------ Campos */
+.campo { display: grid; gap: 6px; }
+
+/* Etiqueta SIEMPRE visible, nunca solo un placeholder: al escribir dentro, un
+   placeholder desaparece y con él la única pista de qué va en ese campo. */
+.campo__etiqueta {
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+
+.campo input[type="text"],
+.campo input[type="password"],
+.campo input[type="number"] {
+  /* 44 px de alto: aquí sí, sin matices. Un panel de administración se abre
+     tanto desde un teléfono como desde un escritorio y no hay nada debajo a lo
+     que le robe espacio. */
+  min-height: 44px;
+  padding: var(--e-2) var(--e-3);
+  background: rgba(5, 11, 24, 0.6);
+  border: 1px solid var(--panel-borde);
+  color: var(--texto);
+  font-family: var(--fuente-cifras);
+  font-size: var(--t-base);
+}
+.campo input:focus-visible {
+  outline: 2px solid var(--cian-brillante);
+  outline-offset: 1px;
+  border-color: var(--panel-borde-vivo);
+}
+.campo input::placeholder { color: var(--texto-decorativo); }
+
+/* Bloqueado: se ve, se entiende y no se puede tocar. Se enseña en lugar de
+   esconderse porque saber que un valor viene de Plesk es justo lo que hace
+   falta cuando algo «no cambia por más que lo cambies». */
+.campo--bloqueado input { opacity: 0.55; cursor: not-allowed; }
+.campo__ayuda {
+  font-size: var(--t-menor);
+  color: var(--texto-apagado);
+}
+.campo__ayuda--bloqueo { color: var(--ambar-seleccion); }
+.campo__error {
+  font-size: var(--t-menor);
+  color: var(--rojo-alerta);
+}
+.campo input[aria-invalid="true"] { border-color: var(--rojo-alerta); }
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: 32px;
+  font-size: var(--t-menor);
+  color: var(--texto-tenue);
+  cursor: pointer;
+}
+.casilla input { width: 18px; height: 18px; accent-color: var(--cian-brillante); }
+
+/* ------------------------------------------------------------------ Botones */
+.boton {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 var(--e-4);
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid var(--panel-borde-vivo);
+  color: var(--texto);
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-menor);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color var(--dur-corta) var(--curva);
+}
+.boton:hover { background: rgba(0, 229, 255, 0.22); }
+.boton:focus-visible { outline: 2px solid var(--cian-brillante); outline-offset: 2px; }
+.boton--tenue {
+  background: none;
+  border-color: var(--panel-borde);
+  min-height: 32px;
+}
+
+/* ----------------------------------------------------------------- Mensajes */
+.mensaje {
+  padding: var(--e-3) var(--e-4);
+  border: 1px solid;
+  font-size: var(--t-base);
+}
+.mensaje--ok    { border-color: rgba(58, 170, 53, 0.6);  color: var(--verde-estado); }
+.mensaje--error { border-color: rgba(255, 82, 82, 0.6);  color: var(--rojo-alerta); }
+.mensaje--info  { border-color: var(--panel-borde);      color: var(--texto-tenue); }
+.mensaje code, .ayuda code {
+  font-family: var(--fuente-cifras);
+  font-size: 0.95em;
+  color: var(--cian-acento);
+}
+.mensaje strong { color: inherit; }
+
+.ayuda { font-size: var(--t-menor); color: var(--texto-apagado); }
+.ayuda--suelta { margin-top: calc(var(--e-2) * -1); }
+.ayuda a { color: var(--cian-acento); }
+
+.ajustes { display: grid; gap: var(--e-4); }
+.ajustes__pie { display: grid; gap: var(--e-2); }
+
+/* --------------------------------------------------------------------- Pie */
+.admin__pie {
+  padding: var(--e-4) var(--e-5) var(--e-5);
+  border-top: 1px solid var(--panel-borde);
+  font-size: var(--t-menor);
+  color: var(--texto-apagado);
+  display: grid;
+  gap: 2px;
+}
+.admin__pie strong { color: var(--texto-tenue); }
+
+/* ------------------------------------------------------------------- Móvil */
+@media (max-width: 600px) {
+  .admin__cabecera { padding: var(--e-4); }
+  .admin__cuerpo { padding: var(--e-4) var(--e-3) var(--e-5); }
+  .boton { justify-self: stretch; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton { transition: none; }
+}

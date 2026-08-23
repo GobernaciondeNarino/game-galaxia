@@ -293,7 +293,11 @@ y la hoja de comandos plegable.
 
 ## Licencia y créditos
 
+**Idea original y diseño: Jonnathan Bucheli Galindo.** La concepción de ORBIS —qué debía ser esta
+interfaz, cómo se navega, cómo se ve y cómo se habla con ella— es suya. Lo que
+hay en este repositorio es la construcción de esa idea.
+
 Código de ORBIS: Gobernación de Nariño.
 Three.js (MIT), MediaPipe Tasks Vision (Apache-2.0), Oswald y Hind Madurai
 (SIL OFL 1.1) y la skill `ui-ux-pro-max` (MIT) conservan sus respectivas
-licencias en `vendor/`, `wj-content/assets/fonts/` y `.claude/skills/`.
+licencias en `wj-includes/externos/`, `wj-content/assets/fonts/` y `.claude/skills/`.

@@ -27,6 +27,13 @@ wj-content/logs/*
 # Claves reales: solo se versiona la plantilla wj-config-ejemplo.php
 wj-config.php
 
+# Lo que se guarda desde el panel de wj-admin: lleva claves de API. El
+# directorio SÍ viaja, para que exista y sea escribible tras un «git pull»;
+# su contenido, nunca.
+wj-content/ajustes/*
+!wj-content/ajustes/.gitkeep
+!wj-content/ajustes/.htaccess
+
 # Las texturas SÍ se versionan: 13 MB que permiten desplegar en Plesk con un
 # solo «git pull», sin subir nada aparte. Licencias en CREDITOS.json.
 # Se descargan y actualizan con: node tools/texturas.mjs

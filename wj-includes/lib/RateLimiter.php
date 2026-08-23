@@ -104,9 +104,17 @@ final class RateLimiter
     {
         $ahora = time();
 
-        // 1. Cupo de quien pregunta.
+        // 1. Cupo de quien pregunta, EN ESTE ÁMBITO.
+        //
+        // El ámbito va en el nombre del archivo, y no es un detalle: sin él los
+        // cuatro usos —narración, transcripción, conversación y la entrada al
+        // panel— compartían un único contador por IP. Cada uno lo comparaba
+        // contra SU límite, así que gastar treinta narraciones dejaba a esa
+        // misma dirección sin poder entrar en wj-admin, cuyo tope son cinco
+        // intentos. Se vio al probar el panel: «Demasiados intentos» al primer
+        // intento del día.
         $propio = $this->contar(
-            $this->directorio . '/' . $this->identificador() . '.json',
+            $this->directorio . '/' . $this->identificador() . '-' . ($this->ambito ?: 'general') . '.json',
             $this->limite,
             $this->ventanaSegundos,
             $ahora
@@ -154,6 +162,38 @@ final class RateLimiter
             'restantes' => $propio['restantes'],
             'esperaSegundos' => $propio['esperaSegundos'],
             'motivo' => null,
+        ];
+    }
+
+    /**
+     * ¿Queda cupo, sin gastarlo?
+     *
+     * Existe para la entrada al panel: allí lo que hay que frenar son los
+     * intentos FALLIDOS, no los aciertos. Con un solo `consumir()` antes de
+     * comprobar la clave, un administrador que entra y sale cinco veces en una
+     * mañana se queda fuera de su propio panel; y esa es exactamente la persona
+     * a la que no hay que bloquear.
+     *
+     * @return array{permitido:bool, restantes:int, esperaSegundos:int}
+     */
+    public function disponible(): array
+    {
+        $archivo = $this->directorio . '/' . $this->identificador() . '-' . ($this->ambito ?: 'general') . '.json';
+        $ahora = time();
+
+        $datos = is_readable($archivo)
+            ? json_decode((string) file_get_contents($archivo), true)
+            : null;
+
+        if (!is_array($datos) || !isset($datos['inicio'], $datos['cuenta'])
+            || $ahora - (int) $datos['inicio'] >= $this->ventanaSegundos) {
+            return ['permitido' => true, 'restantes' => $this->limite, 'esperaSegundos' => 0];
+        }
+
+        return [
+            'permitido' => (int) $datos['cuenta'] < $this->limite,
+            'restantes' => max(0, $this->limite - (int) $datos['cuenta']),
+            'esperaSegundos' => max(0, $this->ventanaSegundos - ($ahora - (int) $datos['inicio'])),
         ];
     }
 

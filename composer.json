@@ -1,6 +1,6 @@
 {
   "name": "orbis/sistema-solar",
-  "description": "ORBIS — interfaz 3D del Sistema Solar. El SDK de Anthropic se vendoriza en api/vendor y SE VERSIONA, por el mismo motivo que three.js y los modelos de MediaPipe: el hosting de destino es un Plesk sin Composer, y el despliegue tiene que seguir siendo un «git pull» y nada más.",
+  "description": "ORBIS — interfaz 3D del Sistema Solar. El SDK de Anthropic se vendoriza en wj-includes/vendor y SE VERSIONA, por el mismo motivo que three.js y los modelos de MediaPipe: el hosting de destino es un Plesk sin Composer, y el despliegue tiene que seguir siendo un «git pull» y nada más.",
   "type": "project",
   "require": {
     "php": ">=8.1",
@@ -9,5 +9,15 @@
   "config": {
     "vendor-dir": "wj-includes/vendor",
     "optimize-autoloader": true
-  }
+  },
+  "authors": [
+    {
+      "name": "Jonnathan Bucheli Galindo",
+      "role": "Idea original y diseño"
+    },
+    {
+      "name": "Gobernación de Nariño",
+      "role": "Desarrollo y mantenimiento"
+    }
+  ]
 }

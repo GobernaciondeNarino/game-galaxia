@@ -14,17 +14,21 @@
  *
  *    1. En el servidor, copia este archivo al lado, sin «.example»:
  *
- *         cp config/secrets.example.php config/secrets.php
+ *         cp wj-config-ejemplo.php wj-config.php
  *
  *       (En el gestor de archivos de Plesk: duplicar y renombrar.)
  *
- *    2. Rellena los valores de config/secrets.php. Lo que dejes vacío usa el
+ *    2. Rellena los valores de wj-config.php. Lo que dejes vacío usa el
  *       valor de la derecha, que es el que ya trae ORBIS.
+ *
+ *       O NO RELLENES NADA y hazlo desde el panel:
+ *       https://tu-dominio/wj-admin/ — más cómodo, y lo que se ponga AQUÍ
+ *       manda sobre lo que se ponga allí.
  *
  *    3. Comprueba que NO se puede leer desde fuera. Abre en el navegador:
  *
- *         https://tu-dominio/config/secrets.php     → tiene que dar 403
- *         https://tu-dominio/api/health.php         → dice qué ha detectado
+ *         https://tu-dominio/wj-config.php               → tiene que dar 403
+ *         https://tu-dominio/wj-includes/api/health.php  → dice qué ha detectado
  *
  *  ──────────────────────────────────────────────────────────────────────────
  *  DÓNDE PONER LAS CLAVES: DOS SITIOS, UNO MEJOR QUE OTRO
@@ -37,9 +41,13 @@
  *        La clave no toca el disco del sitio, así que no puede acabar en una
  *        copia de seguridad descargable ni en un despliegue por FTP.
  *
- *    2º  ESTE ARCHIVO (config/secrets.php)
- *        Más cómodo, y perfectamente válido: está en .gitignore y config/
- *        .htaccess lo bloquea con `Require all denied`. Pero vive en el disco.
+ *    2º  ESTE ARCHIVO (wj-config.php)
+ *        Más cómodo, y perfectamente válido: está en .gitignore y el .htaccess
+ *        raíz lo bloquea por nombre. Pero vive en el disco.
+ *
+ *    3º  EL PANEL de wj-admin, que guarda en wj-content/ajustes/ajustes.json.
+ *        La capa cómoda. Lo que se fije en 1º o 2º se enseña allí bloqueado,
+ *        con su procedencia, en lugar de dejar escribir algo sin efecto.
  *
  *  Si defines una variable de entorno Y la rellenas aquí, GANA LA VARIABLE DE
  *  ENTORNO. Es la causa número uno de «he cambiado la voz y suena igual»:
@@ -49,7 +57,7 @@
  *  NUNCA
  *  ──────────────────────────────────────────────────────────────────────────
  *
- *  · No subas config/secrets.php al repositorio. Está en .gitignore por algo.
+ *  · No subas wj-config.php al repositorio. Está en .gitignore por algo.
  *  · No copies estos valores a ningún archivo de js/, css/ o data/: todo eso
  *    se sirve al navegador y cualquiera puede leerlo. `bash
  *    tools/comprobar-secretos.sh` lo verifica antes de cada commit.
@@ -63,6 +71,33 @@
 declare(strict_types=1);
 
 return [
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  0. PANEL DE ADMINISTRACIÓN — https://tu-dominio/wj-admin/
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Clave para entrar en el panel.
+     *
+     * MIENTRAS ESTÉ VACÍA se usa la de por omisión, «orbis-admin», que viene
+     * escrita en el repositorio: cualquiera que vea el código la conoce. El
+     * panel avisa en rojo mientras siga así. Cámbiala antes de abrir el sitio.
+     *
+     * Mejor todavía: guarda aquí un HASH en lugar de la clave, y así la clave
+     * real no queda escrita en el disco del servidor ni en una copia de
+     * seguridad. Se genera con:
+     *
+     *     php -r 'echo password_hash("tu-clave", PASSWORD_DEFAULT), "\n";'
+     *
+     * Y lo mejor de todo: ponla como variable de entorno WJ_ADMIN_CLAVE en
+     * Plesk, que ni siquiera toca el disco.
+     *
+     * Esta es la ÚNICA clave que el panel no puede cambiarse a sí mismo. Si
+     * pudiera, quien entrase una vez con la de por omisión dejaría fuera al
+     * administrador de verdad.
+     */
+    'WJ_ADMIN_CLAVE' => '',
+
 
     // ════════════════════════════════════════════════════════════════════════
     //  1. NARRACIÓN CON VOZ — ElevenLabs

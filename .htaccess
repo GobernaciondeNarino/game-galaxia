@@ -139,7 +139,7 @@ DirectoryIndex index.html index.php
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^wj-includes/(lib|vendor)/ - [F,L]
-  RewriteRule ^wj-content/(cache|logs)/ - [F,L]
+  RewriteRule ^wj-content/(cache|logs|ajustes)/ - [F,L]
   RewriteRule ^(tools|docs/borradores)/ - [F,L]
 </IfModule>
 

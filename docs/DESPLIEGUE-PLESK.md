@@ -176,6 +176,41 @@ https://tu-dominio/config/secrets.php   →  debe devolver 403
 Si devuelve una página en blanco o el contenido del archivo, detén el
 despliegue y revisa `el .htaccess raíz` y que `AllowOverride` esté habilitado.
 
+### 5.1 bis  El panel: https://tu-dominio/wj-admin/
+
+La forma cómoda de poner las claves y los topes sin abrir un archivo por FTP.
+
+**Antes de abrir el sitio al público, cambia su clave.** Mientras no lo hagas se
+usa `orbis-admin`, que viene escrita en el repositorio: cualquiera que vea el
+código la conoce, y el panel avisa en rojo mientras siga puesta.
+
+Se cambia en Plesk (Dominios → Configuración de PHP → Variables de entorno) con
+el nombre `WJ_ADMIN_CLAVE`, o en `wj-config.php`. **En ningún otro sitio, y a
+propósito:** si el panel pudiera cambiarse su propia clave, quien entrase una vez
+con la de por omisión dejaría fuera al administrador de verdad.
+
+Mejor todavía, guarda un hash en lugar de la clave, y así la real no queda
+escrita en el disco:
+
+```bash
+php -r 'echo password_hash("tu-clave", PASSWORD_DEFAULT), "\n";'
+```
+
+**Qué se puede tocar desde el panel y qué no.** Lo que fijes en las variables de
+entorno o en `wj-config.php` aparece bloqueado, con un rótulo que dice de dónde
+sale. No es una limitación: es la respuesta a «lo cambio y no pasa nada». Quien
+tiene acceso al servidor fija un valor y sabe que ningún panel se lo va a mover.
+
+Lo que se guarda desde el panel va a `wj-content/ajustes/ajustes.json`, fuera de
+lo que se sirve por HTTP y fuera del repositorio. No se reescribe `wj-config.php`
+a propósito: generar código PHP desde un formulario web es la forma más corta de
+acabar ejecutando lo que alguien escriba en un campo de texto.
+
+Ocho intentos fallidos por dirección y hora. Los aciertos no gastan cupo, así
+que entrar y salir varias veces no deja fuera a nadie.
+
+---
+
 ### 5.2 Alternativa para las claves: variables de entorno
 
 Plesk → *Dominios* → **Configuración de PHP** → *Variables de entorno*. Sirve
@@ -196,6 +231,7 @@ despliegue por FTP.
 
 | Nombre | Para qué | Si falta |
 |---|---|---|
+| `WJ_ADMIN_CLAVE` | **Clave del panel** `/wj-admin/`. Solo aquí o en `wj-config.php` | `orbis-admin`, la del repositorio — **cámbiala** |
 | `ELEVENLABS_API_KEY` | Narración hablada y dictado por voz | Narra la voz del navegador, bastante peor |
 | `ELEVENLABS_VOICE_ID` | **Código de la voz** de ORBIS | `lE5ZJB6jGeeuvSNxOvs2`, la voz de ORBIS |
 | `ELEVENLABS_MODEL_ID` | Modelo de síntesis | `eleven_multilingual_v2` |
