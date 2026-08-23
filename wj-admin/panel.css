@@ -90,6 +90,7 @@
   color: var(--texto-tenue);
 }
 
+.campo select,
 .campo input[type="text"],
 .campo input[type="password"],
 .campo input[type="number"] {
@@ -104,6 +105,7 @@
   font-family: var(--fuente-cifras);
   font-size: var(--t-base);
 }
+.campo select:focus-visible,
 .campo input:focus-visible {
   outline: 2px solid var(--cian-brillante);
   outline-offset: 1px;
@@ -136,6 +138,32 @@
   cursor: pointer;
 }
 .casilla input { width: 18px; height: 18px; accent-color: var(--cian-brillante); }
+
+/* Las voces candidatas, cada una con su reproductor.
+
+   Un <audio controls> nativo y `preload="none"`: no se pide ni un byte hasta
+   que se pulsa el play, así que abrir el panel no sintetiza diez voces ni gasta
+   diez veces. Y nativo porque no hay JavaScript en este panel. */
+.voces {
+  display: grid;
+  gap: var(--e-2);
+  margin-top: var(--e-2);
+}
+.voces__una {
+  display: grid;
+  grid-template-columns: minmax(0, 11em) 1fr;
+  gap: var(--e-2);
+  align-items: center;
+}
+.voces__nombre {
+  font-size: var(--t-menor);
+  color: var(--texto-tenue);
+}
+.voces audio { width: 100%; height: 34px; }
+
+@media (max-width: 600px) {
+  .voces__una { grid-template-columns: 1fr; gap: 2px; }
+}
 
 /* ------------------------------------------------------------------ Botones */
 .boton {

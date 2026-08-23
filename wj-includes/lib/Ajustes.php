@@ -65,8 +65,9 @@ final class Ajustes
         ],
         'ELEVENLABS_VOICE_ID' => [
             'tipo' => 'texto', 'grupo' => 'voz', 'patron' => '/^[A-Za-z0-9]{0,40}$/',
-            'etiqueta' => 'Código de la voz',
-            'ayuda' => 'Vacío = la voz de ORBIS. Al cambiarla hay que vaciar la caché de audio.',
+            'etiqueta' => 'Voz de la narración',
+            'ayuda' => 'Elige una y pruébala con el botón. Al cambiarla hay que vaciar la caché de audio, '
+                . 'o las narraciones ya generadas seguirán sonando con la anterior.',
         ],
         'ELEVENLABS_MODEL_ID' => [
             'tipo' => 'texto', 'grupo' => 'voz', 'patron' => '/^[a-z0-9_]{0,40}$/',
@@ -118,6 +119,34 @@ final class Ajustes
             'etiqueta' => 'Respuestas del asistente de TODO el sitio, al día',
             'ayuda' => '',
         ],
+    ];
+
+    /**
+     * Voces candidatas en español, leídas del catálogo real de la cuenta.
+     *
+     * NO es la lista completa —hay 75 voces— sino las que encajan con lo que
+     * ORBIS hace: narrar divulgación en español. Se filtraron por idioma «es» y
+     * caso de uso `informative_educational` o `narrative_story`, que es lo que
+     * ElevenLabs declara de cada una. Las descripciones son suyas, resumidas.
+     *
+     * Está aquí y no en un desplegable suelto porque el panel las ofrece Y el
+     * botón de prueba las sintetiza: una sola lista evita que se pueda pedir la
+     * prueba de una voz que el desplegable no ofrece.
+     *
+     * Cualquier otro identificador se puede escribir a mano: esto es un atajo,
+     * no una cerradura.
+     */
+    const VOCES = [
+        'gbTn1bmCvNgk0QEAVyfM' => 'Enrique M. Nieto — divulgación, acento mexicano. La única «informative_educational» en español',
+        'J2Jb9yZNvpXUNAL3a2bw' => 'Yorman Andrés — colombiano, acento neutro, expresivo',
+        '8mBRP99B2Ng2QwsJMFQl' => 'El Faraón 4 — grave, para documentales y audiolibros',
+        'GTY55jD77hLBRrnQOhNk' => 'Ludovico — latinoamericano, grave y aterciopelado, narración épica',
+        'RyfjEHnKbtma4Srae2za' => 'Juan Carlos — español de España, sereno y cálido',
+        'PHKlYg202ODwQRa3Fxuo' => 'Julio — adulto, algo grave, pensada para narrar',
+        'YqZLNYWZm98oKaaLZkUA' => 'Edoardo — contenido, medido, tono serio',
+        '5z6tF6eAwkAluMyjDFJJ' => 'Alejo — latinoamericano, íntimo, como quien habla al lado',
+        'oqO5cdAzjE5Ik5xWIZRL' => 'Iván — mayor, susurrante, tono de relato antiguo',
+        'xf3Xv0R9rgFTExG0MVNo' => 'Jaime — joven, dicción precisa, cercano',
     ];
 
     /** @var array<string,string>|null */

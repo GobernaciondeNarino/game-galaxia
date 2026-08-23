@@ -144,6 +144,59 @@ echo "\n▸ El almacén está fuera de lo que se sirve\n";
     comprobar('y fuera del repositorio', strpos($gitignore, 'wj-content/ajustes/*') !== false, true);
 }
 
+echo "\n▸ La voz por omisión es de narración en español\n";
+{
+    // ORBIS venía con «Marshal - Toon Character»: personaje de dibujos
+    // animados, en INGLÉS, con style 0,78 y speed 1,2. Estuvo meses ahí porque
+    // nada lo delataba: la síntesis funcionaba y el audio llegaba. Solo se oía.
+    //
+    // Esta comprobación no llama a ElevenLabs —una prueba con red acaba sin
+    // ejecutarse— sino que exige que la voz por omisión esté entre las
+    // candidatas, que son las que se filtraron del catálogo por idioma español
+    // y uso de narración o divulgación. Para contrastarla en vivo está
+    // tools/verificar-voz.php.
+    comprobar(
+        'la voz por omisión está entre las candidatas',
+        isset(Ajustes::VOCES[Config::VOZ_PREDETERMINADA]),
+        true
+    );
+    comprobar(
+        'y no es la de dibujos animados de antes',
+        Config::VOZ_PREDETERMINADA !== 'lE5ZJB6jGeeuvSNxOvs2',
+        true
+    );
+
+    // La voz vieja no puede volver por la puerta de atrás: si alguien la
+    // pusiera en la lista de candidatas, el desplegable la ofrecería y el
+    // probador la sintetizaría.
+    comprobar(
+        'ni figura entre las que ofrece el panel',
+        isset(Ajustes::VOCES['lE5ZJB6jGeeuvSNxOvs2']),
+        false
+    );
+
+    comprobar('hay varias candidatas para comparar', count(Ajustes::VOCES) >= 5, true);
+}
+
+echo "\n▸ El probador de voz no es una puerta abierta\n";
+{
+    $probador = (string) file_get_contents(dirname(__DIR__) . '/wj-admin/probar-voz.php');
+    comprobar('exige sesión del panel', strpos($probador, 'SesionAdmin::dentro()') !== false, true);
+    comprobar('solo acepta voces candidatas', strpos($probador, 'isset(Ajustes::VOCES[$voz])') !== false, true);
+    comprobar('la frase es fija, no llega del cliente', strpos($probador, "\$_GET['texto']") === false, true);
+    comprobar('lleva su propio tope de gasto', strpos($probador, "'pruebavoz'") !== false, true);
+    comprobar('y cachea, para no pagar dos veces lo mismo', strpos($probador, '$cache->existe(') !== false, true);
+
+    // El endpoint PÚBLICO no puede haberse ampliado para esto: si aceptara
+    // cualquier voz, cualquiera recorrería el catálogo a costa de la cuenta.
+    $tts = (string) file_get_contents(dirname(__DIR__) . '/wj-includes/api/tts.php');
+    comprobar(
+        'api/tts.php sigue con su lista blanca',
+        strpos($tts, 'ELEVENLABS_VOCES_PERMITIDAS') !== false && strpos($tts, 'Ajustes::VOCES') === false,
+        true
+    );
+}
+
 echo "\n▸ El panel no devuelve nunca una clave guardada\n";
 {
     // Un campo de contraseña relleno con el valor real lo entrega a cualquiera

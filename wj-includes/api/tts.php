@@ -36,6 +36,9 @@
 
 declare(strict_types=1);
 
+/** Formato del audio que se pide a ElevenLabs. Es el mismo que trae la caché. */
+const FORMATO_AUDIO = 'mp3_44100_128';
+
 require_once __DIR__ . '/../lib/Config.php';
 require_once __DIR__ . '/../lib/Respuesta.php';
 require_once __DIR__ . '/../lib/Cache.php';
@@ -328,7 +331,15 @@ $carga = json_encode([
     ],
 ], JSON_UNESCAPED_UNICODE);
 
-$ch = curl_init('https://api.elevenlabs.io/v1/text-to-speech/' . rawurlencode($voz));
+// `output_format` explícito, como en el cookbook de ElevenLabs. Da la casualidad
+// de que mp3_44100_128 es también lo que la API devuelve por omisión, así que
+// esto no cambia el audio de hoy; lo que quita es la dependencia de un valor
+// por omisión de otro, que puede cambiar sin avisar y dejaría la caché con dos
+// formatos mezclados bajo la misma clave.
+$ch = curl_init(
+    'https://api.elevenlabs.io/v1/text-to-speech/' . rawurlencode($voz)
+    . '?output_format=' . rawurlencode(FORMATO_AUDIO)
+);
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $carga,

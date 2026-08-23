@@ -276,22 +276,48 @@ algo tuyo: `head -c 32 /dev/urandom | base64`.
 interfaz funciona entera: se navega, se lee, se compara y se pregunta al
 catálogo. Lo que se pierde es la voz sintetizada y la conversación libre.
 
-### 5.4 Cambiar la voz
+### 5.4 Cambiar la voz, y oírla antes
 
-1. Saca el código en <https://elevenlabs.io> → *Voices* → elige una →
-   *Copiar ID*. O con la clave:
-   ```bash
-   curl -H "xi-api-key: TU_CLAVE" https://api.elevenlabs.io/v1/voices
-   ```
-2. Ponlo en `ELEVENLABS_VOICE_ID`.
-3. **Borra `wj-content/cache/audio/`.** Los MP3 ya generados siguen ahí con la voz vieja y
-   se seguirían sirviendo tal cual. Es la segunda causa de «he cambiado la voz
-   y suena igual».
-4. Confirma en `wj-includes/api/health.php`: la comprobación `voz_elevenlabs` dice el
-   código activo **y de dónde sale**.
+**Entra en `/wj-admin/`, sección «Narración con voz».** Hay un desplegable con
+diez voces en español y, debajo, un reproductor por cada una: todas dicen la
+misma frase, con los mismos ajustes que usa la narración de verdad. Escúchalas,
+elige y guarda.
+
+La frase de prueba lleva a propósito una cifra con separadores —«1.391.400
+kilómetros»— porque es donde se nota si una voz sirve para esto: leer números en
+español es lo que va a hacer todo el día.
+
+Cada prueba se cachea, así que comparar las diez cuesta diez síntesis una vez y
+ninguna a partir de la segunda.
+
+**Después de cambiarla, borra `wj-content/cache/audio/`.** Los MP3 ya generados
+siguen ahí con la voz anterior y se seguirían sirviendo tal cual.
+
+#### Si quieres otra que no esté en la lista
+
+Las diez del panel son las que encajan con lo que ORBIS hace —español, y uso
+declarado de narración o divulgación— filtradas del catálogo de la cuenta. Hay
+muchas más. Para usar cualquier otra, pon su identificador en
+`ELEVENLABS_VOICE_ID` y **contrástalo antes**:
+
+```bash
+php tools/verificar-voz.php
+```
+
+Pregunta a ElevenLabs qué es esa voz y avisa si no encaja: idioma distinto del
+español, uso declarado de dibujos animados, publicidad o redes sociales, o unos
+ajustes de fábrica demasiado interpretados o rápidos.
+
+> **Por qué existe esa herramienta.** ORBIS narró durante meses con
+> «Marshal - Toon Character»: un personaje de dibujos animados, en inglés, con
+> `style` 0,78 y `speed` 1,2. Nada lo delataba. La síntesis funcionaba, el audio
+> llegaba con su 200, la caché lo guardaba y el diagnóstico daba verde. El único
+> síntoma era el sonido, y el sonido no lo mira ninguna prueba automática.
 
 Un identificador de voz es público —sin la clave de API no sirve para nada— así
 que puede verse sin problema. La clave, no.
+
+---
 
 ### 5.5 Rotar una clave
 

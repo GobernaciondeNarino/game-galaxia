@@ -30,12 +30,35 @@ final class Config
     /**
      * Voz de la narración de ORBIS en ElevenLabs.
      *
+     * ANTES ERA UNA VOZ DE DIBUJOS ANIMADOS, Y NADIE LO SABÍA
+     * ──────────────────────────────────────────────────────
+     * El identificador que llevaba —lE5ZJB6jGeeuvSNxOvs2— corresponde a
+     * «Marshal - Toon Character»: personaje de caricatura, INGLÉS, acento
+     * americano, hombre joven, etiquetado «excited», con style 0,78 y speed
+     * 1,2. Con `eleven_multilingual_v2` habla español, sí, pero con la
+     * entonación de un dibujo animado estadounidense a velocidad y pico.
+     *
+     * No se detectó antes porque nada lo delataba: la síntesis funcionaba, el
+     * audio llegaba y la caché lo guardaba. Solo se oía.
+     *
+     * ESTA
+     * ────
+     * «Enrique M. Nieto». De las 75 voces de la cuenta, es la ÚNICA en español
+     * cuyo caso de uso declarado es `informative_educational`, que es
+     * exactamente el registro de ORBIS: divulgación, no dramatización. Su
+     * descripción en ElevenLabs dice «Great for Narrations».
+     *
+     * No la he escuchado —la clave configurada no tiene permiso para
+     * sintetizar— así que esto es la elección más defendible con los datos del
+     * catálogo, no un veredicto de oído. En wj-admin hay una lista de las otras
+     * candidatas en español y un botón para oírlas antes de decidir.
+     *
      * Un identificador de voz es PÚBLICO: sin la clave de API no sirve para
      * nada, así que puede vivir en el repositorio. Se sustituye sin tocar el
-     * código con la variable de entorno ELEVENLABS_VOICE_ID o con
-     * wj-config.php; el panel de wj-admin dice cuál está ganando.
+     * código con la variable de entorno ELEVENLABS_VOICE_ID, con wj-config.php
+     * o desde el panel; wj-admin dice cuál está ganando.
      */
-    const VOZ_PREDETERMINADA = 'lE5ZJB6jGeeuvSNxOvs2';
+    const VOZ_PREDETERMINADA = 'gbTn1bmCvNgk0QEAVyfM';
 
     /** El motor: código PHP, JS, CSS y librerías de terceros. */
     const INCLUDES = 'wj-includes';

@@ -69,6 +69,7 @@ Fuera de la lista obligatoria, porque sale a internet y tarda medio minuto:
 
 ```bash
 php tools/verificar-horizons.php           # contrasta el catálogo con JPL en vivo
+php tools/verificar-voz.php                # qué es de verdad la voz configurada
 ```
 
 ## Fichas de diseño

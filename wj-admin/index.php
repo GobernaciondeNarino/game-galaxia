@@ -220,6 +220,34 @@ $GRUPOS = [
                 </label>
               <?php endif; ?>
 
+            <?php elseif ($clave === 'ELEVENLABS_VOICE_ID'): ?>
+              <?php $actual = $bloqueado ? (string) Config::obtener($clave) : (string) $guardado; ?>
+              <select id="<?= e($clave) ?>" name="<?= e($clave) ?>" <?= $bloqueado ? 'disabled' : '' ?>>
+                <option value="">La que trae ORBIS — <?= e(Ajustes::VOCES[Config::VOZ_PREDETERMINADA] ?? Config::VOZ_PREDETERMINADA) ?></option>
+                <?php foreach (Ajustes::VOCES as $id => $descripcion): ?>
+                  <option value="<?= e($id) ?>" <?= $actual === $id ? 'selected' : '' ?>><?= e($descripcion) ?></option>
+                <?php endforeach; ?>
+                <?php if ($actual !== '' && !isset(Ajustes::VOCES[$actual])): ?>
+                  <option value="<?= e($actual) ?>" selected><?= e($actual) ?> — escrita a mano</option>
+                <?php endif; ?>
+              </select>
+
+              <?php if (!$bloqueado): ?>
+                <p class="campo__ayuda">
+                  Escúchalas antes de decidir. Cada una dice la misma frase, con los mismos
+                  ajustes que usa la narración de verdad.
+                </p>
+                <ul class="voces">
+                  <?php foreach (Ajustes::VOCES as $id => $descripcion): ?>
+                    <li class="voces__una">
+                      <span class="voces__nombre"><?= e(explode(' — ', $descripcion)[0]) ?></span>
+                      <audio controls preload="none" src="probar-voz.php?voz=<?= e($id) ?>"
+                             aria-label="Probar la voz <?= e(explode(' — ', $descripcion)[0]) ?>"></audio>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              <?php endif; ?>
+
             <?php elseif ($campo['tipo'] === 'entero'): ?>
               <input type="number" id="<?= e($clave) ?>" name="<?= e($clave) ?>"
                      min="<?= (int) $campo['min'] ?>" max="<?= (int) $campo['max'] ?>" inputmode="numeric"
