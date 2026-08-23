@@ -461,6 +461,15 @@ export class HUD {
         const cuerpo = valor ? this.porId.get(valor) : this.porId.get('sol');
         this.mostrarCuerpo(cuerpo);
         this.navegacion.marcar(valor);
+
+        // En un teléfono el perfil está oculto mientras se mira la escena, así
+        // que elegir un cuerpo y no ver su ficha sería elegir a ciegas. Al
+        // seleccionar se pasa a DATOS; al volver a la vista general, a SISTEMA.
+        //
+        // `marcar` y no `elegir`: deja el destino señalado sin volver a
+        // ejecutar su acción, que ya se acaba de ejecutar. Con `elegir`, entrar
+        // en un cuerpo dispararía «vuelve a la vista general» y lo desharía.
+        this.menu?.marcar(valor ? 'datos' : 'sistema');
       }),
       App.al('estado:vista', ({ valor }) => this.establecerVista(valor)),
       App.al('tiempo:velocidad', (v) => {

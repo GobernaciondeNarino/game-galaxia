@@ -481,6 +481,22 @@
    ser cinco atajos: en un teléfono solo cabe una cosa a la vez, así que elegir
    dónde estás y elegir qué miras son la misma decisión. */
 @media (max-width: 1024px) {
+  /* SISTEMA —y por tanto el arranque, que empieza aquí— enseña LA ESCENA.
+     Nada más.
+
+     Antes se abría con el perfil del cuerpo y la tira de navegación ya
+     desplegados, y entre los dos se comían la mitad inferior de la pantalla:
+     de un Sistema Solar en tres dimensiones se veía una franja. Y no hacía
+     falta que estuvieran: para eso están DATOS y CUERPOS en la barra de abajo,
+     a un toque. Una barra de navegación que promete cinco sitios y además
+     enseña dos de ellos de entrada no está ordenando nada.
+
+     GALAXIA, por lo mismo: fuera todo lo que tape el disco. */
+  body[data-seccion="sistema"] #hud-panel-izquierdo,
+  body[data-seccion="sistema"] #hud-navegacion-planetaria,
+  body[data-seccion="galaxia"] #hud-panel-izquierdo,
+  body[data-seccion="galaxia"] #hud-navegacion-planetaria { display: none; }
+
   /* CUERPOS: la tira de navegación manda; el perfil se aparta. */
   body[data-seccion="cuerpos"] #hud-panel-izquierdo { display: none; }
 
@@ -488,10 +504,6 @@
      le toca cuando comparte sitio con la escena. */
   body[data-seccion="datos"] #hud-panel-izquierdo { max-height: 100%; }
   body[data-seccion="datos"] #hud-navegacion-planetaria { display: none; }
-
-  /* GALAXIA: fuera todo lo que tape el disco. */
-  body[data-seccion="galaxia"] #hud-panel-izquierdo,
-  body[data-seccion="galaxia"] #hud-navegacion-planetaria { display: none; }
 }
 
 /* ==========================================================================

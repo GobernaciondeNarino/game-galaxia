@@ -328,13 +328,17 @@
 }
 
 .indicador__accion {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
-  /* Alto mínimo de 24 px: el objetivo de puntero de la WCAG 2.2 (2.5.8). Los de
-     red y FPS se quedan más bajos y eso está bien, porque no se pulsan: la
-     diferencia de altura es la pista de cuál de los cuatro hace algo. */
-  min-height: 24px;
+  /* MISMO TAMAÑO que las pastillas de red y FPS: 2px 6px, sin alto mínimo.
+     Los cuatro indicadores son una fila y tienen que leerse como una fila; con
+     dos de 44 px y dos de 16, la barra parecía dos cosas pegadas.
+
+     Lo que se pulsa no encoge con ellos: el objetivo táctil lo pone el
+     `::after` de abajo, invisible y más alto que la pastilla. La WCAG 2.5.8
+     mide el ÁREA QUE RESPONDE, no lo que se ve pintado. */
   padding: 2px 6px;
 
   background: none;
@@ -357,15 +361,37 @@
   outline-offset: 2px;
 }
 
+/* El área que responde al dedo, más alta que la pastilla y sin pintar nada.
+   24 px es el mínimo del criterio 2.5.8 de la WCAG 2.2, que mide el objetivo,
+   no el dibujo. Se agranda solo en vertical y solo lo justo: estirarlo más
+   robaría toques a la escena, que empieza justo debajo de esta fila. */
+.indicador__accion::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 24px;
+  transform: translateY(-50%);
+}
+
 /* Encendido: el borde se refuerza. El color ya lo pone `data-estado`, pero el
    color por sí solo no puede ser lo único que distinga dos estados. */
 .indicador__accion[aria-pressed="true"] { border-width: 2px; }
 
+/* Y el símbolo va en el color de acento SIEMPRE, encendido o apagado. Con las
+   cuatro pastillas del mismo tamaño, la altura ya no dice cuál se pulsa; esto
+   sí, y no depende solo del color porque los dos que se pulsan son además los
+   únicos que llevan símbolo Y son botones de verdad para el teclado. */
+.indicador__accion .indicador__simbolo { color: var(--cian-brillante); }
+
 @media (pointer: coarse) {
-  /* 44 px con el dedo. Aquí no es un lujo: por debajo de 720 px estos dos
-     botones son la ÚNICA forma de encender la cámara y el micrófono, porque el
-     panel de entradas y la ventana de invitación no se dibujan. */
-  .indicador__accion { min-height: 44px; padding: 2px var(--e-2); }
+  /* 32 px con el dedo. Por debajo de 720 px estos dos botones son la ÚNICA
+     forma de encender la cámara y el micrófono —el panel de entradas y la
+     ventana de invitación no se dibujan—, así que el objetivo crece por encima
+     del mínimo; pero no hasta 44, porque son 14 px de banda invisible a cada
+     lado y por debajo está el lienzo. */
+  .indicador__accion::after { height: 32px; }
 }
 .indicador[data-estado="activo"]   { color: var(--verde-estado); border-color: rgba(58, 170, 53, 0.55); }
 .indicador[data-estado="aviso"]    { color: var(--ambar-seleccion); border-color: rgba(232, 160, 32, 0.55); }
