@@ -116,12 +116,12 @@ con el resto del sitio.
 **Comprobación rápida** una vez subido:
 
 ```
-https://tu-dominio/juegos/orbis/vendor/three/build/three.module.min.js  → 200
-https://tu-dominio/juegos/orbis/api/health.php                          → JSON
-https://tu-dominio/juegos/orbis/config/secrets.php                      → 403
+https://tu-dominio/juegos/orbis/wj-includes/externos/three/build/three.module.min.js  → 200
+https://tu-dominio/juegos/orbis/wj-includes/api/health.php                            → JSON
+https://tu-dominio/juegos/orbis/wj-config.php                                         → 403
 ```
 
-Si el primero devuelve 404, la carpeta `vendor/` no se subió: la pantalla de
+Si el primero devuelve 404, `wj-includes/externos/` no se subió: la pantalla de
 arranque lo dirá con esas mismas palabras y con la ruta exacta que falta.
 
 ---
@@ -134,7 +134,7 @@ find httpdocs -type d -exec chmod 755 {} \;
 find httpdocs -type f -exec chmod 644 {} \;
 
 # Escritura para la caché de audio y los registros
-chmod 775 httpdocs/cache/audio httpdocs/api/logs
+chmod 775 httpdocs/wj-content/cache/audio httpdocs/wj-content/logs httpdocs/wj-content/ajustes
 ```
 
 El propietario debe ser el usuario del suscriptor de Plesk (habitualmente el
@@ -160,17 +160,27 @@ cp wj-config-ejemplo.php wj-config.php
 chmod 640 wj-config.php
 ```
 
-En el *Administrador de archivos* de Plesk: duplicar `secrets.example.php` y
-renombrar la copia a `secrets.php`.
+En el *Administrador de archivos* de Plesk: duplicar `wj-config-ejemplo.php` y
+renombrar la copia a `wj-config.php`.
 
-La plantilla trae los diez valores comentados uno a uno. Lo que dejes vacío usa
-el valor por omisión, así que **no hace falta rellenarlo todo**: con
-`ELEVENLABS_API_KEY` y `ANTHROPIC_API_KEY` ORBIS ya funciona entero.
+La plantilla trae las quince claves comentadas una a una y **todas vacías**. Lo
+que dejes vacío se resuelve más abajo —primero el panel, y si allí tampoco hay
+nada, el valor por omisión que trae ORBIS, escrito en el comentario de cada
+clave—. Así que **no hace falta rellenar nada**: con `ELEVENLABS_API_KEY` y
+`ANTHROPIC_API_KEY`, puestas aquí o desde el panel, ORBIS funciona entero.
+
+> **Viajan vacías a propósito.** Ocho de ellas traían antes su valor por omisión
+> rellenado, y copiar la plantilla —el paso 1 de esta guía— dejaba esos ocho
+> campos **bloqueados** en el panel: para `Config`, un valor escrito en
+> `wj-config.php` es una decisión de quien administra el servidor, y el panel
+> hace bien en no dejar escribir encima. Un valor por omisión no es una
+> decisión, así que ahora vive en el comentario. Rellenar una clave aquí es lo
+> que la convierte en decisión, y solo entonces manda sobre el panel.
 
 Después **comprueba que está bloqueado**:
 
 ```
-https://tu-dominio/config/secrets.php   →  debe devolver 403
+https://tu-dominio/wj-config.php   →  debe devolver 403
 ```
 
 Si devuelve una página en blanco o el contenido del archivo, detén el
@@ -198,8 +208,27 @@ php -r 'echo password_hash("tu-clave", PASSWORD_DEFAULT), "\n";'
 
 **Qué se puede tocar desde el panel y qué no.** Lo que fijes en las variables de
 entorno o en `wj-config.php` aparece bloqueado, con un rótulo que dice de dónde
-sale. No es una limitación: es la respuesta a «lo cambio y no pasa nada». Quien
-tiene acceso al servidor fija un valor y sabe que ningún panel se lo va a mover.
+sale **y qué hay que vaciar para poder editarlo desde el panel**: la variable
+concreta de Plesk, o la línea exacta de `wj-config.php`. No es una limitación:
+es la respuesta a «lo cambio y no pasa nada». Quien tiene acceso al servidor fija
+un valor y sabe que ningún panel se lo va a mover.
+
+Si acabas de copiar la plantilla y ves campos bloqueados, tu `wj-config.php` es
+de una versión anterior: traía los valores por omisión rellenados. Vacía esas
+líneas —`'CLAVE' => '',`— y el panel vuelve a dejarlas editar.
+
+**Lo que falta por configurar.** Al entrar, el panel lista arriba lo que aún no
+está puesto por ninguna de las tres vías, y qué deja de funcionar mientras
+falte: la clave de ElevenLabs, la de Anthropic y la sal de los contadores. Cada
+línea lleva un enlace a su campo. Lo que ya esté resuelto en Plesk o en
+`wj-config.php` no aparece: cuenta como configurado.
+
+**Si el panel no puede escribir, lo dice al entrar y no al guardar.** Los campos
+de clave salen siempre vacíos, así que un fallo al guardar obligaría a volver a
+pegarlas todas. Cuando `wj-content/ajustes/` no es escribible por el usuario con
+el que corre PHP —el caso típico es desplegar con un usuario y servir con
+otro— aparece un aviso en rojo con el `chmod` exacto, y el botón de guardar sale
+apagado.
 
 Lo que se guarda desde el panel va a `wj-content/ajustes/ajustes.json`, fuera de
 lo que se sirve por HTTP y fuera del repositorio. No se reescribe `wj-config.php`
@@ -326,7 +355,7 @@ un mensaje— dala por comprometida:
 
 1. Genera una nueva en el panel del proveedor y **revoca la anterior**.
 2. Cámbiala en la variable de entorno o en `wj-config.php`.
-3. `https://tu-dominio/api/health.php?red=1` para confirmar que la nueva vale.
+3. `https://tu-dominio/wj-includes/api/health.php?red=1` para confirmar que la nueva vale.
 
 No hay que tocar nada más: la caché de audio sigue sirviendo, porque lo que
 guarda son MP3 ya pagados, no la clave.
@@ -337,14 +366,14 @@ guarda son MP3 ya pagados, no la clave.
 
 En este orden:
 
-1. **`https://tu-dominio/api/health.php`**
+1. **`https://tu-dominio/wj-includes/api/health.php`**
    Debe devolver JSON con `"estado": "ok"` o `"aviso"`. Cualquier `"error"`
    aparece detallado en `comprobaciones`.
 
-2. **`https://tu-dominio/api/health.php?red=1`**
+2. **`https://tu-dominio/wj-includes/api/health.php?red=1`**
    Añade la prueba de conectividad y de validez de la clave con ElevenLabs.
 
-2 bis. **`https://tu-dominio/api/tts.php?bodyId=tierra`**
+2 bis. **`https://tu-dominio/wj-includes/api/tts.php?bodyId=tierra`**
    Debe devolver `audio/mpeg`. La primera vez tarda unos segundos —la está
    generando—; la segunda es instantánea y trae la cabecera
    `X-Orbis-Cache: hit`. Con `&soloCache=1` no genera nada: devuelve el audio
@@ -352,7 +381,7 @@ En este orden:
 
 2 ter. **El asistente conversacional.** Desde una terminal:
    ```bash
-   curl -sS -X POST https://tu-dominio/api/chat.php \
+   curl -sS -X POST https://tu-dominio/wj-includes/api/chat.php \
         -H 'Content-Type: application/json' \
         -d '{"turnos":[{"rol":"usuario","texto":"¿Cuánto mide Marte?"}]}'
    ```
@@ -368,8 +397,9 @@ En este orden:
 3. **`http://tu-dominio/`** (sin la ese)
    Debe redirigir a `https://` con un 301.
 
-4. **`https://tu-dominio/config/secrets.php`** → 403
-   **`https://tu-dominio/cache/audio/`** → 403
+4. **`https://tu-dominio/wj-config.php`** → 403
+   **`https://tu-dominio/wj-content/cache/audio/`** → 403
+   **`https://tu-dominio/wj-content/ajustes/ajustes.json`** → 403
 
 5. **`https://tu-dominio/`**
    La pantalla de arranque debe mostrar todos los chequeos en verde o ámbar.
@@ -445,7 +475,7 @@ que se sintetice.
 
 ```bash
 for id in $(php -r 'require "wj-includes/lib/Catalogo.php"; echo implode(" ", Catalogo::identificadores());'); do
-  curl -s -o /dev/null -w "%{http_code} $id\n" "https://tu-dominio/api/tts.php?bodyId=$id"
+  curl -s -o /dev/null -w "%{http_code} $id\n" "https://tu-dominio/wj-includes/api/tts.php?bodyId=$id"
   sleep 2
 done
 ```

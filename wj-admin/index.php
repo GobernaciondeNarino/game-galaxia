@@ -75,6 +75,11 @@ if ($accion === 'entrar' && !SesionAdmin::dentro()) {
 
 $dentro = SesionAdmin::dentro();
 
+// Si el panel no puede escribir, hay que decirlo AL ABRIR y no al guardar:
+// los campos de clave salen siempre vacíos, así que un fallo al guardar
+// obliga a volver a pegarlas todas.
+[$sePuedeGuardar, $porQueNo] = $dentro ? Ajustes::escribible() : [true, ''];
+
 // ---------------------------------------------------------------------------
 // Guardar
 // ---------------------------------------------------------------------------
@@ -122,7 +127,7 @@ function e(?string $t): string
 $GRUPOS = [
     'voz'       => ['titulo' => 'Narración con voz', 'nota' => 'ElevenLabs. Sin clave, ORBIS narra con la voz del navegador.'],
     'asistente' => ['titulo' => 'Asistente conversacional', 'nota' => 'Anthropic. Sin clave, el asistente no conversa; las preguntas del catálogo se siguen respondiendo.'],
-    'gasto'     => ['titulo' => 'Topes de gasto', 'nota' => 'Los de arriba acotan lo que gasta una persona; los de abajo, lo que gasta el sitio entero en un día.'],
+    'gasto'     => ['titulo' => 'Topes de gasto', 'nota' => 'Los primeros acotan lo que gasta una persona; los siguientes, lo que gasta el sitio entero en un día. Vacío deja el valor que trae ORBIS; cero desactiva el tope, que no es lo mismo.'],
 ];
 ?>
 <!doctype html>
@@ -184,6 +189,42 @@ $GRUPOS = [
     </div>
   <?php endif; ?>
 
+  <?php if (!$sePuedeGuardar): ?>
+    <div class="mensaje mensaje--error" role="alert">
+      <strong>Este panel no puede guardar nada</strong>: <?= e($porQueNo) ?>.
+      Todo lo que escribas aquí se perderá al pulsar Guardar.
+      <br><br>
+      Hay que dar permiso de escritura a
+      <code><?= e('wj-content/ajustes/') ?></code> para el usuario con el que corre
+      PHP. En Plesk, desde el gestor de archivos, o por SSH:
+      <br><code>chmod 775 wj-content/ajustes/</code>
+      <br><br>
+      Pasa cuando el despliegue se hace con un usuario y PHP corre con otro.
+      Mientras tanto, la configuración se puede poner igualmente en
+      <code>wj-config.php</code> o en las variables de entorno de Plesk, que
+      además mandan sobre este panel.
+    </div>
+  <?php endif; ?>
+
+  <?php $faltan = Ajustes::faltan(); ?>
+  <?php if ($faltan !== []): ?>
+    <section class="tarjeta">
+      <h2 class="tarjeta__titulo">Lo que falta por configurar</h2>
+      <p class="ayuda">
+        ORBIS funciona sin esto —no se cae ni se queda en blanco— pero cada línea
+        es algo que ahora mismo no hace. Los campos están más abajo.
+      </p>
+      <ul class="faltan">
+        <?php foreach ($faltan as $clave => $campo): ?>
+          <li class="faltan__una">
+            <a class="faltan__ir" href="#<?= e($clave) ?>"><?= e($campo['etiqueta']) ?></a>
+            <span class="faltan__consecuencia"><?= e($campo['sinEsto']) ?></span>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    </section>
+  <?php endif; ?>
+
   <p class="ayuda ayuda--suelta">
     Clave de este panel: <strong><?= e(SesionAdmin::origenClave()) ?></strong>.
     Diagnóstico completo del servidor en
@@ -204,6 +245,11 @@ $GRUPOS = [
             $guardado = Ajustes::obtener($clave);
             $idError = 'e-' . strtolower($clave);
             $error = $erroresCampo[$clave] ?? null;
+
+            // Un campo vacío no significa «sin valor»: significa que manda el
+            // que trae ORBIS. Decir cuál, en el texto de ejemplo, evita que se
+            // rellenen los seis topes «por si acaso» sin saber qué había.
+            $ejemplo = isset($campo['omision']) ? $campo['omision'] . ' (el que trae ORBIS)' : '';
         ?>
           <div class="campo <?= $bloqueado ? 'campo--bloqueado' : '' ?>">
             <label class="campo__etiqueta" for="<?= e($clave) ?>"><?= e($campo['etiqueta']) ?></label>
@@ -252,14 +298,14 @@ $GRUPOS = [
               <input type="number" id="<?= e($clave) ?>" name="<?= e($clave) ?>"
                      min="<?= (int) $campo['min'] ?>" max="<?= (int) $campo['max'] ?>" inputmode="numeric"
                      value="<?= e($bloqueado ? (string) Config::obtener($clave) : (string) $guardado) ?>"
-                     placeholder="<?= e((string) Config::obtener($clave, '')) ?>"
+                     placeholder="<?= e($ejemplo) ?>"
                      <?= $bloqueado ? 'disabled' : '' ?>
                      <?= $error ? 'aria-invalid="true" aria-describedby="' . e($idError) . '"' : '' ?>>
 
             <?php else: ?>
               <input type="text" id="<?= e($clave) ?>" name="<?= e($clave) ?>" autocomplete="off"
                      value="<?= e($bloqueado ? (string) Config::obtener($clave) : (string) $guardado) ?>"
-                     placeholder="<?= e((string) Config::obtener($clave, '')) ?>"
+                     placeholder="<?= e($ejemplo) ?>"
                      <?= $bloqueado ? 'disabled' : '' ?>
                      <?= $error ? 'aria-invalid="true" aria-describedby="' . e($idError) . '"' : '' ?>>
             <?php endif; ?>
@@ -270,8 +316,16 @@ $GRUPOS = [
 
             <?php if ($bloqueado): ?>
               <p class="campo__ayuda campo__ayuda--bloqueo">
-                Fijado en <strong><?= e($origen === 'entorno' ? 'las variables de entorno de Plesk' : 'wj-config.php') ?></strong>.
-                Manda sobre este panel, así que aquí no se puede cambiar.
+                <?php if ($origen === 'entorno'): ?>
+                  Fijado en <strong>las variables de entorno de Plesk</strong>, que mandan
+                  sobre este panel. Para poder cambiarlo desde aquí, borra la variable
+                  <code><?= e($clave) ?></code> en Plesk → Dominios → Configuración de PHP
+                  → Variables de entorno.
+                <?php else: ?>
+                  Fijado en <strong>wj-config.php</strong>, que manda sobre este panel. Para
+                  poder cambiarlo desde aquí, deja esa línea vacía:
+                  <code><?= e("'" . $clave . "' => '',") ?></code>
+                <?php endif; ?>
               </p>
             <?php elseif ($campo['ayuda'] !== ''): ?>
               <p class="campo__ayuda"><?= e($campo['ayuda']) ?></p>
@@ -282,7 +336,7 @@ $GRUPOS = [
     <?php endforeach; ?>
 
     <div class="ajustes__pie">
-      <button type="submit" name="accion" value="guardar" class="boton">Guardar</button>
+      <button type="submit" name="accion" value="guardar" class="boton" <?= $sePuedeGuardar ? '' : 'disabled' ?>>Guardar</button>
       <p class="ayuda">
         Se escribe en <code>wj-content/ajustes/ajustes.json</code>, fuera de lo que se sirve por HTTP.
       </p>

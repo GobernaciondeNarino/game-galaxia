@@ -53,15 +53,26 @@ final class Ajustes
      * formulario —o inventado por quien envíe la petición a mano— entraría
      * directo a la configuración del servidor.
      *
-     *   tipo: 'clave'   secreto; el panel nunca lo devuelve, solo dice si está
-     *         'texto'   cadena corta con formato comprobado
-     *         'entero'  número dentro de un rango
+     *   tipo:    'clave'   secreto; el panel nunca lo devuelve, solo dice si está
+     *            'texto'   cadena corta con formato comprobado
+     *            'entero'  número dentro de un rango
+     *   sinEsto: qué deja de funcionar mientras el campo esté vacío. Solo lo
+     *            llevan los que de verdad hacen falta, y es lo que el panel
+     *            lista arriba en «Lo que falta por configurar». Un campo sin
+     *            esto es un ajuste fino: su valor por omisión ya vale.
+     *   omision: el valor que usa ORBIS si el campo se deja vacío. El panel lo
+     *            enseña como texto de ejemplo, para que un campo en blanco no
+     *            parezca «sin valor» cuando en realidad hay uno en marcha.
+     *            El valor de verdad vive en la llamada a Config, no aquí:
+     *            tools/pruebas-config.php comprueba que los dos coinciden, que
+     *            si no esto se convierte en una segunda copia que se desvía.
      */
     const CAMPOS = [
         'ELEVENLABS_API_KEY' => [
             'tipo' => 'clave', 'grupo' => 'voz',
             'etiqueta' => 'Clave de ElevenLabs',
             'ayuda' => 'elevenlabs.io → Profile → API Key. Necesita el permiso «text_to_speech».',
+            'sinEsto' => 'ORBIS narra con la voz del navegador, que suena bastante peor.',
         ],
         'ELEVENLABS_VOICE_ID' => [
             'tipo' => 'texto', 'grupo' => 'voz', 'patron' => '/^[A-Za-z0-9]{0,40}$/',
@@ -70,11 +81,13 @@ final class Ajustes
                 . 'o las narraciones ya generadas seguirán sonando con la anterior.',
         ],
         'ELEVENLABS_MODEL_ID' => [
+            'omision' => 'eleven_multilingual_v2',
             'tipo' => 'texto', 'grupo' => 'voz', 'patron' => '/^[a-z0-9_]{0,40}$/',
             'etiqueta' => 'Modelo de síntesis',
             'ayuda' => 'eleven_multilingual_v2 da la mejor prosodia en español.',
         ],
         'ELEVENLABS_STT_MODEL' => [
+            'omision' => 'scribe_v1',
             'tipo' => 'texto', 'grupo' => 'voz', 'patron' => '/^[a-z0-9_]{0,40}$/',
             'etiqueta' => 'Modelo de transcripción',
             'ayuda' => 'Para el dictado por voz en navegadores sin reconocimiento propio.',
@@ -83,41 +96,66 @@ final class Ajustes
             'tipo' => 'clave', 'grupo' => 'asistente',
             'etiqueta' => 'Clave de Anthropic',
             'ayuda' => 'console.anthropic.com → Settings → API Keys. Sin ella el asistente no conversa.',
+            'sinEsto' => 'El asistente no conversa: responde 503. Las preguntas del catálogo '
+                . 'se siguen contestando.',
         ],
         'ORBIS_MODELO' => [
+            'omision' => 'claude-opus-5',
             'tipo' => 'texto', 'grupo' => 'asistente', 'patron' => '/^[a-z0-9.\-]{0,60}$/',
             'etiqueta' => 'Modelo del asistente',
             'ayuda' => 'Vacío = el que trae ORBIS. Uno más pequeño gasta menos y responde algo peor.',
         ],
         'LIMITE_GENERACIONES_HORA' => [
+            'omision' => '30',
             'tipo' => 'entero', 'grupo' => 'gasto', 'min' => 0, 'max' => 10000,
             'etiqueta' => 'Narraciones nuevas por visitante y hora',
             'ayuda' => 'Las que ya están en caché no cuentan.',
         ],
         'LIMITE_TRANSCRIPCIONES_HORA' => [
+            'omision' => '120',
             'tipo' => 'entero', 'grupo' => 'gasto', 'min' => 0, 'max' => 10000,
             'etiqueta' => 'Transcripciones por visitante y hora',
             'ayuda' => '',
         ],
         'LIMITE_CONVERSACION_HORA' => [
+            'omision' => '60',
             'tipo' => 'entero', 'grupo' => 'gasto', 'min' => 0, 'max' => 10000,
             'etiqueta' => 'Respuestas del asistente por visitante y hora',
             'ayuda' => 'Es el más caro de los tres.',
         ],
         'TOPE_DIARIO_NARRACION' => [
+            'omision' => '500',
             'tipo' => 'entero', 'grupo' => 'gasto', 'min' => 0, 'max' => 100000,
             'etiqueta' => 'Narraciones nuevas de TODO el sitio, al día',
             'ayuda' => 'Freno de emergencia, no objetivo de uso. Cero lo desactiva.',
         ],
         'TOPE_DIARIO_TRANSCRIPCION' => [
+            'omision' => '1500',
             'tipo' => 'entero', 'grupo' => 'gasto', 'min' => 0, 'max' => 100000,
             'etiqueta' => 'Transcripciones de TODO el sitio, al día',
             'ayuda' => '',
         ],
         'TOPE_DIARIO_CONVERSACION' => [
+            'omision' => '400',
             'tipo' => 'entero', 'grupo' => 'gasto', 'min' => 0, 'max' => 100000,
             'etiqueta' => 'Respuestas del asistente de TODO el sitio, al día',
             'ayuda' => '',
+        ],
+        // La sal es lo único de este grupo que no es un número, y estaba
+        // solo en wj-config.php: quien configurara desde el panel no llegaba
+        // a enterarse de que existe, y se quedaba con la de por omisión —la
+        // misma en todas las instalaciones, que es como no tener ninguna—.
+        // Se admiten los caracteres de base64 porque la forma de generarla
+        // que documenta la plantilla los produce: head -c 32 … | base64.
+        'ORBIS_SAL_LIMITES' => [
+            'tipo' => 'clave', 'grupo' => 'gasto',
+            'patron' => '/^[A-Za-z0-9._\-+\/=]{16,200}$/',
+            'etiqueta' => 'Sal para anonimizar las direcciones IP',
+            'ayuda' => 'Los topes cuentan por visitante, y se guarda un hash de la IP en vez de '
+                . 'la IP. Sin una sal propia ese hash se deshace probando. Genera una con: '
+                . 'head -c 32 /dev/urandom | base64',
+            'sinEsto' => 'Los contadores por visitante usan la sal por omisión, la misma en '
+                . 'todas las instalaciones: el hash de cada IP se puede deshacer probando.',
         ],
     ];
 
@@ -156,6 +194,81 @@ final class Ajustes
     public static function ruta(): string
     {
         return Config::contenido(self::ARCHIVO);
+    }
+
+    /**
+     * ¿Se puede escribir el archivo de ajustes? Y si no, por qué.
+     *
+     * POR QUÉ SE COMPRUEBA ANTES Y NO SOLO AL GUARDAR
+     * ───────────────────────────────────────────────
+     * Porque el fallo llega tarde. Guardar solo falla DESPUÉS de haber
+     * rellenado el formulario entero, y como los campos de clave salen siempre
+     * vacíos, el reintento obliga a volver a pegar las dos claves. Sabiéndolo
+     * al abrir el panel, se arregla el permiso primero y se rellena una vez.
+     *
+     * Es el fallo típico de un despliegue en Plesk: el «git pull» se hace con
+     * un usuario y PHP corre con otro, así que wj-content/ajustes/ llega con
+     * dueño equivocado y el panel guarda en el vacío.
+     *
+     * @return array{0:bool,1:string} [se puede, motivo si no]
+     */
+    public static function escribible(): array
+    {
+        return self::escribibleEn(self::ruta());
+    }
+
+    /**
+     * Lo mismo, para una ruta cualquiera. Es una función pura y está separada
+     * para poder probar los tres desenlaces sin tocar el archivo real del
+     * servidor: existe y no se puede escribir, no existe la carpeta, y la
+     * carpeta existe pero está cerrada.
+     *
+     * @return array{0:bool,1:string}
+     */
+    public static function escribibleEn(string $ruta): array
+    {
+        if (is_file($ruta)) {
+            return is_writable($ruta)
+                ? [true, '']
+                : [false, 'el archivo existe pero PHP no puede escribirlo'];
+        }
+
+        $directorio = dirname($ruta);
+        if (!is_dir($directorio)) {
+            // El directorio se versiona con su .gitkeep justamente para que
+            // exista tras un «git pull». Si falta, el despliegue se hizo por
+            // FTP saltándose los archivos ocultos.
+            return [false, 'la carpeta no existe'];
+        }
+        return is_writable($directorio)
+            ? [true, '']
+            : [false, 'la carpeta existe pero PHP no puede escribir dentro'];
+    }
+
+    /**
+     * Lo que falta por configurar: los campos con «sinEsto» que no tienen
+     * valor por ninguna de las tres vías.
+     *
+     * Se pregunta a Config, no a este archivo, porque un valor puesto en Plesk
+     * o en wj-config.php TAMBIÉN cuenta como configurado. Listar como
+     * pendiente algo que ya está resuelto arriba es la forma más rápida de que
+     * el aviso deje de leerse.
+     *
+     * @return array<string,array> clave => definición del campo
+     */
+    public static function faltan(): array
+    {
+        $pendientes = [];
+        foreach (self::CAMPOS as $clave => $campo) {
+            if (!isset($campo['sinEsto'])) {
+                continue;
+            }
+            $valor = Config::obtener($clave);
+            if ($valor === null || $valor === '') {
+                $pendientes[$clave] = $campo;
+            }
+        }
+        return $pendientes;
     }
 
     /**
@@ -230,12 +343,14 @@ final class Ajustes
             // Las claves de API no tienen un formato público estable, así que
             // solo se comprueba lo que sí se sabe: que no traiga espacios ni
             // saltos de línea —el error de copiar y pegar de siempre— y que
-            // tenga una longitud sensata.
+            // tenga una longitud sensata. Un campo puede traer su propio
+            // patrón: la sal se genera en base64 y lleva «+/=».
             if ($valor === '') {
                 return [true, '', ''];
             }
-            if (preg_match('/^[A-Za-z0-9._\-]{16,200}$/', $valor) !== 1) {
-                return [false, '', 'no parece una clave: revisa que no se haya colado un espacio'];
+            $patron = $campo['patron'] ?? '/^[A-Za-z0-9._\-]{16,200}$/';
+            if (preg_match($patron, $valor) !== 1) {
+                return [false, '', 'no vale: revisa que no se haya colado un espacio y que tenga al menos 16 caracteres'];
             }
             return [true, $valor, ''];
         }

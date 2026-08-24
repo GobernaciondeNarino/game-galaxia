@@ -86,7 +86,11 @@ export class Bienvenida {
       onkeydown: (e) => this._teclado(e),
     }, [
       crear('p', { class: 'bienvenida__marca', text: 'ORBIS' }),
-      crear('h2', { class: 'bienvenida__titulo', id: 'bienvenida-titulo', text: 'Hola. Soy ORBIS.' }),
+      // Quien saluda es Ñaño; ORBIS es lo que presenta. El mismo encuadre que
+      // usan las frases de bienvenida del asistente, en wj-content/data/asistente.json:
+      // si el diálogo dijera «Soy ORBIS» y la voz dijera otra cosa acto
+      // seguido, parecerían dos.
+      crear('h2', { class: 'bienvenida__titulo', id: 'bienvenida-titulo', text: '¡Hola! Soy Ñaño y te presento a ORBIS.' }),
       crear('p', { class: 'bienvenida__texto' }, [
         crear('span', { text: 'Voy a acompañarte por el Sistema Solar. Todo lo que te cuente son medidas reales, con su fuente: si de algo no hay dato, te lo diré en vez de inventarlo.' }),
       ]),
@@ -103,7 +107,7 @@ export class Bienvenida {
 
     this._focoAnterior = document.activeElement;
     this.campo.focus();
-    anunciar('Hola, soy ORBIS. ¿Cómo te llamo? Puedes seguir sin decirlo.');
+    anunciar('Hola, soy Ñaño y te presento a ORBIS. ¿Cómo te llamo? Puedes seguir sin decirlo.');
   }
 
   /** Avisa mientras se escribe, sin regañar por adelantado. */

@@ -11,6 +11,31 @@
    necesita.
    ========================================================================== */
 
+/* ══════════════════════════════════════════════════════════════════════════
+   ESTO ES UNA PÁGINA QUE SE DESPLAZA, Y LA HUD NO
+   ══════════════════════════════════════════════════════════════════════════
+
+   nucleo.css trae `html, body { height: 100%; overflow: hidden }` con el
+   comentario «la HUD nunca desplaza la página», y ahí es exactamente lo que
+   hace falta: una escena a pantalla completa con paneles flotantes encima no
+   puede desplazarse. Pero el panel de administración carga ese mismo archivo
+   —de él salen todas las fichas de diseño— y heredaba la regla.
+
+   El resultado era que ESTE FORMULARIO NO SE PODÍA DESPLAZAR. Mide unos 2.500
+   píxeles de alto y la ventana recorta a la altura que tenga: se veían los
+   primeros campos, y el resto del formulario y el botón de Guardar quedaban
+   fuera, sin barra ni rueda que llegara hasta ellos. Desde fuera se ve como
+   «el panel no me deja rellenar la configuración», que es justo lo que era.
+
+   No se toca nucleo.css: allí la regla está bien. Se deshace aquí, que es lo
+   que hace este archivo —panel.css carga después—.
+   ══════════════════════════════════════════════════════════════════════════ */
+html, body {
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+}
+
 .admin {
   min-height: 100vh;
   display: grid;
@@ -80,6 +105,19 @@
 /* ------------------------------------------------------------------ Campos */
 .campo { display: grid; gap: 6px; }
 
+/* Un elemento de rejilla no baja de su tamaño intrínseco salvo que se le diga.
+   El desplegable de voces lleva descripciones largas —«Enrique M. Nieto —
+   divulgación, acento mexicano. La única “informative_educational” en
+   español»— y con eso se plantaba en 939 px dentro de una columna de 720,
+   empujando la tarjeta entera fuera de la pantalla. Como el desbordamiento
+   horizontal estaba oculto, no aparecía barra: el texto simplemente se
+   cortaba. */
+.campo > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.campo select { text-overflow: ellipsis; }
+
 /* Etiqueta SIEMPRE visible, nunca solo un placeholder: al escribir dentro, un
    placeholder desaparece y con él la única pista de qué va en ese campo. */
 .campo__etiqueta {
@@ -122,6 +160,16 @@
   color: var(--texto-apagado);
 }
 .campo__ayuda--bloqueo { color: var(--ambar-seleccion); }
+
+/* El aviso de bloqueo dice ahora QUÉ hay que vaciar para desbloquear el campo,
+   y eso es un nombre de variable o una línea de PHP: se marca como código o se
+   lee como parte de la frase. */
+.campo__ayuda code {
+  font-family: var(--fuente-cifras);
+  font-size: 0.95em;
+  color: var(--cian-acento);
+  word-break: break-all;
+}
 .campo__error {
   font-size: var(--t-menor);
   color: var(--rojo-alerta);
@@ -186,6 +234,47 @@
   background: none;
   border-color: var(--panel-borde);
   min-height: 32px;
+}
+
+/* Guardar apagado cuando el panel no puede escribir. Se deja a la vista, y no
+   se esconde, porque lo que hace falta entender es que el botón está ahí y no
+   va a servir de nada hasta arreglar el permiso que explica el aviso rojo. */
+.boton[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: none;
+}
+.boton[disabled]:hover { background: none; }
+
+/* ------------------------------------------------- Lo que falta por poner */
+/* Una lista de pendientes, no una alarma: ORBIS funciona sin ninguna de estas
+   cosas. Por eso va en una tarjeta normal y en ámbar, no en rojo, y cada línea
+   dice qué se pierde en lugar de limitarse a nombrar el campo. */
+.faltan {
+  display: grid;
+  gap: var(--e-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.faltan__una {
+  display: grid;
+  gap: 2px;
+  padding-left: var(--e-3);
+  border-left: 2px solid var(--ambar-seleccion);
+}
+.faltan__ir {
+  justify-self: start;
+  font-family: var(--fuente-titulos);
+  font-size: var(--t-menor);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ambar-seleccion);
+}
+.faltan__ir:focus-visible { outline: 2px solid var(--cian-brillante); outline-offset: 2px; }
+.faltan__consecuencia {
+  font-size: var(--t-menor);
+  color: var(--texto-apagado);
 }
 
 /* ----------------------------------------------------------------- Mensajes */

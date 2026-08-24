@@ -17,6 +17,7 @@
  *   · Que la clave del panel no se puede cambiar desde el panel.
  *   · Que un acierto no gasta cupo de intentos, y un fallo sí.
  *   · Que el archivo de ajustes no se queda a medias si algo falla al escribir.
+ *   · Que copiar la plantilla NO bloquea ningún campo del panel.
  *
  *   php tools/pruebas-admin.php
  */
@@ -25,6 +26,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../wj-includes/lib/Ajustes.php';
 require_once __DIR__ . '/../wj-includes/lib/SesionAdmin.php';
+
+// La sesión se arranca ANTES de imprimir nada. PHP no puede mandar la cookie de
+// sesión con la salida ya empezada, y sin esto las pruebas de entrada quedaban
+// sepultadas bajo ochenta líneas de warnings que no son el fallo de nada: un
+// resultado ilegible se acaba mirando por encima, que es justo lo que no puede
+// pasar con las pruebas del panel.
+SesionAdmin::iniciar();
 
 $fallos = 0;
 
@@ -110,6 +118,15 @@ echo "\n▸ Un acierto no gasta intentos; un fallo, sí\n";
         @unlink($f);
     }
 
+    // Entrar regenera el identificador de sesión, y eso no se puede hacer con la
+    // salida ya empezada —en consola siempre lo está—. Es una limitación de
+    // probar código de sesión desde la línea de órdenes, no un fallo: en el
+    // navegador la regeneración sí ocurre, y es lo que impide fijar de antemano
+    // el identificador con el que alguien va a entrar. Se silencia ese aviso, y
+    // solo mientras dura este bloque.
+    $avisos = error_reporting();
+    error_reporting($avisos & ~E_WARNING);
+
     for ($i = 0; $i < 20; $i++) {
         [$ok] = SesionAdmin::entrar(SesionAdmin::CLAVE_POR_OMISION);
         if (!$ok) {
@@ -126,8 +143,132 @@ echo "\n▸ Un acierto no gasta intentos; un fallo, sí\n";
             break;
         }
     }
+    error_reporting($avisos);
+
     comprobar('los fallos sí acaban bloqueando', $fallidos <= SesionAdmin::INTENTOS_HORA + 1, true);
     printf("     bloqueado tras %d intentos fallidos (tope: %d)\n", $fallidos, SesionAdmin::INTENTOS_HORA);
+}
+
+echo "\n▸ Copiar la plantilla no bloquea ningún campo del panel\n";
+{
+    // ESTE ERA EL FALLO. El paso 1 de la instalación es «cp
+    // wj-config-ejemplo.php wj-config.php», y la plantilla traía rellenados
+    // ocho valores por omisión: el modelo de síntesis, el de transcripción y
+    // los seis topes de gasto. Para Config, un valor no vacío en wj-config.php
+    // es una decisión de quien administra el servidor, así que el panel hacía
+    // lo correcto —enseñarlos bloqueados— y quien seguía las instrucciones al
+    // pie de la letra se encontraba ocho de trece campos que no dejaban
+    // escribir, sin haber decidido nada.
+    //
+    // Un valor por omisión no es una decisión. Va en el comentario.
+    $plantilla = require dirname(__DIR__) . '/wj-config-ejemplo.php';
+    $rellenadas = [];
+    foreach ($plantilla as $clave => $valor) {
+        if ($valor !== '') {
+            $rellenadas[] = $clave;
+        }
+    }
+    comprobar('la plantilla viaja entera vacía', $rellenadas, []);
+
+    // Y que siga cubriendo todo lo que el panel ofrece: una clave editable que
+    // la plantilla no mencione es una que solo se puede poner desde el panel,
+    // sin forma de fijarla en el servidor.
+    $sinDocumentar = array_values(array_diff(array_keys(Ajustes::CAMPOS), array_keys($plantilla)));
+    comprobar('y menciona todos los campos del panel', $sinDocumentar, []);
+}
+
+echo "\n▸ Pero un valor puesto A MANO sí bloquea, y dice cómo desbloquearlo\n";
+{
+    // La regla de precedencia no se toca: lo que se escribe en wj-config.php
+    // manda. Lo que cambia es que ahora escribirlo es un acto deliberado.
+    $panel = (string) file_get_contents(dirname(__DIR__) . '/wj-admin/index.php');
+    comprobar(
+        'el panel sigue bloqueando lo que viene de arriba',
+        strpos($panel, "in_array(\$origen, ['entorno', 'wj-config.php'], true)") !== false,
+        true
+    );
+    // Un aviso que solo dice «no se puede cambiar» deja a quien lo lee sin
+    // salida. Tiene que nombrar la línea exacta que hay que vaciar.
+    comprobar('y dice qué línea vaciar', strpos($panel, "deja esa línea vacía") !== false, true);
+    comprobar('nombrando la clave', strpos($panel, "\"'\" . \$clave . \"' => '',\"") !== false, true);
+    comprobar('y la variable de Plesk, si viene de ahí', strpos($panel, 'borra la variable') !== false, true);
+}
+
+echo "\n▸ El panel avisa ANTES de rellenar si no va a poder guardar\n";
+{
+    // Guardar solo fallaba DESPUÉS de rellenar el formulario entero, y como los
+    // campos de clave salen siempre vacíos, el reintento obligaba a volver a
+    // pegar las dos claves. Es el fallo típico de Plesk: el despliegue se hace
+    // con un usuario y PHP corre con otro.
+    $temporal = sys_get_temp_dir() . '/orbis-pruebas-' . bin2hex(random_bytes(4));
+
+    [$ok, $motivo] = Ajustes::escribibleEn($temporal . '/ajustes/ajustes.json');
+    comprobar('sin carpeta, no se puede', $ok, false);
+    comprobar('y lo dice con esas palabras', $motivo, 'la carpeta no existe');
+
+    mkdir($temporal . '/ajustes', 0775, true);
+    [$ok] = Ajustes::escribibleEn($temporal . '/ajustes/ajustes.json');
+    comprobar('con la carpeta escribible, sí', $ok, true);
+
+    // El archivo real del servidor tiene que poder escribirse aquí y ahora, o
+    // las pruebas de más arriba no habrían significado nada.
+    [$ok] = Ajustes::escribible();
+    comprobar('y el almacén de verdad es escribible', $ok, true);
+
+    @rmdir($temporal . '/ajustes');
+    @rmdir($temporal);
+
+    comprobar('el aviso está en el panel', strpos($panel, 'no puede guardar nada') !== false, true);
+    comprobar('y apaga el botón de guardar', strpos($panel, "\$sePuedeGuardar ? '' : 'disabled'") !== false, true);
+}
+
+echo "\n▸ El panel lista lo que falta por configurar\n";
+{
+    // «Almacenar la información que está faltante» empieza por saber cuál es.
+    putenv('ELEVENLABS_API_KEY');
+    putenv('ANTHROPIC_API_KEY');
+    Ajustes::guardar(['ELEVENLABS_API_KEY' => '', 'ANTHROPIC_API_KEY' => '']);
+
+    $faltan = array_keys(Ajustes::faltan());
+    comprobar('la clave de voz aparece como pendiente', in_array('ELEVENLABS_API_KEY', $faltan, true), true);
+    comprobar('la del asistente también', in_array('ANTHROPIC_API_KEY', $faltan, true), true);
+
+    // Cada pendiente dice qué se pierde, no solo cómo se llama el campo.
+    foreach (Ajustes::faltan() as $clave => $campo) {
+        comprobar(sprintf('«%s» explica qué se pierde sin ella', $clave), $campo['sinEsto'] !== '', true);
+    }
+
+    // Y lo que YA está resuelto más arriba no puede figurar como pendiente:
+    // un aviso que pide algo que ya está puesto deja de leerse.
+    // Sin el prefijo de verdad: tools/comprobar-secretos.sh rastrea la FORMA de
+    // una clave por el código del servidor, y hace bien en no distinguir entre
+    // una inventada para una prueba y una de verdad olvidada.
+    putenv('ANTHROPIC_API_KEY=' . str_repeat('k', 40));
+    comprobar(
+        'lo fijado en el entorno no figura como pendiente',
+        isset(Ajustes::faltan()['ANTHROPIC_API_KEY']),
+        false
+    );
+    putenv('ANTHROPIC_API_KEY');
+}
+
+echo "\n▸ La sal de los contadores se puede poner desde el panel\n";
+{
+    // Estaba solo en wj-config.php: quien configurara desde el panel no se
+    // enteraba de que existe y se quedaba con la de por omisión, que es la
+    // misma en todas las instalaciones —o sea, ninguna—.
+    comprobar('es un campo editable', isset(Ajustes::CAMPOS['ORBIS_SAL_LIMITES']), true);
+    comprobar('y es secreta: el panel no la devuelve', Ajustes::CAMPOS['ORBIS_SAL_LIMITES']['tipo'], 'clave');
+
+    // Se genera con «head -c 32 /dev/urandom | base64», que produce «+/=».
+    [$vale] = Ajustes::validar('ORBIS_SAL_LIMITES', 'Yk9wZjJxN3RSbUx4VjhlQTN6RGg1Sg==');
+    comprobar('acepta una sal en base64', $vale, true);
+    [$vale] = Ajustes::validar('ORBIS_SAL_LIMITES', 'corta');
+    comprobar('y no una demasiado corta', $vale, false);
+
+    // Las claves de API no la heredan: su patrón sigue siendo el estricto.
+    [$vale] = Ajustes::validar('ELEVENLABS_API_KEY', 'sk con espacio');
+    comprobar('el patrón laxo no se contagia a las claves', $vale, false);
 }
 
 echo "\n▸ El almacén está fuera de lo que se sirve\n";

@@ -158,7 +158,7 @@ $vozActiva = (string) Config::obtener('ELEVENLABS_VOICE_ID', Config::VOZ_PREDETE
 $origenVoz = Config::origen('ELEVENLABS_VOICE_ID');
 $origenVoz = $origenVoz === 'entorno'
     ? 'variable de entorno ELEVENLABS_VOICE_ID'
-    : ($origenVoz ?? 'valor fijado en api/lib/Config.php');
+    : ($origenVoz ?? 'valor fijado en wj-includes/lib/Config.php');
 
 comprobar(
     'voz_elevenlabs', 'voz de la narración',
@@ -172,7 +172,7 @@ comprobar(
 // --------------------------------------------------------------------------
 // 4c. Asistente conversacional
 //     Son dos piezas y fallan por separado: la clave se configura y el SDK se
-//     sube. Con la clave puesta y sin la carpeta api/vendor —el fallo típico
+//     sube. Con la clave puesta y sin wj-includes/vendor —el fallo típico
 //     de un despliegue por FTP que se dejó 2.339 archivos por el camino— el
 //     asistente devolvería 503 sin que se entienda por qué.
 // --------------------------------------------------------------------------
@@ -190,8 +190,8 @@ comprobar(
     'sdk_anthropic', 'SDK de Anthropic',
     is_readable($sdk) ? 'ok' : ($origenAnthropic !== null ? 'error' : 'aviso'),
     is_readable($sdk)
-        ? 'api/vendor presente'
-        : 'falta api/vendor — ¿subiste la carpeta completa?'
+        ? 'wj-includes/vendor presente'
+        : 'falta wj-includes/vendor — ¿subiste la carpeta completa?'
 );
 
 // El modelo también se puede sustituir, y conviene ver cuál está activo antes
@@ -202,19 +202,55 @@ comprobar(
     (string) Config::obtener('ORBIS_MODELO', 'claude-opus-5')
         . (Config::origen('ORBIS_MODELO') !== null
             ? ' (origen: ' . Config::origen('ORBIS_MODELO') . ')'
-            : ' (valor fijado en api/lib/Conversacion.php)')
+            : ' (valor fijado en wj-includes/lib/Conversacion.php)')
 );
 
 // --------------------------------------------------------------------------
-// 5. config/secrets.php no debe ser accesible por HTTP
+// 5. wj-config.php no debe ser accesible por HTTP
+//
+// ESTA COMPROBACIÓN ESTUVO MINTIENDO
+// ──────────────────────────────────
+// Daba «error» cuando wj-config.php NO existía, y decía que faltaba un
+// «config/.htaccess» que ya no existe: la carpeta config/ desapareció al
+// reorganizar el proyecto en tres. O sea que una instalación impecable —las
+// claves en las variables de entorno de Plesk, que es lo RECOMENDADO, y ningún
+// wj-config.php en el disco— daba estado «error» y health.php respondía 503.
+// Justo el diagnóstico que se mira cuando algo no va, diciendo que algo no va.
+//
+// Lo que de verdad importa no es que el archivo exista, sino que si existe no
+// se pueda descargar. Eso no se puede probar desde dentro —haría falta una
+// petición HTTP a uno mismo—, pero sí se puede comprobar que la regla que lo
+// deniega sigue en el .htaccess de la raíz, que es de donde depende.
 // --------------------------------------------------------------------------
-comprobar(
-    'config_protegido', 'protección de config/',
-    is_file(Config::raiz() . '/wj-config.php') ? 'ok' : 'error',
-    is_file(Config::raiz() . '/wj-config.php')
-        ? 'config/.htaccess presente'
-        : 'FALTA config/.htaccess: las claves quedarían expuestas'
-);
+$rutaConfig = Config::raiz() . '/' . Config::ARCHIVO_CONFIG;
+if (!is_file($rutaConfig)) {
+    comprobar(
+        'config_protegido', 'protección de ' . Config::ARCHIVO_CONFIG,
+        'ok',
+        'no hay archivo: la configuración sale del entorno o del panel, que es lo recomendado'
+    );
+} else {
+    $reglas = (string) @file_get_contents(Config::raiz() . '/.htaccess');
+    $denegado = strpos($reglas, 'FilesMatch "^wj-config') !== false;
+    comprobar(
+        'config_protegido', 'protección de ' . Config::ARCHIVO_CONFIG,
+        $denegado ? 'ok' : 'error',
+        $denegado
+            ? 'existe y el .htaccess de la raíz lo deniega'
+            : 'existe y el .htaccess de la raíz NO lo deniega: las claves quedarían expuestas'
+    );
+}
+
+// --------------------------------------------------------------------------
+// 5 bis. El panel tiene que poder guardar lo que se escriba en él
+//
+// Sin esto, el panel de wj-admin acepta el formulario, dice «Ajustes
+// guardados» —no: fallaba al escribir y lo decía, pero solo DESPUÉS de
+// rellenarlo entero— y aquí no aparecía nada. Es el fallo típico de Plesk:
+// el despliegue se hace con un usuario y PHP corre con otro.
+// --------------------------------------------------------------------------
+comprobarEscritura('ajustes_panel', 'ajustes', false,
+    'el panel de wj-admin no podrá guardar nada de lo que se escriba en él');
 
 // --------------------------------------------------------------------------
 // 6. Datos maestros

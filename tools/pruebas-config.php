@@ -105,6 +105,50 @@ comprobar(
     true
 );
 
+echo "\n▸ El valor por omisión que enseña el panel es el que usa el código\n";
+{
+    // El panel enseña en cada campo vacío cuál es el valor que ORBIS va a usar
+    // igualmente: «30 (el que trae ORBIS)». Ese texto sale de
+    // Ajustes::CAMPOS[...]['omision'], y el valor de VERDAD está en la llamada
+    // a Config de cada endpoint. Son dos sitios, así que se desvían solos: se
+    // cambia el tope en api/tts.php y el panel sigue prometiendo el anterior.
+    //
+    // Aquí se leen las llamadas reales y se contrastan. Un valor por omisión
+    // mal anunciado es peor que ninguno: el número está ahí, se lee como un
+    // dato y no lo es.
+    require_once $raiz . '/wj-includes/lib/Ajustes.php';
+
+    $enElCodigo = [];
+    foreach (fuentesDelBackend($raiz) as $archivo) {
+        $texto = (string) file_get_contents($archivo);
+        // Config::entero('CLAVE', 30)  y  Config::obtener('CLAVE', 'valor')
+        preg_match_all("/Config::entero\(\s*'([A-Z0-9_]+)'\s*,\s*(\d+)\s*\)/", $texto, $enteros, PREG_SET_ORDER);
+        foreach ($enteros as $u) {
+            $enElCodigo[$u[1]] = $u[2];
+        }
+        preg_match_all("/Config::obtener\(\s*'([A-Z0-9_]+)'\s*,\s*'([^']*)'\s*\)/", $texto, $textos, PREG_SET_ORDER);
+        foreach ($textos as $u) {
+            if ($u[2] !== '') {
+                $enElCodigo[$u[1]] = $u[2];
+            }
+        }
+    }
+
+    $anunciados = 0;
+    foreach (Ajustes::CAMPOS as $clave => $campo) {
+        if (!isset($campo['omision'])) {
+            continue;
+        }
+        $anunciados++;
+        comprobar(
+            sprintf('«%s» anuncia lo que el código usa', $clave),
+            $campo['omision'],
+            $enElCodigo[$clave] ?? '(el código no lo declara en ninguna llamada a Config)'
+        );
+    }
+    comprobar('y hay campos que lo anuncian', $anunciados > 0, true);
+}
+
 echo "\n▸ La plantilla no lleva ninguna credencial rellenada\n";
 {
     // Una plantilla con una clave dentro es una clave versionada. Las dos de
@@ -188,10 +232,33 @@ echo "\n▸ api/health.php informa de cada pieza configurable\n";
     foreach ([
         'clave_elevenlabs', 'voz_elevenlabs', 'clave_anthropic', 'sdk_anthropic',
         'modelo_asistente', 'cache_audio', 'cache_respuestas', 'cache_efemerides',
-        'cache_limites', 'config_protegido',
+        'cache_limites', 'config_protegido', 'ajustes_panel',
     ] as $clave) {
         comprobar(sprintf('comprueba «%s»', $clave), strpos($salud, "'" . $clave . "'") !== false, true);
     }
+
+    // EL DIAGNÓSTICO ESTUVO MINTIENDO. «config_protegido» daba error cuando
+    // wj-config.php NO existía —y decía que faltaba un config/.htaccess que ya
+    // no existe, porque config/ desapareció al reorganizar el proyecto—. Con
+    // las claves en las variables de entorno de Plesk, que es lo recomendado,
+    // una instalación impecable daba estado «error» y health.php respondía 503.
+    // El sitio al que se mira cuando algo va mal, diciendo que va mal.
+    comprobar(
+        'no exige que wj-config.php exista',
+        strpos($salud, 'la configuración sale del entorno o del panel') !== false,
+        true
+    );
+    comprobar(
+        'y ya no acusa de que falte un config/.htaccess',
+        strpos($salud, 'FALTA config/.htaccess') !== false,
+        false
+    );
+    // Lo que sí importa: que si el archivo existe, el .htaccess lo deniegue.
+    comprobar(
+        'sí comprueba la regla que lo deniega',
+        strpos($salud, 'FilesMatch "^wj-config') !== false,
+        true
+    );
 }
 
 echo "\n▸ api/health.php NO filtra el valor de ninguna credencial\n";

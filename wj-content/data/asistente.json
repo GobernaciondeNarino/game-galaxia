@@ -14,18 +14,18 @@
   },
   "frases": {
     "bienvenida": {
-      "descripcion": "Saludo inicial, una sola vez por sesión, justo después de cerrar el diálogo de bienvenida.",
+      "descripcion": "Saludo inicial, una sola vez por sesión, justo después de cerrar el diálogo de bienvenida. Quien saluda es Ñaño, y ORBIS es lo que presenta: la interfaz. De ahí «Soy Ñaño y te presento a ORBIS» y no «Soy ORBIS».",
       "conNombre": [
-        "Hola, {nombre}. Soy ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
-        "Un placer, {nombre}. Soy ORBIS. Esto que ves está construido con medidas reales: pulsa cualquier cuerpo y te cuento lo que sabemos de él.",
-        "Hola, {nombre}. Soy ORBIS, y esto es el Sistema Solar a escala. Elige por dónde empezamos, o pregúntame y te llevo.",
-        "Te doy la bienvenida, {nombre}. Soy ORBIS. Puedes moverte con el ratón, con la voz o con las manos, y preguntarme por cualquier cosa que veas."
+        "¡Hola, {nombre}! Soy Ñaño y te presento a ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
+        "Un placer, {nombre}. Soy Ñaño y te presento a ORBIS. Esto que ves está construido con medidas reales: pulsa cualquier cuerpo y te cuento lo que sabemos de él.",
+        "¡Hola, {nombre}! Soy Ñaño y te presento a ORBIS: el Sistema Solar a escala. Elige por dónde empezamos, o pregúntame y te llevo.",
+        "Te doy la bienvenida, {nombre}. Soy Ñaño y te presento a ORBIS. Puedes moverte con el ratón, con la voz o con las manos, y preguntarme por cualquier cosa que veas."
       ],
       "sinNombre": [
-        "Hola. Soy ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
-        "Te doy la bienvenida. Soy ORBIS, y esto es el Sistema Solar a escala, construido con medidas reales. Elige por dónde empezamos.",
-        "Hola. Soy ORBIS. Pulsa cualquier cuerpo y te cuento lo que sabemos de él, o pregúntame y te llevo hasta allí.",
-        "Hola. Soy ORBIS. Puedes moverte con el ratón, con la voz o con las manos, y preguntarme por cualquier cosa que veas."
+        "¡Hola! Soy Ñaño y te presento a ORBIS. Delante tienes el Sistema Solar entero, con los datos que las sondas han ido trayendo a casa. Pregúntame lo que quieras.",
+        "Te doy la bienvenida. Soy Ñaño y te presento a ORBIS: el Sistema Solar a escala, construido con medidas reales. Elige por dónde empezamos.",
+        "¡Hola! Soy Ñaño y te presento a ORBIS. Pulsa cualquier cuerpo y te cuento lo que sabemos de él, o pregúntame y te llevo hasta allí.",
+        "¡Hola! Soy Ñaño y te presento a ORBIS. Puedes moverte con el ratón, con la voz o con las manos, y preguntarme por cualquier cosa que veas."
       ]
     },
     "presentacion": {

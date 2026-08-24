@@ -18,12 +18,30 @@
  *
  *       (En el gestor de archivos de Plesk: duplicar y renombrar.)
  *
- *    2. Rellena los valores de wj-config.php. Lo que dejes vacío usa el
- *       valor de la derecha, que es el que ya trae ORBIS.
+ *    2. Rellena SOLO lo que quieras fijar desde aquí. Lo que dejes vacío se
+ *       queda en manos del panel, y si allí tampoco hay nada, del valor por
+ *       omisión que ya trae ORBIS —escrito en el comentario de cada clave—.
  *
- *       O NO RELLENES NADA y hazlo desde el panel:
+ *       O NO RELLENES NADA y hazlo todo desde el panel:
  *       https://tu-dominio/wj-admin/ — más cómodo, y lo que se ponga AQUÍ
  *       manda sobre lo que se ponga allí.
+ *
+ *  ──────────────────────────────────────────────────────────────────────────
+ *  POR QUÉ TODAS LAS CLAVES VIAJAN VACÍAS
+ *  ──────────────────────────────────────────────────────────────────────────
+ *
+ *  Porque copiar esta plantilla es el paso 1 de la instalación, y ese paso
+ *  BLOQUEABA medio panel. Ocho de estas claves traían rellenado su valor por
+ *  omisión —el modelo de síntesis, el de transcripción y los seis topes de
+ *  gasto— y para Config eso es un valor fijado por quien administra el
+ *  servidor. El panel hacía entonces lo que tiene que hacer con un valor
+ *  fijado: enseñarlo bloqueado. Resultado: quien seguía las instrucciones al
+ *  pie de la letra se encontraba un formulario que no dejaba escribir en la
+ *  mitad de sus campos, sin haber decidido nada.
+ *
+ *  Un valor por omisión no es una decisión. Ahora vive en el comentario, donde
+ *  se lee igual de bien, y la clave viaja vacía: RELLENARLA es lo que
+ *  convierte un valor en una decisión, y solo entonces manda sobre el panel.
  *
  *    3. Comprueba que NO se puede leer desde fuera. Abre en el navegador:
  *
@@ -119,12 +137,14 @@ return [
     /**
      * CÓDIGO DE LA VOZ con la que habla ORBIS.
      *
-     * Déjalo vacío para usar la voz que ya trae ORBIS
-     * (lE5ZJB6jGeeuvSNxOvs2, fijada en api/lib/Config.php).
+     * Déjalo vacío para usar la voz que ya trae ORBIS: «Enrique M. Nieto»
+     * (gbTn1bmCvNgk0QEAVyfM), fijada en wj-includes/lib/Config.php.
      *
-     * Para cambiarla: https://elevenlabs.io → Voices → elige una → Copiar ID.
-     * O saca la lista completa con la clave:
+     * Lo más cómodo es elegirla en el panel de wj-admin, que ofrece las
+     * candidatas en español con un botón para OÍR cada una antes de decidir.
+     * A mano: https://elevenlabs.io → Voices → elige una → Copiar ID. O:
      *     curl -H "xi-api-key: TU_CLAVE" https://api.elevenlabs.io/v1/voices
+     *     php tools/verificar-voz.php   ← qué es de verdad la que hay puesta
      *
      * Un identificador de voz es PÚBLICO: sin la clave de API no sirve para
      * nada, así que no pasa nada porque se vea.
@@ -136,10 +156,10 @@ return [
     'ELEVENLABS_VOICE_ID' => '',
 
     /**
-     * Modelo de síntesis. `eleven_multilingual_v2` da la mejor prosodia en
-     * español; los modelos «turbo» salen más baratos y suenan más planos.
+     * Modelo de síntesis. Vacío = `eleven_multilingual_v2`, que da la mejor
+     * prosodia en español; los «turbo» salen más baratos y suenan más planos.
      */
-    'ELEVENLABS_MODEL_ID' => 'eleven_multilingual_v2',
+    'ELEVENLABS_MODEL_ID' => '',
 
     /**
      * Voces que api/tts.php acepta, separadas por comas.
@@ -152,9 +172,9 @@ return [
 
     /**
      * Modelo de transcripción para api/stt.php (dictado por voz en los
-     * navegadores sin reconocimiento propio).
+     * navegadores sin reconocimiento propio). Vacío = `scribe_v1`.
      */
-    'ELEVENLABS_STT_MODEL' => 'scribe_v1',
+    'ELEVENLABS_STT_MODEL' => '',
 
 
     // ════════════════════════════════════════════════════════════════════════
@@ -175,7 +195,7 @@ return [
     'ANTHROPIC_API_KEY' => '',
 
     /**
-     * Modelo del asistente. Vacío = el que trae ORBIS (claude-opus-5).
+     * Modelo del asistente. Vacío = el que trae ORBIS.
      * Cámbialo por uno más pequeño si el gasto se dispara; responderá algo
      * peor, pero las herramientas y los datos son exactamente los mismos.
      */
@@ -193,23 +213,25 @@ return [
      * Narraciones NUEVAS por IP y hora. Las que ya están en cache/audio/ no
      * cuentan, y la precarga tampoco: el tope limita el gasto, no el uso.
      *
-     * Con 30, una visita normal nunca lo toca. Al llenarse la caché de los 33
-     * cuerpos —lo que pasa una sola vez, en las primeras visitas— el gasto se
-     * detiene y se reanuda a la hora siguiente.
+     * Vacío = 30. Con ese valor una visita normal nunca lo toca. Al llenarse
+     * la caché de los 33 cuerpos —lo que pasa una sola vez, en las primeras
+     * visitas— el gasto se detiene y se reanuda a la hora siguiente.
      */
-    'LIMITE_GENERACIONES_HORA' => 30,
+    'LIMITE_GENERACIONES_HORA' => '',
 
     /**
-     * Transcripciones por IP y hora (api/stt.php). Más alto porque cada una
-     * cuesta bastante menos que una narración y son turnos de conversación.
+     * Transcripciones por IP y hora (api/stt.php). Vacío = 120: más alto
+     * porque cada una cuesta bastante menos que una narración, y son turnos
+     * de conversación.
      */
-    'LIMITE_TRANSCRIPCIONES_HORA' => 120,
+    'LIMITE_TRANSCRIPCIONES_HORA' => '',
 
     /**
-     * Respuestas del asistente por IP y hora (api/chat.php). Es el más caro de
-     * los tres: cada respuesta puede encadenar varias llamadas a herramientas.
+     * Respuestas del asistente por IP y hora (api/chat.php). Vacío = 60. Es el
+     * más caro de los tres: cada respuesta puede encadenar varias llamadas a
+     * herramientas.
      */
-    'LIMITE_CONVERSACION_HORA' => 60,
+    'LIMITE_CONVERSACION_HORA' => '',
 
     // ── Techos del SITIO ENTERO, por día ────────────────────────────────
     //
@@ -225,32 +247,39 @@ return [
     //  y sigue funcionando: la voz pasa a la del navegador y las preguntas del
     //  catálogo se contestan igual.
     //
-    //  Ponlos a cero para desactivarlos. Si los subes, súbelos a sabiendas.
+    //  Vacío = el valor por omisión de cada uno, que es el que dice su
+    //  comentario. CERO los desactiva, que no es lo mismo que vacío. Si los
+    //  subes, súbelos a sabiendas.
 
     /**
      * Narraciones NUEVAS de todo el sitio en 24 h. Las cacheadas no cuentan.
      *
-     * Con 500 hay de sobra: el catálogo entero son 33 cuerpos × 3 narraciones,
-     * más las frases, y una vez generadas no se vuelven a pagar nunca.
+     * Vacío = 500, y con eso hay de sobra: el catálogo entero son 33 cuerpos
+     * × 3 narraciones, más las frases, y una vez generadas no se vuelven a
+     * pagar nunca.
      */
-    'TOPE_DIARIO_NARRACION' => 500,
+    'TOPE_DIARIO_NARRACION' => '',
 
-    /** Transcripciones de todo el sitio en 24 h. */
-    'TOPE_DIARIO_TRANSCRIPCION' => 1500,
+    /** Transcripciones de todo el sitio en 24 h. Vacío = 1500. */
+    'TOPE_DIARIO_TRANSCRIPCION' => '',
 
     /**
      * Respuestas del asistente de todo el sitio en 24 h.
      *
-     * Es el más caro de los tres y el que conviene mirar primero si el gasto
-     * sorprende: cada respuesta puede encadenar varias llamadas a herramientas.
+     * Vacío = 400. Es el más caro de los tres y el que conviene mirar primero
+     * si el gasto sorprende: cada respuesta puede encadenar varias llamadas a
+     * herramientas.
      */
-    'TOPE_DIARIO_CONVERSACION' => 400,
+    'TOPE_DIARIO_CONVERSACION' => '',
 
     /**
      * Sal con la que se anonimizan las direcciones IP de los contadores.
      *
      * PONLE ALGO PROPIO. Cualquier texto largo vale:
      *     head -c 32 /dev/urandom | base64
+     *
+     * También se puede poner desde el panel de wj-admin, que además avisa en
+     * rojo mientras siga sin ponerse.
      *
      * Los topes de arriba cuentan por visitante, y ORBIS guarda un hash de la
      * IP en lugar de la IP: así en cache/limites/ no queda una lista de
