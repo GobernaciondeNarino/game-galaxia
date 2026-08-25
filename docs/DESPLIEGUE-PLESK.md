@@ -164,18 +164,14 @@ En el *Administrador de archivos* de Plesk: duplicar `wj-config-ejemplo.php` y
 renombrar la copia a `wj-config.php`.
 
 La plantilla trae las quince claves comentadas una a una y **todas vacías**. Lo
-que dejes vacío se resuelve más abajo —primero el panel, y si allí tampoco hay
-nada, el valor por omisión que trae ORBIS, escrito en el comentario de cada
-clave—. Así que **no hace falta rellenar nada**: con `ELEVENLABS_API_KEY` y
-`ANTHROPIC_API_KEY`, puestas aquí o desde el panel, ORBIS funciona entero.
+que dejes vacío usa el valor por omisión que trae ORBIS, escrito en el
+comentario de cada clave. Así que **no hace falta rellenar nada**: con
+`ELEVENLABS_API_KEY` y `ANTHROPIC_API_KEY`, puestas aquí o desde el panel, ORBIS
+funciona entero.
 
-> **Viajan vacías a propósito.** Ocho de ellas traían antes su valor por omisión
-> rellenado, y copiar la plantilla —el paso 1 de esta guía— dejaba esos ocho
-> campos **bloqueados** en el panel: para `Config`, un valor escrito en
-> `wj-config.php` es una decisión de quien administra el servidor, y el panel
-> hace bien en no dejar escribir encima. Un valor por omisión no es una
-> decisión, así que ahora vive en el comentario. Rellenar una clave aquí es lo
-> que la convierte en decisión, y solo entonces manda sobre el panel.
+> **Este archivo es la capa de abajo.** Lo que se guarde desde el panel de
+> `/wj-admin/` gana a lo que pongas aquí. Ponlo aquí para lo que quieras dejar
+> fijado de una vez; usa el panel para lo que vayas a cambiar.
 
 Después **comprueba que está bloqueado**:
 
@@ -206,16 +202,26 @@ escrita en el disco:
 php -r 'echo password_hash("tu-clave", PASSWORD_DEFAULT), "\n";'
 ```
 
-**Qué se puede tocar desde el panel y qué no.** Lo que fijes en las variables de
-entorno o en `wj-config.php` aparece bloqueado, con un rótulo que dice de dónde
-sale **y qué hay que vaciar para poder editarlo desde el panel**: la variable
-concreta de Plesk, o la línea exacta de `wj-config.php`. No es una limitación:
-es la respuesta a «lo cambio y no pasa nada». Quien tiene acceso al servidor fija
-un valor y sabe que ningún panel se lo va a mover.
+**Qué se puede tocar desde el panel: todo menos su propia clave.** Lo que
+guardes aquí manda sobre las variables de entorno de Plesk y sobre
+`wj-config.php`. Ningún campo aparece bloqueado.
 
-Si acabas de copiar la plantilla y ves campos bloqueados, tu `wj-config.php` es
-de una versión anterior: traía los valores por omisión rellenados. Vacía esas
-líneas —`'CLAVE' => '',`— y el panel vuelve a dejarlas editar.
+Antes era al revés, y bastaba con rellenar `wj-config.php` —el paso 5.1 de esta
+misma guía— para que el panel enseñara esos campos en gris y sin poder tocarlos.
+El razonamiento de entonces era que quien tiene acceso al servidor fija un valor
+y ningún panel web se lo mueve; el problema es que quien rellenó el archivo es
+la misma persona que abre el panel, y ahora quiere cambiar la voz sin entrar por
+FTP. Un panel de administración que no puede administrar no protege de nada:
+solo obliga a rodearlo.
+
+`WJ_ADMIN_CLAVE` sigue fuera, y ahí sí es a propósito: un panel que puede
+reescribir su propia cerradura no es una cerradura.
+
+**Que el panel mande no es silencioso.** Cada campo dice si hay un valor debajo
+—en Plesk o en `wj-config.php`—, cuál de los dos está ganando, y que el de abajo
+está escrito y no se usa. Al borrar el del panel se vuelve al de abajo, y la
+casilla lo dice con esas palabras. Sin ese aviso, la regla nueva sería la nueva
+causa de «lo he cambiado y suena igual», solo que por el otro lado.
 
 **Lo que falta por configurar.** Al entrar, el panel lista arriba lo que aún no
 está puesto por ninguna de las tres vías, y qué deja de funcionar mientras
@@ -243,15 +249,16 @@ que entrar y salir varias veces no deja fuera a nadie.
 ### 5.2 Alternativa para las claves: variables de entorno
 
 Plesk → *Dominios* → **Configuración de PHP** → *Variables de entorno*. Sirve
-para cualquiera de los diez nombres de la tabla de abajo.
+para cualquiera de los quince nombres de la tabla de abajo.
 
 Es mejor sitio para las dos claves de API: no tocan el disco del sitio, así que
 no pueden acabar en una copia de seguridad descargable ni viajar en un
 despliegue por FTP.
 
-> **La variable de entorno GANA al archivo.** Si defines las dos, el archivo se
-> ignora en silencio. Es la causa número uno de «he cambiado la voz y suena
-> igual»; `wj-includes/api/health.php` dice de dónde sale cada valor precisamente por eso.
+> **La variable de entorno gana al archivo, y el panel gana a las dos.** El
+> orden completo es: panel → variable de entorno → `wj-config.php` → el valor
+> que trae ORBIS. `wj-includes/api/health.php` dice de dónde sale cada valor en
+> marcha, y el panel avisa campo por campo de lo que está tapando.
 
 > Con PHP-FPM puede hacer falta reiniciar el *pool* del dominio para que las
 > variables se apliquen (Plesk lo ofrece en la misma pantalla).
@@ -429,7 +436,9 @@ En este orden:
 | El guiño no funciona pero las manos sí | falta `face_landmarker.task`; se avisa en el panel de entradas | mismo remedio; entretanto, el puño y la voz siguen deteniendo la narración |
 | Error 500 en `api/*.php` | Versión de PHP o extensión ausente | Mira el registro de errores del dominio en Plesk |
 | El asistente responde 503 `asistente_no_configurado` | Falta `ANTHROPIC_API_KEY`, o falta `wj-includes/vendor/` | `wj-includes/api/health.php` dice cuál de las dos: mira `clave_anthropic` y `sdk_anthropic` |
-| Se cambió la voz y sigue sonando la anterior | Una variable de entorno gana al archivo, o la caché sirve los MP3 viejos | `wj-includes/api/health.php` → `voz_elevenlabs` dice el origen; luego borra `wj-content/cache/audio/` |
+| Se cambió la voz y sigue sonando la anterior | Un valor guardado en el panel gana al del archivo, o la caché sirve los MP3 viejos | `wj-includes/api/health.php` → `voz_elevenlabs` dice el origen, y el panel dice campo por campo qué está tapando; luego borra `wj-content/cache/audio/` |
+| El asistente falla en cuanto se le pregunta algo, pero el diagnóstico está en verde | `ORBIS_MODELO` mal escrito. Los identificadores llevan **guiones, no puntos**: `claude-sonnet-4-6`, no `claude-sonnet-4.6` | `wj-includes/api/health.php?red=1` → `modelo_existe` lo pregunta al catálogo de Anthropic y dice si ese modelo no existe |
+| `red_elevenlabs` responde un HTTP 4xx | La API rechaza la clave. El motivo lo manda ElevenLabs en la respuesta | `health.php?red=1` lo enseña literal (`invalid_api_key`, `detected_unusual_activity`…). Si es la clave, genera otra en elevenlabs.io |
 | El asistente responde por escrito pero no se le oye | `wj-content/cache/respuestas/` no escribible | `wj-includes/api/health.php` → `cache_respuestas`; `chmod 775` con el propietario correcto |
 | Las preguntas de posición tardan mucho | `wj-content/cache/efemerides/` no escribible: se llama a JPL en cada una | `wj-includes/api/health.php` → `cache_efemerides` |
 | Los topes de gasto no se aplican | `wj-content/cache/limites/` no escribible: sin contadores no hay límite | `wj-includes/api/health.php` → `cache_limites`. **Revísalo antes de abrir al público** |

@@ -19,16 +19,20 @@
  *  QUIÉN GANA A QUIÉN
  * ════════════════════════════════════════════════════════════════════════════
  *
- *   1º  variable de entorno de Plesk
- *   2º  wj-config.php
- *   3º  ESTE ARCHIVO (lo que se guarda desde el panel)
+ *   1º  ESTE ARCHIVO (lo que se guarda desde el panel)
+ *   2º  variable de entorno de Plesk
+ *   3º  wj-config.php
  *   4º  el valor por omisión del código
  *
- * El panel es la capa CÓMODA, no la que manda. Si un valor viene de más arriba,
- * el panel lo enseña bloqueado y dice de dónde sale, en lugar de dejar que se
- * escriba algo que luego no tiene efecto. Ese era exactamente el problema de
- * «he cambiado la voz y suena igual»: dos sitios diciendo cosas distintas y
- * ninguna pista de cuál estaba ganando.
+ * El panel MANDA. Iba el último, y bastaba con rellenar wj-config.php —el paso
+ * 1 de las instrucciones de instalación— para que el panel enseñara esos campos
+ * bloqueados: un panel de administración que no podía administrar. El
+ * razonamiento completo está en Config.php.
+ *
+ * A cambio, lo que queda debajo tiene que verse. Config::origenes() devuelve
+ * TODOS los sitios donde hay un valor y el panel los enseña campo por campo. Si
+ * no, cambiaríamos el «he cambiado la voz y suena igual» por el mismo silencio
+ * en la otra dirección.
  *
  * La clave del panel NO se puede tocar desde el panel, a propósito: quien
  * entrase con la clave por omisión podría cambiarla y dejar fuera al
@@ -103,7 +107,9 @@ final class Ajustes
             'omision' => 'claude-opus-5',
             'tipo' => 'texto', 'grupo' => 'asistente', 'patron' => '/^[a-z0-9.\-]{0,60}$/',
             'etiqueta' => 'Modelo del asistente',
-            'ayuda' => 'Vacío = el que trae ORBIS. Uno más pequeño gasta menos y responde algo peor.',
+            'ayuda' => 'Vacío = el que trae ORBIS. Uno más pequeño gasta menos y responde algo peor. '
+                . 'Los identificadores llevan GUIONES, no puntos: claude-sonnet-4-6, no claude-sonnet-4.6. '
+                . 'Uno mal escrito no da error hasta que alguien pregunta algo; health.php?red=1 lo comprueba.',
         ],
         'LIMITE_GENERACIONES_HORA' => [
             'omision' => '30',

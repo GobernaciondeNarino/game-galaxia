@@ -6,12 +6,24 @@
  *  QUÉ ES Y QUÉ NO ES
  * ════════════════════════════════════════════════════════════════════════════
  *
- * Es la forma cómoda de poner las claves y los topes de gasto sin abrir un
- * archivo por FTP. NO es la forma autorizada: lo que se fije en las variables
- * de entorno de Plesk o en wj-config.php gana siempre, y aquí se enseña
- * bloqueado con su procedencia en lugar de dejar escribir algo que luego no
- * tendría efecto. Esa discrepancia silenciosa entre dos sitios es justo lo que
- * hace perder tardes enteras.
+ * Es la forma de poner las claves y los topes de gasto sin abrir un archivo por
+ * FTP, y lo que se guarde aquí MANDA: por encima de las variables de entorno de
+ * Plesk y por encima de wj-config.php.
+ *
+ * No era así. El orden era el contrario y bastaba con rellenar wj-config.php
+ * —el paso 1 de las instrucciones de instalación— para que el panel enseñara
+ * esos campos bloqueados y sin poder tocarlos. El motivo por el que cambió está
+ * escrito entero en wj-includes/lib/Config.php.
+ *
+ * A cambio, la regla no puede ser invisible: cada campo dice si hay un valor
+ * debajo, dónde está y que no se está usando. Una discrepancia silenciosa entre
+ * dos sitios es justo lo que hace perder tardes enteras, y da igual en qué
+ * dirección vaya.
+ *
+ * LO ÚNICO QUE ESTE PANEL NO PUEDE CAMBIAR es su propia clave de entrada
+ * (WJ_ADMIN_CLAVE): no está en Ajustes::CAMPOS y SesionAdmin la lee saltándose
+ * la capa del panel. Si pudiera cambiarla, quien entrase una vez con la clave
+ * por omisión dejaría fuera al administrador de verdad.
  *
  * ════════════════════════════════════════════════════════════════════════════
  *  SIN JAVASCRIPT, A PROPÓSITO
@@ -90,10 +102,10 @@ if ($accion === 'guardar' && $dentro) {
     } else {
         $entrantes = [];
         foreach (Ajustes::CAMPOS as $clave => $campo) {
-            // Un valor fijado más arriba no se toca aunque llegue en el envío.
-            if (in_array(Config::origen($clave), ['entorno', 'wj-config.php'], true)) {
-                continue;
-            }
+            // Ya no se descarta nada por venir fijado más arriba: el panel
+            // manda. La lista cerrada de Ajustes::CAMPOS sigue siendo la
+            // cerradura —un campo inventado en el envío no entra— y
+            // WJ_ADMIN_CLAVE no está en ella, a propósito.
             if ($campo['tipo'] === 'clave') {
                 if (!empty($_POST['borrar'][$clave])) {
                     $entrantes[$clave] = '';
@@ -225,6 +237,26 @@ $GRUPOS = [
     </section>
   <?php endif; ?>
 
+  <?php
+    // Cuántos campos tienen algo escrito en otro sitio. Se explica UNA vez
+    // aquí, y cada campo lleva solo la línea corta: doce párrafos en ámbar
+    // repitiendo lo mismo hacen que un panel correcto parezca una alarma.
+    $conOtroValor = 0;
+    foreach (Ajustes::CAMPOS as $c => $_) {
+        if (array_diff(Config::origenes($c), ['panel']) !== []) {
+            $conOtroValor++;
+        }
+    }
+  ?>
+  <?php if ($conOtroValor > 0): ?>
+    <p class="ayuda ayuda--suelta">
+      Lo que guardes aquí <strong>manda</strong> sobre las variables de entorno de Plesk y
+      sobre <code>wj-config.php</code>. Hay <?= (int) $conOtroValor ?> campo(s) con un valor
+      escrito también en otro sitio; cada uno lo dice debajo, en ámbar. Para volver al de
+      abajo, deja el campo vacío y guarda.
+    </p>
+  <?php endif; ?>
+
   <p class="ayuda ayuda--suelta">
     Clave de este panel: <strong><?= e(SesionAdmin::origenClave()) ?></strong>.
     Diagnóstico completo del servidor en
@@ -240,36 +272,64 @@ $GRUPOS = [
         <p class="ayuda"><?= e($GRUPOS[$grupo]['nota']) ?></p>
 
         <?php foreach ($campos as $clave => $campo):
-            $origen = Config::origen($clave);
-            $bloqueado = in_array($origen, ['entorno', 'wj-config.php'], true);
             $guardado = Ajustes::obtener($clave);
             $idError = 'e-' . strtolower($clave);
             $error = $erroresCampo[$clave] ?? null;
 
-            // Un campo vacío no significa «sin valor»: significa que manda el
-            // que trae ORBIS. Decir cuál, en el texto de ejemplo, evita que se
-            // rellenen los seis topes «por si acaso» sin saber qué había.
-            $ejemplo = isset($campo['omision']) ? $campo['omision'] . ' (el que trae ORBIS)' : '';
+            // TODOS los sitios donde hay un valor, en orden de mando. Nada se
+            // bloquea ya, pero lo que queda debajo tiene que verse: si no, se
+            // cambia wj-config.php, no pasa nada, y no hay forma de saber por
+            // qué. El panel manda, y lo dice.
+            $origenes = Config::origenes($clave);
+            $debajo = array_values(array_diff($origenes, ['panel']));
+            $mandaElPanel = in_array('panel', $origenes, true);
+
+            // Un campo vacío no significa «sin valor»: significa que manda lo
+            // de debajo, o el valor que trae ORBIS. Decir cuál, en el texto de
+            // ejemplo, evita rellenar los seis topes «por si acaso».
+            $ejemplo = $debajo !== []
+                ? 'ahora manda el valor de ' . $debajo[0]
+                : (isset($campo['omision']) ? $campo['omision'] . ' (el que trae ORBIS)' : '');
         ?>
-          <div class="campo <?= $bloqueado ? 'campo--bloqueado' : '' ?>">
+          <div class="campo">
             <label class="campo__etiqueta" for="<?= e($clave) ?>"><?= e($campo['etiqueta']) ?></label>
 
             <?php if ($campo['tipo'] === 'clave'): ?>
               <input type="password" id="<?= e($clave) ?>" name="<?= e($clave) ?>"
-                     autocomplete="off" placeholder="<?= $guardado !== null ? 'guardada — escribe para cambiarla' : 'sin configurar' ?>"
-                     <?= $bloqueado ? 'disabled' : '' ?>
+                     autocomplete="off" placeholder="<?= $guardado !== null ? 'guardada — escribe para cambiarla' : e($ejemplo !== '' ? $ejemplo : 'sin configurar') ?>"
                      <?= $error ? 'aria-invalid="true" aria-describedby="' . e($idError) . '"' : '' ?>>
-              <?php if (!$bloqueado && $guardado !== null): ?>
+              <?php if ($guardado !== null): ?>
                 <label class="casilla">
                   <input type="checkbox" name="borrar[<?= e($clave) ?>]" value="1">
-                  <span>Borrar la clave guardada</span>
+                  <span>Borrar la guardada aquí<?= $debajo !== [] ? ' y volver a la de ' . e($debajo[0]) : '' ?></span>
                 </label>
               <?php endif; ?>
 
             <?php elseif ($clave === 'ELEVENLABS_VOICE_ID'): ?>
-              <?php $actual = $bloqueado ? (string) Config::obtener($clave) : (string) $guardado; ?>
-              <select id="<?= e($clave) ?>" name="<?= e($clave) ?>" <?= $bloqueado ? 'disabled' : '' ?>>
-                <option value="">La que trae ORBIS — <?= e(Ajustes::VOCES[Config::VOZ_PREDETERMINADA] ?? Config::VOZ_PREDETERMINADA) ?></option>
+              <?php
+                // Lo guardado en el panel es lo que se elige; lo de debajo, lo
+                // que se usaría si aquí no hubiera nada. Antes se enseñaba «La
+                // que trae ORBIS» aunque wj-config.php tuviera otra puesta, que
+                // es mentir sobre lo que está sonando.
+                $actual = (string) $guardado;
+                if ($debajo === []) {
+                    $sinElegir = 'La que trae ORBIS — '
+                        . (Ajustes::VOCES[Config::VOZ_PREDETERMINADA] ?? Config::VOZ_PREDETERMINADA);
+                } elseif ($actual === '') {
+                    // Sin nada elegido aquí, lo efectivo ES lo de debajo, y se
+                    // puede nombrar: es lo que está sonando ahora mismo.
+                    $efectivo = (string) Config::obtener($clave, Config::VOZ_PREDETERMINADA);
+                    $sinElegir = 'Sin elegir aquí — suena ' . (Ajustes::VOCES[$efectivo] ?? $efectivo)
+                        . ' (de ' . $debajo[0] . ')';
+                } else {
+                    // Con algo elegido aquí, lo efectivo es ESTO, no lo de
+                    // debajo: nombrar la voz efectiva y atribuirla a
+                    // wj-config.php sería decir justo lo contrario de la verdad.
+                    $sinElegir = 'Sin elegir aquí — volver a la de ' . $debajo[0];
+                }
+              ?>
+              <select id="<?= e($clave) ?>" name="<?= e($clave) ?>">
+                <option value=""><?= e($sinElegir) ?></option>
                 <?php foreach (Ajustes::VOCES as $id => $descripcion): ?>
                   <option value="<?= e($id) ?>" <?= $actual === $id ? 'selected' : '' ?>><?= e($descripcion) ?></option>
                 <?php endforeach; ?>
@@ -278,35 +338,31 @@ $GRUPOS = [
                 <?php endif; ?>
               </select>
 
-              <?php if (!$bloqueado): ?>
-                <p class="campo__ayuda">
-                  Escúchalas antes de decidir. Cada una dice la misma frase, con los mismos
-                  ajustes que usa la narración de verdad.
-                </p>
-                <ul class="voces">
-                  <?php foreach (Ajustes::VOCES as $id => $descripcion): ?>
-                    <li class="voces__una">
-                      <span class="voces__nombre"><?= e(explode(' — ', $descripcion)[0]) ?></span>
-                      <audio controls preload="none" src="probar-voz.php?voz=<?= e($id) ?>"
-                             aria-label="Probar la voz <?= e(explode(' — ', $descripcion)[0]) ?>"></audio>
-                    </li>
-                  <?php endforeach; ?>
-                </ul>
-              <?php endif; ?>
+              <p class="campo__ayuda">
+                Escúchalas antes de decidir. Cada una dice la misma frase, con los mismos
+                ajustes que usa la narración de verdad.
+              </p>
+              <ul class="voces">
+                <?php foreach (Ajustes::VOCES as $id => $descripcion): ?>
+                  <li class="voces__una">
+                    <span class="voces__nombre"><?= e(explode(' — ', $descripcion)[0]) ?></span>
+                    <audio controls preload="none" src="probar-voz.php?voz=<?= e($id) ?>"
+                           aria-label="Probar la voz <?= e(explode(' — ', $descripcion)[0]) ?>"></audio>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
 
             <?php elseif ($campo['tipo'] === 'entero'): ?>
               <input type="number" id="<?= e($clave) ?>" name="<?= e($clave) ?>"
                      min="<?= (int) $campo['min'] ?>" max="<?= (int) $campo['max'] ?>" inputmode="numeric"
-                     value="<?= e($bloqueado ? (string) Config::obtener($clave) : (string) $guardado) ?>"
+                     value="<?= e((string) $guardado) ?>"
                      placeholder="<?= e($ejemplo) ?>"
-                     <?= $bloqueado ? 'disabled' : '' ?>
                      <?= $error ? 'aria-invalid="true" aria-describedby="' . e($idError) . '"' : '' ?>>
 
             <?php else: ?>
               <input type="text" id="<?= e($clave) ?>" name="<?= e($clave) ?>" autocomplete="off"
-                     value="<?= e($bloqueado ? (string) Config::obtener($clave) : (string) $guardado) ?>"
+                     value="<?= e((string) $guardado) ?>"
                      placeholder="<?= e($ejemplo) ?>"
-                     <?= $bloqueado ? 'disabled' : '' ?>
                      <?= $error ? 'aria-invalid="true" aria-describedby="' . e($idError) . '"' : '' ?>>
             <?php endif; ?>
 
@@ -314,21 +370,19 @@ $GRUPOS = [
               <p class="campo__error" id="<?= e($idError) ?>" role="alert"><?= e($error) ?></p>
             <?php endif; ?>
 
-            <?php if ($bloqueado): ?>
-              <p class="campo__ayuda campo__ayuda--bloqueo">
-                <?php if ($origen === 'entorno'): ?>
-                  Fijado en <strong>las variables de entorno de Plesk</strong>, que mandan
-                  sobre este panel. Para poder cambiarlo desde aquí, borra la variable
-                  <code><?= e($clave) ?></code> en Plesk → Dominios → Configuración de PHP
-                  → Variables de entorno.
+            <?php if ($campo['ayuda'] !== ''): ?>
+              <p class="campo__ayuda"><?= e($campo['ayuda']) ?></p>
+            <?php endif; ?>
+
+            <?php if ($debajo !== []): ?>
+              <p class="campo__ayuda campo__ayuda--debajo">
+                <?php if ($mandaElPanel): ?>
+                  Manda esto. Debajo hay otro valor en <strong><?= e(implode(' y en ', $debajo)) ?></strong>,
+                  sin usar.
                 <?php else: ?>
-                  Fijado en <strong>wj-config.php</strong>, que manda sobre este panel. Para
-                  poder cambiarlo desde aquí, deja esa línea vacía:
-                  <code><?= e("'" . $clave . "' => '',") ?></code>
+                  Ahora manda el de <strong><?= e($debajo[0]) ?></strong>.
                 <?php endif; ?>
               </p>
-            <?php elseif ($campo['ayuda'] !== ''): ?>
-              <p class="campo__ayuda"><?= e($campo['ayuda']) ?></p>
             <?php endif; ?>
           </div>
         <?php endforeach; ?>

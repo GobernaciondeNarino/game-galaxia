@@ -105,6 +105,44 @@ comprobar(
     true
 );
 
+echo "\n▸ El orden de precedencia, ejercitado de verdad\n";
+{
+    // Se comprueba con las cuatro capas puestas a la vez, porque el orden es
+    // exactamente la clase de regla que se documenta bien y se implementa mal.
+    // La clave del panel (WJ_ADMIN_CLAVE) no entra aquí a propósito: no pasa
+    // por Config, y eso lo comprueba el bloque de arriba.
+    require_once $raiz . '/wj-includes/lib/Ajustes.php';
+
+    $rutaAjustes = Ajustes::ruta();
+    $respaldo = is_file($rutaAjustes) ? (string) file_get_contents($rutaAjustes) : null;
+    @unlink($rutaAjustes);
+
+    // 4ª capa: el valor por omisión del código, sin nada más puesto.
+    comprobar('sin nada, gana el valor por omisión', Config::obtener('ORBIS_MODELO', 'por-omision'), 'por-omision');
+    comprobar('y no hay ningún origen', Config::origenes('ORBIS_MODELO'), []);
+
+    // 2ª capa: el entorno gana al valor por omisión.
+    putenv('ORBIS_MODELO=del-entorno');
+    comprobar('el entorno gana al por omisión', Config::obtener('ORBIS_MODELO', 'por-omision'), 'del-entorno');
+
+    // 1ª capa: el panel gana al entorno. Es LA regla que cambió: antes el panel
+    // iba el último y rellenar wj-config.php dejaba el formulario en gris.
+    Ajustes::guardar(['ORBIS_MODELO' => 'del-panel']);
+    comprobar('el panel gana al entorno', Config::obtener('ORBIS_MODELO'), 'del-panel');
+    comprobar('y se ve que hay algo debajo', Config::origenes('ORBIS_MODELO'), ['panel', 'entorno']);
+
+    // Al vaciarlo en el panel, vuelve lo de debajo. Sin esto no habría marcha
+    // atrás: quedaría un valor puesto desde el panel sin forma de deshacerlo.
+    Ajustes::guardar(['ORBIS_MODELO' => '']);
+    comprobar('al vaciarlo, vuelve el entorno', Config::obtener('ORBIS_MODELO'), 'del-entorno');
+
+    putenv('ORBIS_MODELO');
+    @unlink($rutaAjustes);
+    if ($respaldo !== null) {
+        file_put_contents($rutaAjustes, $respaldo);
+    }
+}
+
 echo "\n▸ El valor por omisión que enseña el panel es el que usa el código\n";
 {
     // El panel enseña en cada campo vacío cuál es el valor que ORBIS va a usar

@@ -3,14 +3,39 @@
  * Lectura de la configuración del servidor, y mapa de las carpetas.
  *
  * Orden de búsqueda de cada valor:
- *   1. variable de entorno (recomendado en Plesk: la clave no toca el disco),
- *   2. wj-config.php, en la raíz,
- *   3. lo guardado desde el panel de wj-admin.
+ *   1. lo guardado desde el panel de wj-admin,
+ *   2. variable de entorno (en Plesk: la clave no toca el disco),
+ *   3. wj-config.php, en la raíz,
+ *   4. el valor por omisión del código.
  *
- * El panel va el ÚLTIMO a propósito: es la capa cómoda, no la que manda. Quien
- * tiene acceso al servidor puede fijar un valor y saber que ningún panel se lo
- * va a cambiar. Y el panel, en vez de dejar escribir algo que luego no tendría
- * efecto, enseña esos valores bloqueados y dice de dónde salen.
+ * ════════════════════════════════════════════════════════════════════════════
+ *  EL PANEL VA EL PRIMERO, Y ANTES IBA EL ÚLTIMO
+ * ════════════════════════════════════════════════════════════════════════════
+ *
+ * El orden era el contrario, con este razonamiento: quien tiene acceso al
+ * servidor fija un valor y ningún panel web se lo mueve. Como principio no está
+ * mal. En la práctica dejaba el panel inservible.
+ *
+ * Basta con rellenar wj-config.php —que es literalmente el paso 1 de las
+ * instrucciones de instalación— para que el panel enseñe esos campos
+ * bloqueados. Y quien administra el sitio no es un intruso: es la misma persona
+ * que escribió el archivo, y que ahora quiere cambiar la voz sin abrir un gestor
+ * de archivos por FTP. Un panel de administración que no puede administrar no
+ * protege de nada; solo obliga a rodearlo.
+ *
+ * LO QUE SÍ SIGUE PROTEGIDO, porque es lo único que de verdad importa: la clave
+ * de entrada al panel (WJ_ADMIN_CLAVE) NO pasa por aquí. La lee SesionAdmin
+ * directamente del entorno y de wj-config.php, saltándose esta capa. Un panel
+ * que puede reescribir su propia cerradura no es una cerradura, y eso no ha
+ * cambiado: quien entrase una vez podría cambiarlo todo menos la forma de
+ * volver a entrar.
+ *
+ * EL PELIGRO NUEVO es el silencio al revés: alguien cambia wj-config.php y no
+ * pasa nada, porque el panel tiene un valor por encima. Para eso existe
+ * origenes(): el panel enseña, campo por campo, TODOS los sitios donde hay un
+ * valor y cuál está ganando, y api/health.php dice lo mismo. La regla no puede
+ * ser invisible; si lo fuera volveríamos al «lo cambio y suena igual» de
+ * siempre, solo que por el otro lado.
  *
  * Aquí viven también las dos rutas base del proyecto. Estaban repartidas en
  * literales por todo el backend —'/data/…', '/cache/…', '/api/vendor/…'— y
@@ -80,57 +105,75 @@ final class Config
      */
     public static function obtener(string $clave, ?string $predeterminado = null): ?string
     {
-        $entorno = getenv($clave);
-        if ($entorno !== false && $entorno !== '') {
-            return $entorno;
-        }
-
-        self::cargarSecretos();
-
-        if (isset(self::$secretos[$clave]) && self::$secretos[$clave] !== '') {
-            return (string) self::$secretos[$clave];
-        }
-
-        // Tercera fuente: el panel. Se carga aquí y no arriba para no leer un
-        // archivo más en cada petición cuando el valor ya venía del entorno.
+        // El panel, primero. Ajustes guarda el archivo en memoria tras la
+        // primera lectura, así que esto es un acceso a disco por petición, no
+        // uno por cada consulta.
         require_once __DIR__ . '/Ajustes.php';
         $delPanel = Ajustes::obtener($clave);
         if ($delPanel !== null) {
             return $delPanel;
         }
 
+        $entorno = getenv($clave);
+        if ($entorno !== false && $entorno !== '') {
+            return $entorno;
+        }
+
+        self::cargarSecretos();
+        if (isset(self::$secretos[$clave]) && self::$secretos[$clave] !== '') {
+            return (string) self::$secretos[$clave];
+        }
+
         return $predeterminado;
     }
 
     /**
-     * De dónde sale un valor: 'entorno', 'wj-config.php', 'panel' o null.
+     * De dónde sale el valor que GANA: 'panel', 'entorno', 'wj-config.php', o
+     * null si no hay ninguno.
      *
      * Existe para api/health.php, que tiene que poder decir POR QUÉ está
      * ganando un valor y no otro. Es la respuesta a «he cambiado la voz y
-     * suena igual»: casi siempre hay una variable de entorno antigua que gana
-     * a lo que se acaba de escribir en wj-config.php.
+     * suena igual».
      *
      * Nunca devuelve el valor, solo su procedencia: así el diagnóstico puede
      * ser público sin filtrar una credencial.
      */
     public static function origen(string $clave): ?string
     {
+        $todos = self::origenes($clave);
+        return $todos === [] ? null : $todos[0];
+    }
+
+    /**
+     * TODOS los sitios donde hay un valor para esa clave, en orden de mando: el
+     * primero es el que gana y los demás están escritos sin usarse.
+     *
+     * Sin esto, que el panel mande sería una trampa: se cambiaría wj-config.php,
+     * no pasaría nada, y no habría ninguna pista de por qué. El panel usa esta
+     * lista para decir, campo por campo, qué hay debajo de lo que se ve.
+     *
+     * @return list<string> por ejemplo ['panel', 'wj-config.php']
+     */
+    public static function origenes(string $clave): array
+    {
+        $encontrados = [];
+
+        require_once __DIR__ . '/Ajustes.php';
+        if (Ajustes::obtener($clave) !== null) {
+            $encontrados[] = 'panel';
+        }
+
         $entorno = getenv($clave);
         if ($entorno !== false && $entorno !== '') {
-            return 'entorno';
+            $encontrados[] = 'entorno';
         }
 
         self::cargarSecretos();
         if (isset(self::$secretos[$clave]) && self::$secretos[$clave] !== '') {
-            return 'wj-config.php';
+            $encontrados[] = 'wj-config.php';
         }
 
-        require_once __DIR__ . '/Ajustes.php';
-        if (Ajustes::obtener($clave) !== null) {
-            return 'panel';
-        }
-
-        return null;
+        return $encontrados;
     }
 
     /** Lee wj-config.php una sola vez por petición. */

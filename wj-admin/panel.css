@@ -151,15 +151,15 @@ html, body {
 }
 .campo input::placeholder { color: var(--texto-decorativo); }
 
-/* Bloqueado: se ve, se entiende y no se puede tocar. Se enseña en lugar de
-   esconderse porque saber que un valor viene de Plesk es justo lo que hace
-   falta cuando algo «no cambia por más que lo cambies». */
-.campo--bloqueado input { opacity: 0.55; cursor: not-allowed; }
 .campo__ayuda {
   font-size: var(--t-menor);
   color: var(--texto-apagado);
 }
-.campo__ayuda--bloqueo { color: var(--ambar-seleccion); }
+/* Lo que hay escrito en otro sitio y NO se está usando porque manda el panel.
+   Va en ámbar y no en rojo: no es un error, es la información que impide el
+   «lo cambio en wj-config.php y no pasa nada». Ningún campo se bloquea ya, así
+   que este aviso es lo único que queda entre saberlo y no saberlo. */
+.campo__ayuda--debajo { color: var(--ambar-seleccion); }
 
 /* El aviso de bloqueo dice ahora QUÉ hay que vaciar para desbloquear el campo,
    y eso es un nombre de variable o una línea de PHP: se marca como código o se

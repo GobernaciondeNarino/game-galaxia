@@ -18,30 +18,35 @@
  *
  *       (En el gestor de archivos de Plesk: duplicar y renombrar.)
  *
- *    2. Rellena SOLO lo que quieras fijar desde aquí. Lo que dejes vacío se
- *       queda en manos del panel, y si allí tampoco hay nada, del valor por
- *       omisión que ya trae ORBIS —escrito en el comentario de cada clave—.
+ *    2. Rellena SOLO lo que quieras fijar desde aquí. Lo que dejes vacío usa el
+ *       valor por omisión que ya trae ORBIS, escrito en el comentario de cada
+ *       clave.
  *
  *       O NO RELLENES NADA y hazlo todo desde el panel:
- *       https://tu-dominio/wj-admin/ — más cómodo, y lo que se ponga AQUÍ
- *       manda sobre lo que se ponga allí.
+ *       https://tu-dominio/wj-admin/ — más cómodo, y lo que se ponga ALLÍ manda
+ *       sobre lo que se ponga aquí.
  *
  *  ──────────────────────────────────────────────────────────────────────────
- *  POR QUÉ TODAS LAS CLAVES VIAJAN VACÍAS
+ *  ESTE ARCHIVO ES LA CAPA DE ABAJO, NO LA DE ARRIBA
  *  ──────────────────────────────────────────────────────────────────────────
  *
- *  Porque copiar esta plantilla es el paso 1 de la instalación, y ese paso
- *  BLOQUEABA medio panel. Ocho de estas claves traían rellenado su valor por
- *  omisión —el modelo de síntesis, el de transcripción y los seis topes de
- *  gasto— y para Config eso es un valor fijado por quien administra el
- *  servidor. El panel hacía entonces lo que tiene que hacer con un valor
- *  fijado: enseñarlo bloqueado. Resultado: quien seguía las instrucciones al
- *  pie de la letra se encontraba un formulario que no dejaba escribir en la
- *  mitad de sus campos, sin haber decidido nada.
+ *  Lo que se guarde desde el panel de wj-admin GANA a lo que haya aquí. Era al
+ *  revés, y el resultado era que copiar esta plantilla —el paso 1 de la
+ *  instalación— dejaba medio panel bloqueado y sin poder tocarlo. Un panel de
+ *  administración que no puede administrar no protege de nada.
  *
- *  Un valor por omisión no es una decisión. Ahora vive en el comentario, donde
- *  se lee igual de bien, y la clave viaja vacía: RELLENARLA es lo que
- *  convierte un valor en una decisión, y solo entonces manda sobre el panel.
+ *  Así que si rellenas algo aquí y luego lo cambias en el panel, manda el
+ *  panel. No en silencio: cada campo del panel dice si hay un valor debajo,
+ *  dónde está y que no se está usando, y `health.php` dice de dónde sale cada
+ *  valor en marcha.
+ *
+ *  LO ÚNICO QUE EL PANEL NO PUEDE CAMBIAR es su propia clave de entrada,
+ *  WJ_ADMIN_CLAVE: esa se fija aquí o en Plesk, y en ningún otro sitio.
+ *
+ *  Y todas las claves viajan VACÍAS. Ocho traían antes su valor por omisión
+ *  rellenado, y para Config un valor escrito es un valor escrito: aparecía en
+ *  el panel como algo decidido cuando nadie había decidido nada. Un valor por
+ *  omisión no es una decisión, así que ahora vive en el comentario.
  *
  *    3. Comprueba que NO se puede leer desde fuera. Abre en el navegador:
  *
@@ -54,22 +59,25 @@
  *
  *  Cada valor se busca en este orden y gana el PRIMERO que aparece:
  *
- *    1º  VARIABLE DE ENTORNO de Plesk  ←  recomendado para las claves
+ *    1º  EL PANEL de wj-admin, que guarda en wj-content/ajustes/ajustes.json.
+ *        Lo más cómodo, y lo que manda. Fuera de lo que se sirve por HTTP y
+ *        fuera del repositorio, igual que este archivo.
+ *
+ *    2º  VARIABLE DE ENTORNO de Plesk
  *        Dominios → Configuración de PHP → Variables de entorno.
  *        La clave no toca el disco del sitio, así que no puede acabar en una
- *        copia de seguridad descargable ni en un despliegue por FTP.
+ *        copia de seguridad descargable ni en un despliegue por FTP. Es la
+ *        mejor opción para lo que se ponga UNA vez y no se vaya a cambiar.
  *
- *    2º  ESTE ARCHIVO (wj-config.php)
- *        Más cómodo, y perfectamente válido: está en .gitignore y el .htaccess
- *        raíz lo bloquea por nombre. Pero vive en el disco.
+ *    3º  ESTE ARCHIVO (wj-config.php)
+ *        Perfectamente válido: está en .gitignore y el .htaccess raíz lo
+ *        bloquea por nombre. Pero vive en el disco, y cede ante los dos de
+ *        arriba.
  *
- *    3º  EL PANEL de wj-admin, que guarda en wj-content/ajustes/ajustes.json.
- *        La capa cómoda. Lo que se fije en 1º o 2º se enseña allí bloqueado,
- *        con su procedencia, en lugar de dejar escribir algo sin efecto.
- *
- *  Si defines una variable de entorno Y la rellenas aquí, GANA LA VARIABLE DE
- *  ENTORNO. Es la causa número uno de «he cambiado la voz y suena igual»:
- *  `api/health.php` dice de dónde sale cada valor, precisamente para eso.
+ *  Si rellenas algo aquí Y hay un valor en el panel, GANA EL PANEL.
+ *  `health.php` dice de dónde sale cada valor, y el propio panel avisa campo
+ *  por campo de lo que está tapando. Sin ese aviso, esta regla sería la nueva
+ *  causa de «lo he cambiado y suena igual».
  *
  *  ──────────────────────────────────────────────────────────────────────────
  *  NUNCA

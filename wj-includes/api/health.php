@@ -308,10 +308,26 @@ if (isset($_GET['red']) && $_GET['red'] === '1') {
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_HTTPHEADER     => $clave ? ['xi-api-key: ' . $clave] : [],
         ]);
-        curl_exec($ch);
+        $cuerpo1 = curl_exec($ch);
         $codigo = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         $errorCurl = curl_error($ch);
         curl_close($ch);
+
+        // Con un código que no es 200 ni 401, «respuesta HTTP 400» a secas no
+        // dice nada y no hay adónde ir. ElevenLabs manda un motivo en el cuerpo
+        // —«invalid_api_key», «detected_unusual_activity»…— y ese motivo NO es
+        // un secreto: es lo que le pasa a la clave, no la clave. Se recorta y se
+        // enseña, que es lo que convierte un número en algo accionable.
+        $motivoApi = '';
+        $detalle1 = json_decode((string) $cuerpo1, true);
+        if (is_array($detalle1)) {
+            $bruto = $detalle1['detail']['message']
+                ?? $detalle1['detail']['status']
+                ?? (is_string($detalle1['detail'] ?? null) ? $detalle1['detail'] : '');
+            if (is_string($bruto) && $bruto !== '') {
+                $motivoApi = ': ' . mb_substr(str_replace(["\n", "\r"], ' ', $bruto), 0, 160);
+            }
+        }
 
         if ($codigo === 200) {
             comprobar('red_elevenlabs', 'conexión con ElevenLabs', 'ok', 'API alcanzable y clave válida');
@@ -351,9 +367,23 @@ if (isset($_GET['red']) && $_GET['red'] === '1') {
                     : 'la clave puede sintetizar'
             );
         } elseif ($codigo === 401) {
-            comprobar('red_elevenlabs', 'conexión con ElevenLabs', 'error', 'API alcanzable pero la clave es inválida');
+            comprobar(
+                'red_elevenlabs',
+                'conexión con ElevenLabs',
+                'error',
+                'API alcanzable pero la clave es inválida' . $motivoApi
+            );
         } elseif ($codigo > 0) {
-            comprobar('red_elevenlabs', 'conexión con ElevenLabs', 'aviso', 'API alcanzable, respuesta HTTP ' . $codigo);
+            // Un 4xx aquí es la clave, no la red: la petición llegó y la
+            // rechazaron. Se marca como error, no como aviso, porque sin esto
+            // la narración no funciona y un «aviso» invita a ignorarlo.
+            comprobar(
+                'red_elevenlabs',
+                'conexión con ElevenLabs',
+                $codigo >= 400 && $codigo < 500 ? 'error' : 'aviso',
+                'la API rechaza la clave con un HTTP ' . $codigo . $motivoApi
+                    . ($motivoApi === '' ? ' (sin motivo en la respuesta)' : '')
+            );
         } else {
             // No se expone el mensaje crudo de curl para no filtrar rutas internas.
             comprobar(
@@ -361,6 +391,69 @@ if (isset($_GET['red']) && $_GET['red'] === '1') {
                 'conexión con ElevenLabs',
                 'error',
                 'sin salida a Internet' . ($errorCurl !== '' ? ' (fallo de conexión)' : '')
+            );
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // 8 bis. ¿Existe de verdad el modelo del asistente? (solo con ?red=1)
+    //
+    // UN MODELO MAL ESCRITO NO SE NOTA HASTA QUE ALGUIEN PREGUNTA ALGO.
+    // Los identificadores llevan guiones y no puntos —claude-sonnet-4-6, no
+    // claude-sonnet-4.6— y el error de teclearlo con punto es tan fácil de
+    // cometer como imposible de ver: la clave está, el SDK está, el
+    // diagnóstico daba verde entero, y el asistente devuelve 404 a la primera
+    // pregunta. Preguntar al catálogo de modelos cuesta una petición y no
+    // gasta ni un token.
+    // ----------------------------------------------------------------------
+    // Se carga aquí dentro y no arriba: solo hace falta con ?red=1, y el resto
+    // del diagnóstico tiene que seguir respondiendo aunque falte el SDK.
+    require_once __DIR__ . '/../lib/Conversacion.php';
+
+    $claveAnthropic = Config::obtener('ANTHROPIC_API_KEY');
+    $modelo = (string) Config::obtener('ORBIS_MODELO', Conversacion::MODELO);
+
+    if (extension_loaded('curl') && $claveAnthropic !== null && $claveAnthropic !== '') {
+        $ch3 = curl_init('https://api.anthropic.com/v1/models/' . rawurlencode($modelo));
+        curl_setopt_array($ch3, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_HTTPHEADER     => [
+                'x-api-key: ' . $claveAnthropic,
+                'anthropic-version: 2023-06-01',
+            ],
+        ]);
+        $cuerpo3 = curl_exec($ch3);
+        $codigo3 = (int) curl_getinfo($ch3, CURLINFO_RESPONSE_CODE);
+        curl_close($ch3);
+
+        if ($codigo3 === 200) {
+            $m = json_decode((string) $cuerpo3, true);
+            comprobar(
+                'modelo_existe', 'el modelo del asistente existe', 'ok',
+                'confirmado con Anthropic: ' . (string) ($m['display_name'] ?? $modelo)
+            );
+        } elseif ($codigo3 === 404) {
+            comprobar(
+                'modelo_existe', 'el modelo del asistente existe', 'error',
+                sprintf(
+                    'Anthropic no conoce ningún modelo «%s». Revísalo: los identificadores llevan '
+                        . 'guiones y no puntos (claude-sonnet-4-6, no claude-sonnet-4.6). Mientras siga '
+                        . 'así, el asistente falla en cuanto alguien le pregunta algo',
+                    $modelo
+                )
+            );
+        } elseif ($codigo3 === 401) {
+            comprobar(
+                'modelo_existe', 'el modelo del asistente existe', 'error',
+                'la clave de Anthropic no vale: no se ha podido comprobar el modelo'
+            );
+        } else {
+            comprobar(
+                'modelo_existe', 'el modelo del asistente existe', 'aviso',
+                'no se ha podido comprobar (HTTP ' . $codigo3 . ')'
             );
         }
     }

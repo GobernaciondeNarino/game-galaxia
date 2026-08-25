@@ -86,18 +86,29 @@ echo "\n▸ Cada tipo se valida por separado\n";
     }
 }
 
-echo "\n▸ Un valor fijado más arriba NO se puede pisar desde el panel\n";
+echo "\n▸ El panel manda sobre el entorno y sobre wj-config.php\n";
 {
-    // Es la regla que hace que el panel sea cómodo sin ser peligroso: quien
-    // tiene acceso al servidor fija algo y ningún panel se lo cambia.
+    // ERA AL REVÉS, Y ESA ERA LA REGLA QUE HACÍA INSERVIBLE EL PANEL.
+    // El razonamiento de entonces —quien tiene acceso al servidor fija algo y
+    // ningún panel web se lo cambia— suena bien hasta que se recuerda que quien
+    // rellenó wj-config.php es la MISMA persona que abre el panel. Rellenar ese
+    // archivo es el paso 1 de la instalación, así que seguir las instrucciones
+    // bastaba para dejar medio formulario en gris.
     putenv('ORBIS_MODELO=claude-opus-5');
-    comprobar('el entorno manda', Config::origen('ORBIS_MODELO'), 'entorno');
-    comprobar('aunque el panel tenga otro valor', Ajustes::obtener('ORBIS_MODELO'), 'claude-sonnet-5');
-    comprobar('lo que se usa es el del entorno', Config::obtener('ORBIS_MODELO'), 'claude-opus-5');
+    comprobar('el panel gana al entorno', Config::origen('ORBIS_MODELO'), 'panel');
+    comprobar('y lo que se usa es lo del panel', Config::obtener('ORBIS_MODELO'), 'claude-sonnet-5');
+
+    // Pero lo de debajo no desaparece: se sigue viendo, que es lo que impide
+    // el «lo cambio en Plesk y no pasa nada» por el otro lado.
+    comprobar('lo de debajo se sigue viendo', Config::origenes('ORBIS_MODELO'), ['panel', 'entorno']);
+
+    // Y al borrarlo del panel, vuelve a mandar lo de debajo.
+    Ajustes::guardar(['ORBIS_MODELO' => '']);
+    comprobar('al borrarlo aquí, vuelve el entorno', Config::obtener('ORBIS_MODELO'), 'claude-opus-5');
     putenv('ORBIS_MODELO');
 
-    // Y sin nada por encima, vuelve a mandar el panel.
-    comprobar('sin entorno, manda el panel', Config::origen('ORBIS_MODELO'), 'panel');
+    comprobar('y sin nada, no hay origen', Config::origen('ORBIS_MODELO'), null);
+    Ajustes::guardar(['ORBIS_MODELO' => 'claude-sonnet-5']);
 }
 
 echo "\n▸ La clave del panel no se puede cambiar desde el panel\n";
@@ -177,21 +188,49 @@ echo "\n▸ Copiar la plantilla no bloquea ningún campo del panel\n";
     comprobar('y menciona todos los campos del panel', $sinDocumentar, []);
 }
 
-echo "\n▸ Pero un valor puesto A MANO sí bloquea, y dice cómo desbloquearlo\n";
+echo "\n▸ Ningún campo se bloquea, y lo que queda debajo se dice\n";
 {
-    // La regla de precedencia no se toca: lo que se escribe en wj-config.php
-    // manda. Lo que cambia es que ahora escribirlo es un acto deliberado.
     $panel = (string) file_get_contents(dirname(__DIR__) . '/wj-admin/index.php');
+
+    // Nada de «disabled» ni de descartar campos al guardar por venir de arriba:
+    // eso era exactamente lo que impedía administrar desde el panel.
     comprobar(
-        'el panel sigue bloqueando lo que viene de arriba',
+        'no queda ningún campo deshabilitado por su origen',
         strpos($panel, "in_array(\$origen, ['entorno', 'wj-config.php'], true)") !== false,
+        false
+    );
+    comprobar('ni la clase de bloqueo', strpos($panel, 'campo--bloqueado') !== false, false);
+
+    // Pero que el panel mande no puede ser invisible: si se cambia wj-config.php
+    // y no pasa nada, hemos cambiado un silencio por el contrario.
+    comprobar('el panel consulta todos los orígenes', strpos($panel, 'Config::origenes(') !== false, true);
+    comprobar('avisa de lo que hay escrito y sin usar', strpos($panel, 'sin usar') !== false, true);
+    comprobar('y de qué manda mientras el campo esté vacío', strpos($panel, 'Ahora manda el de') !== false, true);
+    comprobar('y lo explica entero una vez arriba', strpos($panel, 'con un valor
+      escrito también en otro sitio') !== false, true);
+
+    // El botón de borrar tiene que decir a qué se vuelve al borrar: sin eso,
+    // «Borrar la clave guardada» parece que deja el sitio sin clave.
+    comprobar('borrar dice a dónde se vuelve', strpos($panel, 'y volver a la de') !== false, true);
+}
+
+echo "\n▸ El desplegable de voces no miente sobre cuál está sonando\n";
+{
+    // Decía «La que trae ORBIS» aunque wj-config.php tuviera otra puesta. Con el
+    // panel mandando, un desplegable en blanco significa «aquí no he elegido»,
+    // no «suena la de por omisión»: son cosas distintas y hay que decir cuál.
+    $panel = (string) file_get_contents(dirname(__DIR__) . '/wj-admin/index.php');
+    comprobar('nombra la que suena de verdad', strpos($panel, 'Sin elegir aquí — suena') !== false, true);
+    comprobar('y de dónde sale', strpos($panel, "' (de ' . \$debajo[0] . ')'") !== false, true);
+
+    // Y solo la nombra cuando de verdad es la de debajo. Con una elegida en el
+    // panel, la efectiva es ESA: nombrarla y atribuirla a wj-config.php sería
+    // decir exactamente lo contrario de lo que pasa.
+    comprobar(
+        'con una elegida aquí, no se la atribuye a wj-config.php',
+        strpos($panel, "'Sin elegir aquí — volver a la de ' . \$debajo[0]") !== false,
         true
     );
-    // Un aviso que solo dice «no se puede cambiar» deja a quien lo lee sin
-    // salida. Tiene que nombrar la línea exacta que hay que vaciar.
-    comprobar('y dice qué línea vaciar', strpos($panel, "deja esa línea vacía") !== false, true);
-    comprobar('nombrando la clave', strpos($panel, "\"'\" . \$clave . \"' => '',\"") !== false, true);
-    comprobar('y la variable de Plesk, si viene de ahí', strpos($panel, 'borra la variable') !== false, true);
 }
 
 echo "\n▸ El panel avisa ANTES de rellenar si no va a poder guardar\n";
